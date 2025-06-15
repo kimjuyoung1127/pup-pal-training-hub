@@ -38,7 +38,7 @@ const getGenderEmoji = (gender: string) => {
 
 const ProfileHeader = ({ dogInfo, onImageUpload, onImageDelete }: ProfileHeaderProps) => {
   return (
-    <Card className="card-soft overflow-hidden bg-gradient-to-r from-orange-100 to-cream-200">
+    <Card className="card-soft overflow-hidden bg-gradient-to-r from-sky-100 to-blue-100">
       <CardContent className="p-6">
         <div className="flex items-center space-x-4">
           <div className="relative">
@@ -46,7 +46,7 @@ const ProfileHeader = ({ dogInfo, onImageUpload, onImageDelete }: ProfileHeaderP
               {dogInfo.image_url ? (
                 <AvatarImage src={dogInfo.image_url} alt={dogInfo.name} className="object-cover" />
               ) : (
-                <AvatarFallback className="bg-orange-200 text-2xl">
+                <AvatarFallback className="bg-sky-200 text-2xl">
                   {getGenderEmoji(dogInfo.gender)}
                 </AvatarFallback>
               )}
