@@ -1,11 +1,8 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ArrowLeft, Play, Clock } from 'lucide-react';
-import { useTodaysTrainingStats } from '@/hooks/useTodaysTrainingStats';
-import { Skeleton } from '@/components/ui/skeleton';
+import { ArrowLeft, Play } from 'lucide-react';
 import TrainingProgressPage from './TrainingProgressPage';
 import AiTrainingRecommender from './AiTrainingRecommender';
 import { TrainingProgram } from '@/lib/trainingData';
@@ -17,10 +14,6 @@ const TrainingStartPage = ({
 }) => {
   const [selectedAiTraining, setSelectedAiTraining] = useState<TrainingProgram | null>(null);
   const [isTrainingActive, setIsTrainingActive] = useState(false);
-  const {
-    data: stats,
-    isLoading
-  } = useTodaysTrainingStats();
 
   const quickTips = ['간식을 미리 준비해주세요 🦴', '조용한 환경에서 훈련하세요 🤫', '긍정적인 보상을 잊지 마세요 ❤️', '강아지의 컨디션을 확인하세요 😊'];
   
@@ -61,53 +54,6 @@ const TrainingStartPage = ({
       </div>
 
       <div className="p-6 space-y-6">
-        {/* Today's Progress */}
-        <motion.div initial={{
-        opacity: 0,
-        y: 20
-      }} animate={{
-        opacity: 1,
-        y: 0
-      }} transition={{
-        duration: 0.5
-      }}>
-          <Card className="card-soft p-6 bg-gradient-to-br from-blue-50 to-sky-100 border-blue-200/50">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-800">오늘의 진행상황</h2>
-              <div className="text-2xl">📊</div>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              {isLoading ? <>
-                  <div className="text-center space-y-2">
-                    <Skeleton className="h-7 w-1/2 mx-auto" />
-                    <Skeleton className="h-4 w-full mx-auto" />
-                  </div>
-                  <div className="text-center space-y-2">
-                    <Skeleton className="h-7 w-1/2 mx-auto" />
-                    <Skeleton className="h-4 w-full mx-auto" />
-                  </div>
-                  <div className="text-center space-y-2">
-                    <Skeleton className="h-7 w-1/2 mx-auto" />
-                    <Skeleton className="h-4 w-full mx-auto" />
-                  </div>
-                </> : <>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">{stats?.completedTrainings ?? 0}</div>
-                    <p className="text-sm text-gray-600">완료한 훈련</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">{stats?.totalDuration ?? 0}분</div>
-                    <p className="text-sm text-gray-600">훈련 시간</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">{stats?.averageSuccessRate ?? 0}%</div>
-                    <p className="text-sm text-gray-600">성공률</p>
-                  </div>
-                </>}
-            </div>
-          </Card>
-        </motion.div>
-        
         {/* AI Training Recommender */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
