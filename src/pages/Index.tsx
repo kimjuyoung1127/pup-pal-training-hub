@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import OnboardingPage from '@/components/OnboardingPage';
 import LoginPage from '@/components/LoginPage';
@@ -7,6 +8,7 @@ import DogProfilePage from '@/components/DogProfilePage';
 import TrainingStartPage from '@/components/TrainingStartPage';
 import SettingsPage from '@/components/SettingsPage';
 import BottomNavigation from '@/components/BottomNavigation';
+import TrainingHistoryPage from '@/components/TrainingHistoryPage';
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState<'onboarding' | 'login' | 'dashboard' | 'dog-info' | 'dog-profile' | 'training' | 'training-progress' | 'history' | 'settings'>('onboarding');
@@ -32,6 +34,8 @@ const Index = () => {
       setCurrentPage('dashboard');
     } else if (page === 'settings') {
       setCurrentPage('settings');
+    } else if (page === 'history') {
+      setCurrentPage('history');
     }
   };
 
@@ -43,7 +47,7 @@ const Index = () => {
   };
 
   // 하단 네비게이션을 보여줄 페이지들
-  const showBottomNav = ['dashboard', 'dog-info', 'dog-profile', 'training', 'settings'].includes(currentPage);
+  const showBottomNav = ['dashboard', 'dog-info', 'dog-profile', 'training', 'settings', 'history'].includes(currentPage);
 
   const renderPage = () => {
     switch (currentPage) {
@@ -61,6 +65,8 @@ const Index = () => {
         return <TrainingStartPage onNavigate={handleNavigate} />;
       case 'settings':
         return <SettingsPage />;
+      case 'history':
+        return <TrainingHistoryPage onNavigate={handleNavigate} />;
       default:
         return <DashboardPage onNavigate={handleNavigate} />;
     }
