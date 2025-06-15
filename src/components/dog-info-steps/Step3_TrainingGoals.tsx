@@ -2,10 +2,10 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Heart, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { DogInfo } from '@/types/dog';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 type Option = {
   id: number;
@@ -17,8 +17,8 @@ interface Props {
   dogInfo: DogInfo;
   healthOptions: Option[];
   trainingGoalOptions: Option[];
-  handleHealthStatusChange: (statusId: number, checked: boolean) => void;
-  handleTrainingGoalChange: (goalId: number, checked: boolean) => void;
+  handleHealthStatusChange: (statusIds: string[]) => void;
+  handleTrainingGoalChange: (goalIds: string[]) => void;
 }
 
 const Step3_TrainingGoals: React.FC<Props> = ({ 
@@ -47,36 +47,25 @@ const Step3_TrainingGoals: React.FC<Props> = ({
               <Label className="text-cream-800 font-semibold text-lg font-pretendard">건강 상태</Label>
             </div>
             <p className="text-sm text-cream-600 mb-4 font-pretendard">우리 아이의 현재 건강 상태를 알려주세요 (복수 선택 가능)</p>
-            <div className="grid grid-cols-2 gap-3">
-              {healthOptions.map((option, index) => (
-                <motion.div
+            <ToggleGroup
+              type="multiple"
+              value={dogInfo.healthStatus.map(String)}
+              onValueChange={handleHealthStatusChange}
+              className="grid grid-cols-2 gap-3"
+            >
+              {healthOptions.map((option) => (
+                <ToggleGroupItem
                   key={option.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                  className={`flex items-center space-x-3 p-3 rounded-xl border-2 transition-all duration-200 cursor-pointer hover:scale-105 ${
-                    dogInfo.healthStatus.includes(option.id)
-                      ? 'bg-orange-100 border-orange-300 shadow-md'
-                      : 'bg-white border-cream-200 hover:border-orange-200 hover:bg-orange-50'
-                  }`}
-                  onClick={() => handleHealthStatusChange(option.id, !dogInfo.healthStatus.includes(option.id))}
+                  value={String(option.id)}
+                  className="flex items-center justify-start text-left space-x-3 p-3 h-auto rounded-xl border-2 transition-all duration-200 data-[state=on]:bg-orange-100 data-[state=on]:border-orange-300 data-[state=on]:shadow-md bg-white border-cream-200 hover:border-orange-200 hover:bg-orange-50 data-[state=on]:text-cream-700 text-cream-700"
                 >
-                  <Checkbox
-                    id={`health-${option.id}`}
-                    checked={dogInfo.healthStatus.includes(option.id)}
-                    onCheckedChange={(checked) => handleHealthStatusChange(option.id, checked as boolean)}
-                    className="data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
-                  />
                   <span className="text-lg">{option.icon}</span>
-                  <Label
-                    htmlFor={`health-${option.id}`}
-                    className="text-sm text-cream-700 cursor-pointer font-pretendard flex-1"
-                  >
+                  <span className="text-sm font-pretendard flex-1">
                     {option.label}
-                  </Label>
-                </motion.div>
+                  </span>
+                </ToggleGroupItem>
               ))}
-            </div>
+            </ToggleGroup>
           </CardContent>
         </Card>
       </motion.div>
@@ -94,36 +83,25 @@ const Step3_TrainingGoals: React.FC<Props> = ({
               <Label className="text-cream-800 font-semibold text-lg font-pretendard">훈련 목표</Label>
             </div>
             <p className="text-sm text-cream-600 mb-4 font-pretendard">어떤 훈련을 원하시나요? (복수 선택 가능)</p>
-            <div className="grid grid-cols-1 gap-3">
-              {trainingGoalOptions.map((option, index) => (
-                <motion.div
+            <ToggleGroup
+              type="multiple"
+              value={dogInfo.trainingGoals.map(String)}
+              onValueChange={handleTrainingGoalChange}
+              className="grid grid-cols-1 gap-3"
+            >
+              {trainingGoalOptions.map((option) => (
+                <ToggleGroupItem
                   key={option.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                  className={`flex items-center space-x-3 p-3 rounded-xl border-2 transition-all duration-200 cursor-pointer hover:scale-105 ${
-                    dogInfo.trainingGoals.includes(option.id)
-                      ? 'bg-orange-100 border-orange-300 shadow-md'
-                      : 'bg-white border-cream-200 hover:border-orange-200 hover:bg-orange-50'
-                  }`}
-                  onClick={() => handleTrainingGoalChange(option.id, !dogInfo.trainingGoals.includes(option.id))}
+                  value={String(option.id)}
+                  className="flex items-center justify-start text-left space-x-3 p-3 h-auto rounded-xl border-2 transition-all duration-200 data-[state=on]:bg-orange-100 data-[state=on]:border-orange-300 data-[state=on]:shadow-md bg-white border-cream-200 hover:border-orange-200 hover:bg-orange-50 data-[state=on]:text-cream-700 text-cream-700"
                 >
-                  <Checkbox
-                    id={`goal-${option.id}`}
-                    checked={dogInfo.trainingGoals.includes(option.id)}
-                    onCheckedChange={(checked) => handleTrainingGoalChange(option.id, checked as boolean)}
-                    className="data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
-                  />
                   <span className="text-lg">{option.icon}</span>
-                  <Label
-                    htmlFor={`goal-${option.id}`}
-                    className="text-sm text-cream-700 cursor-pointer font-pretendard flex-1"
-                  >
+                  <span className="text-sm font-pretendard flex-1">
                     {option.label}
-                  </Label>
-                </motion.div>
+                  </span>
+                </ToggleGroupItem>
               ))}
-            </div>
+            </ToggleGroup>
           </CardContent>
         </Card>
       </motion.div>

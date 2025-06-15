@@ -65,21 +65,17 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
     fetchOptions();
   }, []);
 
-  const handleHealthStatusChange = (statusId: number, checked: boolean) => {
+  const handleHealthStatusChange = (statusIds: string[]) => {
     setDogInfo(prev => ({
       ...prev,
-      healthStatus: checked 
-        ? [...prev.healthStatus, statusId]
-        : prev.healthStatus.filter(id => id !== statusId)
+      healthStatus: statusIds.map(Number)
     }));
   };
 
-  const handleTrainingGoalChange = (goalId: number, checked: boolean) => {
+  const handleTrainingGoalChange = (goalIds: string[]) => {
     setDogInfo(prev => ({
       ...prev,
-      trainingGoals: checked 
-        ? [...prev.trainingGoals, goalId]
-        : prev.trainingGoals.filter(id => id !== goalId)
+      trainingGoals: goalIds.map(Number)
     }));
   };
 
