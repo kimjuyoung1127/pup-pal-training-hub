@@ -38,7 +38,7 @@ const SettingsPage = () => {
       <h1 className="text-2xl font-bold">설정</h1>
       
       <Card className="shadow-sm">
-        <CardHeader>
+        <CardHeader className="bg-orange-100">
           <div className="flex items-center space-x-4">
             <Avatar className="h-16 w-16">
               <AvatarImage src={userAvatar} alt={userName || ''} />
