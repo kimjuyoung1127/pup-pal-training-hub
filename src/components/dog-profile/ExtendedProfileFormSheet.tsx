@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useMutation } from '@tanstack/react-query';
 
-export type MissionKey = keyof Omit<FullDogExtendedProfile, 'id' | 'dog_id' | 'created_at' | 'updated_at' | 'favorite_snacks' | 'sensitive_factors' | 'past_history' | '[key: string]'>;
+export type MissionKey = keyof Omit<FullDogExtendedProfile, 'id' | 'dog_id' | 'created_at' | 'updated_at' | 'favorite_snacks' | 'sensitive_factors' | 'past_history'>;
 
 interface ExtendedProfileFormSheetProps {
     isOpen: boolean;
@@ -98,10 +99,10 @@ const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedPro
         const arrayKeys: (string)[] = ['known_behaviors', 'favorites', 'sensitive_items', 'preferred_play'];
         const booleanKeys: (string)[] = ['family_kids', 'family_elderly'];
 
-        if (arrayKeys.includes(mission.key)) {
+        if (arrayKeys.includes(String(mission.key))) {
             processedValue = values.value.split(',').map(s => s.trim()).filter(Boolean);
             if (processedValue.length === 0) processedValue = null;
-        } else if (booleanKeys.includes(mission.key)) {
+        } else if (booleanKeys.includes(String(mission.key))) {
             processedValue = values.value === '예';
         }
         
