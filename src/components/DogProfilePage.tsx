@@ -9,6 +9,7 @@ import { DogInfo } from '@/types/dog';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface DogProfilePageProps {
   onNavigate: (page: string) => void;
@@ -24,6 +25,7 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
     badgesCount: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchDogProfile = async () => {
@@ -226,6 +228,49 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
     toast.success('프로필 이미지가 삭제되었습니다.');
   };
 
+  const handleDeleteDogProfile = async () => {
+    if (!dogInfo) return;
+    setIsDeleting(true);
+    toast.loading('프로필을 삭제하는 중입니다...');
+
+    try {
+        const dogId = dogInfo.id;
+
+        // Delete related data first
+        await supabase.from('dog_health_status').delete().eq('dog_id', dogId);
+        await supabase.from('dog_desired_behaviors').delete().eq('dog_id', dogId);
+        await supabase.from('training_history').delete().eq('dog_id', dogId);
+        await supabase.from('dog_badges').delete().eq('dog_id', dogId);
+
+        // Delete image from storage
+        if (dogInfo.image_url) {
+            try {
+                const oldPath = new URL(dogInfo.image_url).pathname.replace(`/storage/v1/object/public/dog-profiles/`, '');
+                await supabase.storage.from('dog-profiles').remove([oldPath]);
+            } catch (error) {
+                console.warn('Could not delete image, continuing profile deletion.', error);
+            }
+        }
+
+        // Finally, delete the dog record
+        const { error: deleteDogError } = await supabase.from('dogs').delete().eq('id', dogId);
+
+        if (deleteDogError) throw deleteDogError;
+
+        toast.dismiss();
+        toast.success('강아지 프로필이 삭제되었습니다.');
+        setDogInfo(null); // Go back to the 'no profile' view
+
+    } catch (error) {
+        const err = error as Error
+        console.error('Error deleting dog profile:', err);
+        toast.dismiss();
+        toast.error(`프로필 삭제 중 오류가 발생했습니다: ${err.message}`);
+    } finally {
+        setIsDeleting(false);
+    }
+  };
+
   const getAgeLabel = (age: string) => {
     switch (age) {
       case 'puppy': return '강아지 (6개월 미만)';
@@ -284,15 +329,43 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
               <p className="text-sm text-cream-600 font-pretendard">소중한 가족을 소개합니다</p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onNavigate('dog-info')}
-            className="text-cream-600 hover:text-cream-800 border-cream-300"
-          >
-            <Edit className="w-4 h-4 mr-1" />
-            편집
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onNavigate('dog-info')}
+              className="text-cream-600 hover:text-cream-800 border-cream-300"
+            >
+              <Edit className="w-4 h-4 mr-1" />
+              편집
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  disabled={isDeleting}
+                >
+                  <Trash2 className="w-4 h-4 mr-1" />
+                  삭제
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>정말로 삭제하시겠습니까?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    이 작업은 되돌릴 수 없습니다. 강아지의 프로필과 모든 훈련 기록이 영구적으로 삭제됩니다.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={isDeleting}>취소</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDeleteDogProfile} disabled={isDeleting} className="bg-red-600 hover:bg-red-700">
+                    {isDeleting ? '삭제 중...' : '삭제'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </div>
       </div>
 
