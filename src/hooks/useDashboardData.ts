@@ -2,6 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { Tables } from '@/integrations/supabase/types';
 
 const fetchDog = async () => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -23,7 +24,9 @@ const fetchDog = async () => {
   return data;
 };
 
-const fetchRandom = async (tableName: 'training_tips' | 'recommended_videos' | 'daily_missions') => {
+type TableName = 'training_tips' | 'recommended_videos' | 'daily_missions';
+
+const fetchRandom = async <T extends TableName>(tableName: T): Promise<Tables<T> | null> => {
     const { data, error } = await supabase.from(tableName).select('*');
     if (error) {
         console.error(`Error fetching from ${tableName}:`, error);
@@ -31,7 +34,7 @@ const fetchRandom = async (tableName: 'training_tips' | 'recommended_videos' | '
         throw error;
     }
     if (!data || data.length === 0) return null;
-    return data[Math.floor(Math.random() * data.length)];
+    return data[Math.floor(Math.random() * data.length)] as Tables<T>;
 }
 
 export const useDashboardData = () => {
