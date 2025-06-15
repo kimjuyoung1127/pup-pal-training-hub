@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import OnboardingPage from '@/components/OnboardingPage';
 import LoginPage from '@/components/LoginPage';
 import DashboardPage from '@/components/DashboardPage';
@@ -8,16 +8,48 @@ import TrainingStartPage from '@/components/TrainingStartPage';
 import SettingsPage from '@/components/SettingsPage';
 import BottomNavigation from '@/components/BottomNavigation';
 import TrainingHistoryPage from '@/components/TrainingHistoryPage';
+import { supabase } from '@/integrations/supabase/client';
+import { Session } from '@supabase/supabase-js';
 
 const Index = () => {
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState<'onboarding' | 'login' | 'dashboard' | 'dog-info' | 'dog-profile' | 'training' | 'training-progress' | 'history' | 'settings'>('onboarding');
   const [dogInfo, setDogInfo] = useState<any>(null);
 
+  useEffect(() => {
+    setLoading(true);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+
+    if (session) {
+      setCurrentPage('dashboard');
+    } else {
+      const onboardingComplete = localStorage.getItem('onboardingComplete');
+      setCurrentPage(onboardingComplete ? 'login' : 'onboarding');
+    }
+  }, [session, loading]);
+
   const handleOnboardingComplete = () => {
+    localStorage.setItem('onboardingComplete', 'true');
     setCurrentPage('login');
   };
 
   const handleLogin = () => {
+    // This is now mainly handled by onAuthStateChange.
+    // It can be kept for non-OAuth login methods if any are added in the future.
     setCurrentPage('dashboard');
   };
 
@@ -70,6 +102,14 @@ const Index = () => {
         return <DashboardPage onNavigate={handleNavigate} />;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream-50 to-orange-50">
+        <div className="text-2xl font-bold text-cream-800">로딩 중...</div>
+      </div>
+    );
+  }
 
   return (
     <div className={`relative min-h-screen ${showBottomNav ? 'pb-20' : ''}`}>

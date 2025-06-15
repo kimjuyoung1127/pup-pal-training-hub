@@ -1,13 +1,22 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const LoginPage = ({ onLogin }: { onLogin: () => void }) => {
-  const handleGoogleLogin = () => {
-    // TODO: Supabase Google OAuth 연동
-    console.log('Google 로그인 시도');
-    onLogin(); // 임시로 바로 로그인 처리
+  const handleGoogleLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+
+    if (error) {
+      console.error('구글 로그인 중 오류 발생:', error);
+      toast.error('로그인 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    }
   };
 
   const handleKakaoLogin = () => {
