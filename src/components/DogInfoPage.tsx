@@ -218,10 +218,10 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
                       <SelectTrigger className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl text-cream-800">
                         <SelectValue placeholder="체중을 선택해주세요" className="text-cream-500" />
                       </SelectTrigger>
-                      <SelectContent className="bg-white border-cream-200">
-                        <SelectItem value="small" className="text-cream-800 hover:bg-cream-100">소형견 (7kg 미만)</SelectItem>
-                        <SelectItem value="medium" className="text-cream-800 hover:bg-cream-100">중형견 (7kg ~ 25kg)</SelectItem>
-                        <SelectItem value="large" className="text-cream-800 hover:bg-cream-100">대형견 (25kg 이상)</SelectItem>
+                      <SelectContent className="bg-white border-cream-200 z-50">
+                        <SelectItem value="small" className="text-cream-800 hover:bg-orange-100 focus:bg-orange-100">소형견 (7kg 미만)</SelectItem>
+                        <SelectItem value="medium" className="text-cream-800 hover:bg-orange-100 focus:bg-orange-100">중형견 (7kg ~ 25kg)</SelectItem>
+                        <SelectItem value="large" className="text-cream-800 hover:bg-orange-100 focus:bg-orange-100">대형견 (25kg 이상)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
