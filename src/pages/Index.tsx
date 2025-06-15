@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import OnboardingPage from '@/components/OnboardingPage';
 import LoginPage from '@/components/LoginPage';
@@ -10,6 +11,7 @@ import BottomNavigation from '@/components/BottomNavigation';
 import TrainingHistoryPage from '@/components/TrainingHistoryPage';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const Index = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -113,7 +115,17 @@ const Index = () => {
 
   return (
     <div className={`relative min-h-screen ${showBottomNav ? 'pb-20' : ''}`}>
-      {renderPage()}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentPage}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          {renderPage()}
+        </motion.div>
+      </AnimatePresence>
       {showBottomNav && (
         <BottomNavigation 
           currentPage={currentPage}
