@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, Clock, MoreVertical, Edit, Trash2, ShieldQuestion } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MoreVertical, Edit, Trash2, ShieldQuestion, Award } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTrainingHistory, TrainingLog } from '@/hooks/useTrainingHistory';
@@ -17,6 +18,8 @@ import {
 import DeleteTrainingLogDialog from './DeleteTrainingLogDialog';
 import EditTrainingLogDialog from './EditTrainingLogDialog';
 import { useTodaysTrainingStats } from '@/hooks/useTodaysTrainingStats';
+import { useDogBadges } from '@/hooks/useDogBadges';
+import DogBadges from './DogBadges';
 
 interface TrainingHistoryPageProps {
   onNavigate: (page: string) => void;
@@ -104,6 +107,7 @@ const TrainingHistoryCard = ({ item, onEdit, onDelete }: { item: TrainingLog, on
 const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
   const { data: trainingHistory, isLoading, isError } = useTrainingHistory();
   const { data: stats, isLoading: isLoadingStats } = useTodaysTrainingStats();
+  const { data: badges, isLoading: isLoadingBadges } = useDogBadges();
   const [logToDelete, setLogToDelete] = useState<TrainingLog | null>(null);
   const [logToEdit, setLogToEdit] = useState<TrainingLog | null>(null);
 
@@ -207,6 +211,8 @@ const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
         </Card>
       </motion.div>
       
+      <DogBadges badges={badges || []} isLoading={isLoadingBadges} />
+
       {renderContent()}
 
       <DeleteTrainingLogDialog 
