@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bone, Calendar } from 'lucide-react';
+import { Bone, History } from 'lucide-react';
 
 interface QuickActionsProps {
   onNavigate: (page: string) => void;
@@ -27,12 +27,12 @@ const QuickActions = ({ onNavigate }: QuickActionsProps) => {
             <span>🎯</span>
           </Button>
           <Button
-            onClick={() => onNavigate('dashboard')}
+            onClick={() => onNavigate('history')}
             variant="outline"
             className="w-full border-cream-300 text-cream-700 hover:bg-cream-100 justify-between py-3"
           >
             <div className="flex items-center space-x-2">
-              <Calendar className="w-4 h-4" />
+              <History className="w-4 h-4" />
               <span className="font-pretendard">훈련 기록 보기</span>
             </div>
             <span>📊</span>
