@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -63,7 +62,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream-50 to-sky-50">
+    <div className="min-h-screen bg-gradient-to-br from-cream-50 to-sky-50 pb-32">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-cream-200 px-6 py-4">
         <div className="flex items-center space-x-3">
@@ -85,7 +84,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
         </div>
       </div>
 
-      <div className="p-6 space-y-6 pb-32">
+      <div className="p-6 space-y-6">
         {/* Today's Progress */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -205,8 +204,8 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
         </motion.div>
       </div>
 
-      {/* Fixed Bottom Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-cream-200 p-6">
+      {/* Fixed Bottom Button - positioned above bottom navigation */}
+      <div className="fixed bottom-16 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-cream-200 p-6">
         <Button
           onClick={handleStartTraining}
           disabled={!selectedTraining}

@@ -6,7 +6,7 @@ import { BookOpen, Calendar, BarChart3, Settings } from 'lucide-react';
 
 const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-cream-50 to-orange-50 pb-20">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-cream-200 px-6 py-4">
         <div className="flex items-center justify-between">
@@ -108,15 +108,6 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
             </div>
           </div>
         </Card>
-      </div>
-
-      {/* Bottom navigation placeholder */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-cream-200 p-4">
-        <div className="flex justify-center">
-          <p className="text-sm text-cream-600">
-            더 많은 기능이 곧 추가될 예정입니다! 🚀
-          </p>
-        </div>
       </div>
     </div>
   );
