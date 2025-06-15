@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -9,9 +8,11 @@ export interface TrainingLog {
   duration_minutes: number | null;
   success_rate: number | null;
   training_type: string | null;
+  notes?: string | null;
 }
 
 export type TrainingLogUpdate = Partial<Omit<TrainingLog, 'id'>>;
+export type TrainingLogCreate = Omit<TrainingLog, 'id' | 'session_date'>;
 
 const fetchTrainingHistory = async (): Promise<TrainingLog[]> => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -37,7 +38,7 @@ const fetchTrainingHistory = async (): Promise<TrainingLog[]> => {
 
   const { data, error } = await supabase
     .from('training_history')
-    .select('id, session_date, duration_minutes, success_rate, training_type')
+    .select('id, session_date, duration_minutes, success_rate, training_type, notes')
     .eq('dog_id', dog.id)
     .order('session_date', { ascending: false })
     .order('created_at', { ascending: false });
@@ -57,6 +58,42 @@ export const useTrainingHistory = () => {
     const query = useQuery({
         queryKey: ['trainingHistory'],
         queryFn: fetchTrainingHistory,
+    });
+
+    const addMutation = useMutation({
+        mutationFn: async (newLog: TrainingLogCreate) => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error("로그인이 필요합니다.");
+
+            const { data: dog, error: dogError } = await supabase
+                .from('dogs')
+                .select('id')
+                .eq('user_id', user.id)
+                .single();
+            
+            if (dogError || !dog) throw new Error("강아지 정보를 찾을 수 없습니다.");
+
+            const { data, error } = await supabase
+                .from('training_history')
+                .insert([{ ...newLog, dog_id: dog.id, user_id: user.id }])
+                .select()
+                .single();
+
+            if (error) {
+                toast.error('훈련 기록 저장에 실패했습니다.');
+                throw error;
+            }
+            return data;
+        },
+        onSuccess: () => {
+            toast.success('훈련 기록이 저장되었습니다.');
+            queryClient.invalidateQueries({ queryKey: ['trainingHistory'] });
+            queryClient.invalidateQueries({ queryKey: ['todaysTrainingStats'] });
+        },
+        onError: (error) => {
+            console.error('Error adding training log:', error);
+            toast.error(error.message);
+        }
     });
 
     const deleteMutation = useMutation({
@@ -99,11 +136,12 @@ export const useTrainingHistory = () => {
         onSuccess: () => {
             toast.success('훈련 기록이 수정되었습니다.');
             queryClient.invalidateQueries({ queryKey: ['trainingHistory'] });
+            queryClient.invalidateQueries({ queryKey: ['todaysTrainingStats'] });
         },
         onError: (error) => {
             console.error('Error updating training log:', error);
         }
     });
 
-    return { ...query, deleteMutation, updateMutation };
+    return { ...query, addMutation, deleteMutation, updateMutation };
 }

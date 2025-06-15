@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -5,9 +6,11 @@ import { Card } from '@/components/ui/card';
 import { ArrowLeft, Play, Clock } from 'lucide-react';
 import { useTodaysTrainingStats } from '@/hooks/useTodaysTrainingStats';
 import { Skeleton } from '@/components/ui/skeleton';
+import TrainingProgressPage from './TrainingProgressPage';
 
 const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void }) => {
   const [selectedTraining, setSelectedTraining] = useState<string | null>(null);
+  const [isTrainingActive, setIsTrainingActive] = useState(false);
   const { data: stats, isLoading } = useTodaysTrainingStats();
 
   const trainingTypes = [
@@ -58,11 +61,24 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
 
   const handleStartTraining = () => {
     if (selectedTraining) {
-      console.log(`Starting training: ${selectedTraining}`);
-      // TODO: 실제 훈련 진행 페이지로 이동
-      onNavigate('training-progress');
+      setIsTrainingActive(true);
     }
   };
+
+  const handleExitTraining = () => {
+    setIsTrainingActive(false);
+    setSelectedTraining(null);
+  }
+
+  if (isTrainingActive && selectedTraining) {
+    return (
+      <TrainingProgressPage
+        trainingId={selectedTraining}
+        onNavigate={onNavigate}
+        onExit={handleExitTraining}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-100 pb-32">
