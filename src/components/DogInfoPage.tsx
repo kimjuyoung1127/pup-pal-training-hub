@@ -188,11 +188,11 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
                       <SelectTrigger className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl text-cream-800">
                         <SelectValue placeholder="나이를 선택해주세요" className="text-cream-500" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="puppy">강아지 (6개월 미만)</SelectItem>
-                        <SelectItem value="young">어린 개 (6개월 ~ 2년)</SelectItem>
-                        <SelectItem value="adult">성견 (2년 ~ 7년)</SelectItem>
-                        <SelectItem value="senior">노견 (7년 이상)</SelectItem>
+                      <SelectContent className="bg-white border-cream-200 z-50">
+                        <SelectItem value="puppy" className="text-cream-800 hover:bg-orange-100 focus:bg-orange-100">강아지 (6개월 미만)</SelectItem>
+                        <SelectItem value="young" className="text-cream-800 hover:bg-orange-100 focus:bg-orange-100">어린 개 (6개월 ~ 2년)</SelectItem>
+                        <SelectItem value="adult" className="text-cream-800 hover:bg-orange-100 focus:bg-orange-100">성견 (2년 ~ 7년)</SelectItem>
+                        <SelectItem value="senior" className="text-cream-800 hover:bg-orange-100 focus:bg-orange-100">노견 (7년 이상)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
