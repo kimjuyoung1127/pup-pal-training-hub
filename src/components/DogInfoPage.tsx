@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -144,15 +143,15 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
                       value={dogInfo.name}
                       onChange={(e) => setDogInfo(prev => ({ ...prev, name: e.target.value }))}
                       placeholder="예: 바둑이"
-                      className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 focus:ring-2 focus:ring-orange-100 rounded-xl"
+                      className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 focus:ring-2 focus:ring-orange-100 rounded-xl text-cream-800 placeholder:text-cream-500"
                     />
                   </div>
 
                   <div>
                     <Label htmlFor="age" className="text-cream-800 font-medium">나이</Label>
                     <Select onValueChange={(value) => setDogInfo(prev => ({ ...prev, age: value }))}>
-                      <SelectTrigger className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl">
-                        <SelectValue placeholder="나이를 선택해주세요" />
+                      <SelectTrigger className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl text-cream-800">
+                        <SelectValue placeholder="나이를 선택해주세요" className="text-cream-500" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="puppy">강아지 (6개월 미만)</SelectItem>
@@ -169,14 +168,22 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
                       <Button
                         variant={dogInfo.gender === 'male' ? 'default' : 'outline'}
                         onClick={() => setDogInfo(prev => ({ ...prev, gender: 'male' }))}
-                        className="flex-1"
+                        className={`flex-1 ${
+                          dogInfo.gender === 'male' 
+                            ? 'bg-cream-400 hover:bg-cream-500 text-cream-800 border-0' 
+                            : 'bg-white hover:bg-cream-100 text-cream-700 border-2 border-cream-200'
+                        }`}
                       >
                         🐕 남아
                       </Button>
                       <Button
                         variant={dogInfo.gender === 'female' ? 'default' : 'outline'}
                         onClick={() => setDogInfo(prev => ({ ...prev, gender: 'female' }))}
-                        className="flex-1"
+                        className={`flex-1 ${
+                          dogInfo.gender === 'female' 
+                            ? 'bg-cream-400 hover:bg-cream-500 text-cream-800 border-0' 
+                            : 'bg-white hover:bg-cream-100 text-cream-700 border-2 border-cream-200'
+                        }`}
                       >
                         🐕‍🦺 여아
                       </Button>
@@ -200,15 +207,15 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
                       value={dogInfo.breed}
                       onChange={(e) => setDogInfo(prev => ({ ...prev, breed: e.target.value }))}
                       placeholder="예: 골든 리트리버, 믹스견 등"
-                      className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 focus:ring-2 focus:ring-orange-100 rounded-xl"
+                      className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 focus:ring-2 focus:ring-orange-100 rounded-xl text-cream-800 placeholder:text-cream-500"
                     />
                   </div>
 
                   <div>
                     <Label htmlFor="weight" className="text-cream-800 font-medium">체중</Label>
                     <Select onValueChange={(value) => setDogInfo(prev => ({ ...prev, weight: value }))}>
-                      <SelectTrigger className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl">
-                        <SelectValue placeholder="체중을 선택해주세요" />
+                      <SelectTrigger className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl text-cream-800">
+                        <SelectValue placeholder="체중을 선택해주세요" className="text-cream-500" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="small">소형견 (7kg 미만)</SelectItem>
