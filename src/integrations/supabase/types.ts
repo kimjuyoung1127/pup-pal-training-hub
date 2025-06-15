@@ -9,6 +9,27 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      badges: {
+        Row: {
+          description: string | null
+          icon: string | null
+          id: number
+          name: string
+        }
+        Insert: {
+          description?: string | null
+          icon?: string | null
+          id?: number
+          name: string
+        }
+        Update: {
+          description?: string | null
+          icon?: string | null
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
       behavior_options: {
         Row: {
           id: number
@@ -23,6 +44,42 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      dog_badges: {
+        Row: {
+          achieved_at: string
+          badge_id: number
+          dog_id: string
+          id: number
+        }
+        Insert: {
+          achieved_at?: string
+          badge_id: number
+          dog_id: string
+          id?: number
+        }
+        Update: {
+          achieved_at?: string
+          badge_id?: number
+          dog_id?: string
+          id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dog_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dog_badges_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: false
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dog_desired_behaviors: {
         Row: {
@@ -134,6 +191,47 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      training_history: {
+        Row: {
+          created_at: string
+          dog_id: string
+          duration_minutes: number | null
+          id: string
+          session_date: string
+          success_rate: number | null
+          training_type: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dog_id: string
+          duration_minutes?: number | null
+          id?: string
+          session_date?: string
+          success_rate?: number | null
+          training_type?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dog_id?: string
+          duration_minutes?: number | null
+          id?: string
+          session_date?: string
+          success_rate?: number | null
+          training_type?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_history_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: false
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

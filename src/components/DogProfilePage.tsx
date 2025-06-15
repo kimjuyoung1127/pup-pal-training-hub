@@ -18,6 +18,11 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
   const [dogInfo, setDogInfo] = useState<(DogInfo & { id: string; image_url: string | null; }) | null>(null);
   const [healthStatusNames, setHealthStatusNames] = useState<string[]>([]);
   const [trainingGoalNames, setTrainingGoalNames] = useState<string[]>([]);
+  const [trainingStats, setTrainingStats] = useState({
+    consecutiveDays: 0,
+    averageSuccessRate: 0,
+    badgesCount: 0,
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -55,6 +60,61 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
       const behaviorIds = behaviorLinks?.map(l => l.behavior_option_id) || [];
       const { data: behaviorData } = behaviorIds.length > 0 ? await supabase.from('behavior_options').select('name').in('id', behaviorIds) : { data: [] };
       const fetchedTrainingGoalNames = behaviorData?.map(g => g.name) || [];
+
+      const { data: trainingHistoryData } = await supabase
+        .from('training_history')
+        .select('session_date, success_rate')
+        .eq('dog_id', dogData.id)
+        .order('session_date', { ascending: false });
+
+      const { count: badgesCount } = await supabase
+        .from('dog_badges')
+        .select('*', { count: 'exact', head: true })
+        .eq('dog_id', dogData.id);
+
+      if (trainingHistoryData && trainingHistoryData.length > 0) {
+        const totalSuccessRate = trainingHistoryData.reduce((acc, record) => acc + (Number(record.success_rate) || 0), 0);
+        const averageSuccessRate = Math.round(totalSuccessRate / trainingHistoryData.length);
+
+        const trainingDates = [...new Set(trainingHistoryData.map(h => h.session_date))].map(d => new Date(d)).sort((a,b) => b.getTime() - a.getTime());
+
+        let consecutiveDays = 0;
+        if (trainingDates.length > 0) {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const firstDate = new Date(trainingDates[0]);
+            firstDate.setHours(0,0,0,0);
+            
+            const diffTime = today.getTime() - firstDate.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays <= 1) {
+                consecutiveDays = 1;
+                for (let i = 0; i < trainingDates.length - 1; i++) {
+                    const currentDay = new Date(trainingDates[i]);
+                    const nextDay = new Date(trainingDates[i+1]);
+                    const dayDiff = Math.round((currentDay.getTime() - nextDay.getTime()) / (1000 * 60 * 60 * 24));
+                    if (dayDiff === 1) {
+                        consecutiveDays++;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+        
+        setTrainingStats({
+            consecutiveDays: consecutiveDays,
+            averageSuccessRate: averageSuccessRate,
+            badgesCount: badgesCount || 0,
+        });
+      } else {
+        setTrainingStats({
+            consecutiveDays: 0,
+            averageSuccessRate: 0,
+            badgesCount: badgesCount || 0,
+        });
+      }
       
       const fullDogInfo: DogInfo & { id: string; image_url: string | null; } = {
         id: dogData.id,
@@ -356,17 +416,17 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
           <div className="grid grid-cols-3 gap-4">
             <Card className="card-soft text-center p-4">
               <div className="text-2xl mb-2">📅</div>
-              <p className="text-lg font-bold text-orange-600">7일</p>
+              <p className="text-lg font-bold text-orange-600">{trainingStats.consecutiveDays}일</p>
               <p className="text-xs text-cream-600 font-pretendard">연속 훈련</p>
             </Card>
             <Card className="card-soft text-center p-4">
               <div className="text-2xl mb-2">🏆</div>
-              <p className="text-lg font-bold text-orange-600">85%</p>
+              <p className="text-lg font-bold text-orange-600">{trainingStats.averageSuccessRate}%</p>
               <p className="text-xs text-cream-600 font-pretendard">성공률</p>
             </Card>
             <Card className="card-soft text-center p-4">
               <div className="text-2xl mb-2">⭐</div>
-              <p className="text-lg font-bold text-orange-600">12</p>
+              <p className="text-lg font-bold text-orange-600">{trainingStats.badgesCount}</p>
               <p className="text-xs text-cream-600 font-pretendard">획득 뱃지</p>
             </Card>
           </div>
