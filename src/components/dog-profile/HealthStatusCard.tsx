@@ -10,10 +10,10 @@ interface HealthStatusCardProps {
 
 const HealthStatusCard = ({ healthStatusNames }: HealthStatusCardProps) => {
   return (
-    <Card className="card-soft bg-sky-50">
+    <Card className="card-soft bg-green-50">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center space-x-2 text-cream-800 font-pretendard">
-          <Heart className="w-5 h-5 text-sky-500" />
+          <Heart className="w-5 h-5 text-green-500" />
           <span>건강 상태</span>
         </CardTitle>
       </CardHeader>

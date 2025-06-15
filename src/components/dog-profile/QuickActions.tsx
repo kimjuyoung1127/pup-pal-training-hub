@@ -10,7 +10,7 @@ interface QuickActionsProps {
 
 const QuickActions = ({ onNavigate }: QuickActionsProps) => {
   return (
-    <Card className="card-soft">
+    <Card className="card-soft bg-green-50">
       <CardHeader className="pb-3">
         <CardTitle className="text-cream-800 font-pretendard">빠른 액션</CardTitle>
       </CardHeader>

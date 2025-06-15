@@ -28,7 +28,7 @@ const GrowthMissionBoard = ({ extendedProfile, dogId, onUpdate }: GrowthMissionB
 
     return (
         <>
-            <Card className="card-soft bg-sky-50">
+            <Card className="card-soft bg-green-50">
                 <CardHeader>
                     <CardTitle className="text-cream-800 font-pretendard">🌱 강아지 성장 미션 보드</CardTitle>
                     <p className="text-sm text-cream-600 font-pretendard">"프로필을 완성하고 더 정확한 훈련법을 추천받으세요!"</p>
@@ -55,7 +55,7 @@ const GrowthMissionBoard = ({ extendedProfile, dogId, onUpdate }: GrowthMissionB
                             >
                                 <Card
                                     onClick={() => setSelectedMission(mission)}
-                                    className={`cursor-pointer transition-all duration-300 h-full flex flex-col justify-between ${isCompleted ? 'bg-green-50 border-green-200' : 'bg-white hover:bg-sky-100'}`}
+                                    className={`cursor-pointer transition-all duration-300 h-full flex flex-col justify-between ${isCompleted ? 'bg-green-50 border-green-200' : 'bg-white hover:bg-green-100'}`}
                                 >
                                     <CardContent className="p-4 flex items-center justify-between">
                                         <div>
