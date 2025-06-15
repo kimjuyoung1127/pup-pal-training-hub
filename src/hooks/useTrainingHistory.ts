@@ -102,6 +102,7 @@ export const useTrainingHistory = () => {
             toast.success('훈련 기록이 저장되었습니다.');
             queryClient.invalidateQueries({ queryKey: ['trainingHistory'] });
             queryClient.invalidateQueries({ queryKey: ['dogBadges'] });
+            queryClient.invalidateQueries({ queryKey: ['dogProfile'] });
         },
         onError: (error) => {
             console.error('Error adding training log:', error);
@@ -126,6 +127,7 @@ export const useTrainingHistory = () => {
             toast.success('훈련 기록이 삭제되었습니다.');
             queryClient.invalidateQueries({ queryKey: ['trainingHistory'] });
             queryClient.invalidateQueries({ queryKey: ['dogBadges'] });
+            queryClient.invalidateQueries({ queryKey: ['dogProfile'] });
         },
         onError: (error) => {
             console.error('Error deleting training log:', error);
@@ -151,6 +153,7 @@ export const useTrainingHistory = () => {
             toast.success('훈련 기록이 수정되었습니다.');
             queryClient.invalidateQueries({ queryKey: ['trainingHistory'] });
             queryClient.invalidateQueries({ queryKey: ['dogBadges'] });
+            queryClient.invalidateQueries({ queryKey: ['dogProfile'] });
         },
         onError: (error) => {
             console.error('Error updating training log:', error);
