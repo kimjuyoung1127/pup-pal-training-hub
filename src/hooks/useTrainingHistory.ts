@@ -25,6 +25,8 @@ const fetchTrainingHistory = async (): Promise<TrainingLog[]> => {
     .from('dogs')
     .select('id')
     .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
     .single();
 
   if (dogError && dogError.code !== 'PGRST116') {
@@ -70,9 +72,19 @@ export const useTrainingHistory = () => {
                 .from('dogs')
                 .select('id')
                 .eq('user_id', user.id)
+                .order('created_at', { ascending: false })
+                .limit(1)
                 .single();
             
-            if (dogError || !dog) throw new Error("강아지 정보를 찾을 수 없습니다.");
+            if (dogError && dogError.code !== 'PGRST116') {
+                console.error('Error fetching dog for new training log:', dogError);
+                toast.error('강아지 정보를 가져오는 중 오류가 발생했습니다.');
+                throw dogError;
+            }
+
+            if (!dog) {
+                throw new Error("강아지 정보를 찾을 수 없습니다. 프로필을 먼저 등록해주세요.");
+            }
 
             const { data, error } = await supabase
                 .from('training_history')
@@ -81,6 +93,7 @@ export const useTrainingHistory = () => {
                 .single();
 
             if (error) {
+                console.error("Error inserting training log:", error)
                 toast.error('훈련 기록 저장에 실패했습니다.');
                 throw error;
             }
