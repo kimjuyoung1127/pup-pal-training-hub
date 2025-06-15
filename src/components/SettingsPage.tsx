@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { type User as SupabaseUser } from '@supabase/supabase-js';
@@ -8,39 +7,34 @@ import { Button } from "@/components/ui/button";
 import { LogOut, Loader2 } from 'lucide-react';
 import { MediaGallery } from './settings/MediaGallery';
 import { DarkModeToggle } from './settings/DarkModeToggle';
-
 const SettingsPage = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchUser = async () => {
       setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: {
+          user
+        }
+      } = await supabase.auth.getUser();
       setUser(user);
       setLoading(false);
     };
     fetchUser();
   }, []);
-
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
-
   const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email;
   const userEmail = user?.email;
   const userAvatar = user?.user_metadata?.avatar_url;
-
   if (loading) {
-    return (
-      <div className="p-4 bg-background min-h-screen flex items-center justify-center">
+    return <div className="p-4 bg-background min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="p-4 bg-background text-foreground min-h-screen space-y-6">
+  return <div className="p-4 text-foreground min-h-screen space-y-6 bg-amber-200">
       <h1 className="text-2xl font-bold">설정</h1>
       
       <Card className="shadow-sm">
@@ -63,17 +57,11 @@ const SettingsPage = () => {
       <DarkModeToggle />
       
       <div className="mt-8">
-        <Button 
-          variant="ghost" 
-          className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 p-4"
-          onClick={handleLogout}
-        >
+        <Button variant="ghost" className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 p-4" onClick={handleLogout}>
           <LogOut className="w-5 h-5 mr-3" />
           로그아웃
         </Button>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default SettingsPage;
