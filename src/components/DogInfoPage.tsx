@@ -29,6 +29,7 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
     trainingGoals: []
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [optionsLoading, setOptionsLoading] = useState(true);
 
   const [healthOptions, setHealthOptions] = useState<Option[]>([]);
   const [trainingGoalOptions, setTrainingGoalOptions] = useState<Option[]>([]);
@@ -46,20 +47,33 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
 
   useEffect(() => {
     const fetchOptions = async () => {
-      const { data: healthData, error: healthError } = await supabase.from('health_status_options').select('id, name');
-      if (healthError) {
-        console.error('Error fetching health options:', healthError);
-        toast.error("건강 상태 목록을 불러오는데 실패했습니다.");
-      } else {
-        setHealthOptions(healthData.map(o => ({ id: o.id, label: o.name, icon: healthIcons[o.name] || '❓' })));
-      }
+      setOptionsLoading(true);
+      try {
+        const [healthResult, trainingResult] = await Promise.all([
+          supabase.from('health_status_options').select('id, name'),
+          supabase.from('behavior_options').select('id, name')
+        ]);
 
-      const { data: trainingData, error: trainingError } = await supabase.from('behavior_options').select('id, name');
-      if (trainingError) {
-        console.error('Error fetching training options:', trainingError);
-        toast.error("훈련 목표 목록을 불러오는데 실패했습니다.");
-      } else {
-        setTrainingGoalOptions(trainingData.map(o => ({ id: o.id, label: o.name, icon: trainingGoalIcons[o.name] || '❓' })));
+        const { data: healthData, error: healthError } = healthResult;
+        if (healthError) {
+          console.error('Error fetching health options:', healthError);
+          toast.error("건강 상태 목록을 불러오는데 실패했습니다.");
+        } else if (healthData) {
+          setHealthOptions(healthData.map(o => ({ id: o.id, label: o.name, icon: healthIcons[o.name] || '❓' })));
+        }
+
+        const { data: trainingData, error: trainingError } = trainingResult;
+        if (trainingError) {
+          console.error('Error fetching training options:', trainingError);
+          toast.error("훈련 목표 목록을 불러오는데 실패했습니다.");
+        } else if (trainingData) {
+          setTrainingGoalOptions(trainingData.map(o => ({ id: o.id, label: o.name, icon: trainingGoalIcons[o.name] || '❓' })));
+        }
+      } catch (error) {
+        console.error("Error fetching options:", error);
+        toast.error("옵션 목록을 불러오는 중 오류가 발생했습니다.");
+      } finally {
+        setOptionsLoading(false);
       }
     };
     fetchOptions();
@@ -188,7 +202,8 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
           healthOptions={healthOptions}
           trainingGoalOptions={trainingGoalOptions}
           handleHealthStatusChange={handleHealthStatusChange} 
-          handleTrainingGoalChange={handleTrainingGoalChange} 
+          handleTrainingGoalChange={handleTrainingGoalChange}
+          isLoading={optionsLoading}
         />;
       default:
         return null;
