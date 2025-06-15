@@ -5,7 +5,9 @@ import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { BookOpen, BarChart3 } from 'lucide-react';
+import { BookOpen, BarChart3, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
 const DashboardContent = ({
   onNavigate
 }: {
@@ -23,6 +25,8 @@ const DashboardContent = ({
     toggleMissionCompleted,
     resetMissionIfNeeded
   } = useDashboardStore();
+  const navigate = useNavigate();
+
   useEffect(() => {
     resetMissionIfNeeded();
   }, [resetMissionIfNeeded]);
@@ -154,6 +158,14 @@ const DashboardContent = ({
 
       {/* Action buttons */}
       <motion.div className="space-y-4" variants={itemVariants}>
+        <Button onClick={() => navigate('/chat')} className="w-full btn-primary justify-between py-6">
+            <div className="flex items-center space-x-3">
+              <Sparkles className="w-5 h-5" />
+              <span className="text-lg">AI 훈련 코치와 대화하기</span>
+            </div>
+            <div className="text-2xl">🤖</div>
+        </Button>
+
         <Button onClick={() => onNavigate('dog-info')} className="w-full btn-secondary justify-between py-6">
           <div className="flex items-center space-x-3">
             <BookOpen className="w-5 h-5" />
