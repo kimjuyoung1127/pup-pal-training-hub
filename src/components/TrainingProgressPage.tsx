@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -11,12 +10,13 @@ import { useTrainingHistory, TrainingLogCreate } from '@/hooks/useTrainingHistor
 import { Progress } from "@/components/ui/progress";
 
 interface TrainingProgressPageProps {
-  trainingId: string;
+  trainingId?: string;
+  trainingProgram?: TrainingProgram;
   onNavigate: (page: string) => void;
   onExit: () => void;
 }
 
-const TrainingProgressPage = ({ trainingId, onNavigate, onExit }: TrainingProgressPageProps) => {
+const TrainingProgressPage = ({ trainingId, onNavigate, onExit, trainingProgram }: TrainingProgressPageProps) => {
   const [flowStep, setFlowStep] = useState(1); // 1: intro, 2: steps, 3: log, 4: summary
   const [currentStep, setCurrentStep] = useState(0);
   const [api, setApi] = React.useState<CarouselApi>()
@@ -24,7 +24,7 @@ const TrainingProgressPage = ({ trainingId, onNavigate, onExit }: TrainingProgre
   const [trainingResult, setTrainingResult] = useState<{ success: boolean | null, notes: string }>({ success: null, notes: '' });
   const { addMutation } = useTrainingHistory();
   
-  const trainingProgram = trainingPrograms[trainingId];
+  const program = trainingProgram || (trainingId ? trainingPrograms[trainingId] : null);
 
   useEffect(() => {
     if (!api) return;
@@ -32,7 +32,7 @@ const TrainingProgressPage = ({ trainingId, onNavigate, onExit }: TrainingProgre
     api.on("select", () => setCurrentStep(api.selectedScrollSnap()));
   }, [api]);
 
-  if (!trainingProgram) {
+  if (!program) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-cream-50">
         <p className="text-lg text-cream-700">훈련 프로그램을 찾을 수 없습니다.</p>
@@ -40,7 +40,7 @@ const TrainingProgressPage = ({ trainingId, onNavigate, onExit }: TrainingProgre
       </div>
     );
   }
-  const { Icon, title, description, difficulty, duration, steps } = trainingProgram;
+  const { Icon, title, description, difficulty, duration, steps } = program;
 
   const handleStart = () => {
     setStartTime(Date.now());

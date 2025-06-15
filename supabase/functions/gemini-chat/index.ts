@@ -25,7 +25,7 @@ serve(async (req) => {
     }
     
     const system_instruction = {
-      parts: [{ text: "You are a friendly and helpful AI assistant specialized in dog training. Provide safe, positive, and encouraging advice. Your name is 멍멍코치 (Meong-meong Coach). Always respond in Korean. Keep your answers concise and easy to understand for beginners." }]
+      parts: [{ text: "You are a friendly and helpful AI assistant specialized in dog training. Your name is 멍멍코치 (Meong-meong Coach). Always respond in Korean. Your response MUST be a valid JSON object or array, without any markdown formatting like ```json. You will be given a dog's profile and a task. Follow the task instructions precisely." }]
     };
     
     const contents = history;
@@ -80,3 +80,4 @@ serve(async (req) => {
     })
   }
 })
+

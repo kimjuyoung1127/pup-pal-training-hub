@@ -6,12 +6,16 @@ import { ArrowLeft, Play, Clock } from 'lucide-react';
 import { useTodaysTrainingStats } from '@/hooks/useTodaysTrainingStats';
 import { Skeleton } from '@/components/ui/skeleton';
 import TrainingProgressPage from './TrainingProgressPage';
+import AiTrainingRecommender from './AiTrainingRecommender';
+import { TrainingProgram } from '@/lib/trainingData';
+
 const TrainingStartPage = ({
   onNavigate
 }: {
   onNavigate: (page: string) => void;
 }) => {
   const [selectedTraining, setSelectedTraining] = useState<string | null>(null);
+  const [selectedAiTraining, setSelectedAiTraining] = useState<TrainingProgram | null>(null);
   const [isTrainingActive, setIsTrainingActive] = useState(false);
   const {
     data: stats,
@@ -51,18 +55,38 @@ const TrainingStartPage = ({
     color: 'bg-gradient-to-br from-indigo-50 to-indigo-100'
   }];
   const quickTips = ['간식을 미리 준비해주세요 🦴', '조용한 환경에서 훈련하세요 🤫', '긍정적인 보상을 잊지 마세요 ❤️', '강아지의 컨디션을 확인하세요 😊'];
+  
   const handleStartTraining = () => {
-    if (selectedTraining) {
+    if (selectedTraining || selectedAiTraining) {
       setIsTrainingActive(true);
     }
   };
+
   const handleExitTraining = () => {
     setIsTrainingActive(false);
     setSelectedTraining(null);
+    setSelectedAiTraining(null);
   };
-  if (isTrainingActive && selectedTraining) {
-    return <TrainingProgressPage trainingId={selectedTraining} onNavigate={onNavigate} onExit={handleExitTraining} />;
+
+  const handleSelectStaticTraining = (trainingId: string) => {
+    setSelectedTraining(trainingId);
+    setSelectedAiTraining(null);
+  };
+
+  const handleSelectAiTraining = (training: TrainingProgram) => {
+    setSelectedAiTraining(training);
+    setSelectedTraining(null);
+  };
+
+  if (isTrainingActive) {
+    if (selectedAiTraining) {
+      return <TrainingProgressPage trainingProgram={selectedAiTraining} onNavigate={onNavigate} onExit={handleExitTraining} />;
+    }
+    if (selectedTraining) {
+      return <TrainingProgressPage trainingId={selectedTraining} onNavigate={onNavigate} onExit={handleExitTraining} />;
+    }
   }
+
   return <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-100 pb-32">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-4">
@@ -139,7 +163,7 @@ const TrainingStartPage = ({
         duration: 0.5,
         delay: 0.1
       }} className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl p-4 border border-gray-200/50">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">훈련 선택하기</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">기본 훈련 선택하기</h2>
           <div className="space-y-4">
             {trainingTypes.map((training, index) => <motion.div key={training.id} initial={{
             opacity: 0,
@@ -151,8 +175,8 @@ const TrainingStartPage = ({
             duration: 0.3,
             delay: index * 0.1
           }}>
-                <Card onClick={() => setSelectedTraining(training.id)} className="bg-amber-300">
-                  <div className="flex items-start space-x-4">
+                <Card onClick={() => handleSelectStaticTraining(training.id)} className={`cursor-pointer transition-all bg-white/50 hover:bg-white ${selectedTraining === training.id ? 'border-blue-500 ring-2 ring-blue-400' : 'border-cream-200'}`}>
+                  <div className="flex items-start space-x-4 p-4">
                     <div className={`p-3 rounded-xl ${training.color}`}>
                       <div className="text-2xl">{training.icon}</div>
                     </div>
@@ -221,7 +245,7 @@ const TrainingStartPage = ({
 
       {/* Fixed Bottom Button - positioned above bottom navigation */}
       <div className="fixed bottom-16 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-200 p-6">
-        <Button onClick={handleStartTraining} disabled={!selectedTraining} className={`w-full py-4 text-lg font-bold transition-all duration-200 ${selectedTraining ? 'btn-primary' : 'bg-gray-300 text-gray-600 cursor-not-allowed hover:bg-gray-300 hover:scale-100'}`}>
+        <Button onClick={handleStartTraining} disabled={!selectedTraining && !selectedAiTraining} className={`w-full py-4 text-lg font-bold transition-all duration-200 ${selectedTraining || selectedAiTraining ? 'btn-primary' : 'bg-gray-300 text-gray-600 cursor-not-allowed hover:bg-gray-300 hover:scale-100'}`}>
           <div className="flex items-center justify-center space-x-2">
             <Play className="w-5 h-5" />
             <span>훈련 시작하기</span>
