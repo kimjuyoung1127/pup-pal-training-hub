@@ -129,6 +129,50 @@ export type Database = {
           },
         ]
       }
+      dog_extended_profile: {
+        Row: {
+          created_at: string
+          dog_id: string
+          family_composition: string | null
+          favorite_snacks: string | null
+          id: string
+          living_environment: string | null
+          past_history: string | null
+          sensitive_factors: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dog_id: string
+          family_composition?: string | null
+          favorite_snacks?: string | null
+          id?: string
+          living_environment?: string | null
+          past_history?: string | null
+          sensitive_factors?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dog_id?: string
+          family_composition?: string | null
+          favorite_snacks?: string | null
+          id?: string
+          living_environment?: string | null
+          past_history?: string | null
+          sensitive_factors?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dog_extended_profile_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: true
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dog_health_status: {
         Row: {
           dog_id: string

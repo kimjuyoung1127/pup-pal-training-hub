@@ -6,8 +6,22 @@ import { toast } from 'sonner';
 
 export type FullDogInfo = DogInfo & { id: string; image_url: string | null; };
 
+export interface FullDogExtendedProfile {
+  id: string;
+  dog_id: string;
+  living_environment: string | null;
+  family_composition: string | null;
+  favorite_snacks: string | null;
+  sensitive_factors: string | null;
+  past_history: string | null;
+  created_at: string;
+  updated_at: string;
+  [key: string]: any;
+}
+
 export const useDogProfile = () => {
   const [dogInfo, setDogInfo] = useState<FullDogInfo | null>(null);
+  const [extendedProfile, setExtendedProfile] = useState<FullDogExtendedProfile | null>(null);
   const [healthStatusNames, setHealthStatusNames] = useState<string[]>([]);
   const [trainingGoalNames, setTrainingGoalNames] = useState<string[]>([]);
   const [trainingStats, setTrainingStats] = useState({
@@ -24,6 +38,7 @@ export const useDogProfile = () => {
     if (!user) {
       setIsLoading(false);
       setDogInfo(null);
+      setExtendedProfile(null);
       return;
     }
     
@@ -40,9 +55,16 @@ export const useDogProfile = () => {
           console.error('Error fetching dog data:', dogError);
       }
       setDogInfo(null);
+      setExtendedProfile(null);
       setIsLoading(false);
       return;
     }
+
+    const { data: extendedProfileData } = await supabase
+        .from('dog_extended_profile')
+        .select('*')
+        .eq('dog_id', dogData.id)
+        .maybeSingle();
 
     const { data: healthLinks } = await supabase.from('dog_health_status').select('health_status_option_id').eq('dog_id', dogData.id);
     const healthStatusIds = healthLinks?.map(l => l.health_status_option_id) || [];
@@ -124,6 +146,7 @@ export const useDogProfile = () => {
     setDogInfo(fullDogInfo);
     setHealthStatusNames(fetchedHealthStatusNames);
     setTrainingGoalNames(fetchedTrainingGoalNames);
+    setExtendedProfile(extendedProfileData);
     setIsLoading(false);
   }, []);
 
@@ -263,6 +286,8 @@ export const useDogProfile = () => {
     trainingStats,
     isLoading,
     isDeleting,
+    extendedProfile,
+    fetchDogProfile,
     handleImageUpload,
     handleImageDelete,
     handleDeleteDogProfile,

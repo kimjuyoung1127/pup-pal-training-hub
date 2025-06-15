@@ -11,6 +11,7 @@ import TrainingGoalsCard from './dog-profile/TrainingGoalsCard';
 import TrainingStats from './dog-profile/TrainingStats';
 import QuickActions from './dog-profile/QuickActions';
 import DeleteProfileDialog from './dog-profile/DeleteProfileDialog';
+import GrowthMissionBoard from './dog-profile/GrowthMissionBoard';
 
 interface DogProfilePageProps {
   onNavigate: (page: string) => void;
@@ -24,6 +25,8 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
     trainingStats,
     isLoading,
     isDeleting,
+    extendedProfile,
+    fetchDogProfile,
     handleImageUpload,
     handleImageDelete,
     handleDeleteDogProfile,
@@ -111,11 +114,19 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
         >
           <TrainingStats stats={trainingStats} />
         </motion.div>
-
+        
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <GrowthMissionBoard extendedProfile={extendedProfile} dogId={dogInfo.id} onUpdate={fetchDogProfile} />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
         >
           <QuickActions onNavigate={onNavigate} />
         </motion.div>
