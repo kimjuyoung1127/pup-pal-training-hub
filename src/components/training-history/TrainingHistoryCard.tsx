@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { Calendar, Clock, MoreVertical, Edit, Trash2, Star } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 import {
   DropdownMenu,
@@ -33,18 +33,33 @@ const TrainingHistoryCard = ({ item, onEdit, onDelete }: TrainingHistoryCardProp
   };
   const icon = item.training_type ? (iconMap[item.training_type] || '⭐') : '⭐';
 
+  const renderStars = (rate: number | null) => {
+    if (rate === null) return null;
+    const rating = Math.max(0, Math.ceil(rate / 20));
+    return (
+      <div className="flex items-center">
+        {[...Array(5)].map((_, i) => (
+          <Star
+            key={i}
+            className={`w-5 h-5 transition-colors ${i < rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
     <motion.div
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, x: -20 }}
+      exit={{ opacity: 0, x: -30, transition: { duration: 0.2 } }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="shadow-sm hover:shadow-md transition-shadow">
+      <Card className="shadow-none border border-cream-200 bg-cream-50">
         <CardContent className="p-4">
           <div className="flex items-start space-x-4">
-            <div className="text-3xl p-3 bg-cream-100 rounded-xl">{icon}</div>
+            <div className="text-3xl p-3 bg-white rounded-xl border border-cream-200">{icon}</div>
             <div className="flex-1">
               <div className="flex justify-between items-start">
                 <p className="font-bold text-lg text-gray-800">{item.training_type || '알 수 없는 훈련'}</p>
@@ -82,13 +97,13 @@ const TrainingHistoryCard = ({ item, onEdit, onDelete }: TrainingHistoryCardProp
                 <div className="mt-3">
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-sm font-medium text-gray-600">성공률</span>
-                    <span className="text-sm font-bold text-orange-500">{item.success_rate}%</span>
+                    {renderStars(item.success_rate)}
                   </div>
-                  <Progress value={item.success_rate} className="h-2 bg-cream-200" indicatorClassName="bg-orange-400" />
+                  <Progress value={item.success_rate} className="h-2 bg-cream-200" indicatorClassName="bg-gradient-to-r from-orange-300 to-orange-500" />
                 </div>
               )}
               {item.notes && (
-                <p className="mt-3 text-sm text-gray-700 bg-cream-100 p-3 rounded-md border border-cream-200 whitespace-pre-wrap">
+                <p className="mt-3 text-sm text-gray-700 bg-white p-3 rounded-lg border border-cream-200 whitespace-pre-wrap">
                   {item.notes}
                 </p>
               )}
