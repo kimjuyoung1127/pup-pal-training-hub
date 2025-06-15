@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Home, User, BarChart3, Settings } from 'lucide-react';
+import { Home, User, BarChart3, Settings, ClipboardList } from 'lucide-react';
 
 interface BottomNavigationProps {
   currentPage: string;
@@ -27,6 +27,12 @@ const BottomNavigation = ({ currentPage, onNavigate }: BottomNavigationProps) =>
       label: '훈련',
       icon: BarChart3,
       page: 'training'
+    },
+    {
+      id: 'history',
+      label: '기록',
+      icon: ClipboardList,
+      page: 'history'
     },
     {
       id: 'settings',
