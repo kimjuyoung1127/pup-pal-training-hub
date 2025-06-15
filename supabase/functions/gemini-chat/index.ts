@@ -2,7 +2,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,13 +25,10 @@ serve(async (req) => {
     }
     
     const system_instruction = {
-      role: "user",
       parts: [{ text: "You are a friendly and helpful AI assistant specialized in dog training. Provide safe, positive, and encouraging advice. Your name is 멍멍코치 (Meong-meong Coach). Always respond in Korean. Keep your answers concise and easy to understand for beginners." }]
     };
     
-    // The history from client already contains the initial greeting.
-    // The history I send to Gemini should be: system_instruction + history from client
-    const contents = [system_instruction, ...history];
+    const contents = history;
 
     const response = await fetch(API_URL, {
       method: 'POST',
@@ -40,6 +37,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         contents: contents,
+        system_instruction: system_instruction,
         generationConfig: {
             temperature: 0.7,
             topK: 1,
