@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +5,10 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Check, ChevronsUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface DogInfo {
   name: string;
@@ -18,8 +20,40 @@ interface DogInfo {
   trainingGoals: string[];
 }
 
+const dogBreeds = [
+  "말티즈",
+  "푸들",
+  "치와와",
+  "포메라니안",
+  "요크셔 테리어",
+  "시츄",
+  "비숑 프리제",
+  "페키니즈",
+  "웰시 코기",
+  "시바 이누",
+  "비글",
+  "프렌치 불독",
+  "코카 스파니엘",
+  "보스턴 테리어",
+  "보더 콜리",
+  "진돗개",
+  "삽살개",
+  "풍산개",
+  "골든 리트리버",
+  "래브라도 리트리버",
+  "저먼 셰퍼드",
+  "알래스칸 말라뮤트",
+  "도베르만",
+  "로트와일러",
+  "그레이트 데인",
+  "버니즈 마운틴 독",
+  "믹스견",
+  "잘 모르겠어요"
+];
+
 const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void }) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [breedOpen, setBreedOpen] = useState(false);
   const [dogInfo, setDogInfo] = useState<DogInfo>({
     name: '',
     age: '',
@@ -202,14 +236,56 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
 
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="breed" className="text-cream-800 font-medium">견종</Label>
-                    <Input
-                      id="breed"
-                      value={dogInfo.breed}
-                      onChange={(e) => setDogInfo(prev => ({ ...prev, breed: e.target.value }))}
-                      placeholder="예: 골든 리트리버, 믹스견 등"
-                      className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 focus:ring-2 focus:ring-orange-100 rounded-xl text-cream-800 placeholder:text-cream-400"
-                    />
+                    <Label className="text-cream-800 font-medium">견종</Label>
+                    <Popover open={breedOpen} onOpenChange={setBreedOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={breedOpen}
+                          className="w-full justify-between mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl text-cream-800 hover:bg-cream-50"
+                        >
+                          {dogInfo.breed
+                            ? dogBreeds.find((breed) => breed === dogInfo.breed)
+                            : "견종을 선택해주세요"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0 bg-white border-cream-200 shadow-lg z-50">
+                        <Command className="bg-white">
+                          <CommandInput 
+                            placeholder="견종을 검색해보세요..." 
+                            className="h-9 text-cream-800"
+                          />
+                          <CommandList className="max-h-60 overflow-y-auto">
+                            <CommandEmpty className="text-cream-600 py-6 text-center text-sm">
+                              검색 결과가 없습니다.
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {dogBreeds.map((breed) => (
+                                <CommandItem
+                                  key={breed}
+                                  value={breed}
+                                  onSelect={(currentValue) => {
+                                    setDogInfo(prev => ({ ...prev, breed: currentValue === dogInfo.breed ? "" : currentValue }));
+                                    setBreedOpen(false);
+                                  }}
+                                  className="text-cream-800 hover:bg-orange-100 cursor-pointer"
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      dogInfo.breed === breed ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {breed}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </div>
 
                   <div>
