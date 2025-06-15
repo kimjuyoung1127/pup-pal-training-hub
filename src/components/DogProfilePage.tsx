@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -138,7 +137,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
                   <Badge 
                     key={index} 
                     variant="outline" 
-                    className="bg-green-50 border-green-200 text-green-700"
+                    className="bg-cream-100 border-cream-300 text-cream-800"
                   >
                     {status}
                   </Badge>
