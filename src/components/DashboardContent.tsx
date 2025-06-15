@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useDashboardStore } from '@/store/dashboardStore';
@@ -125,7 +126,7 @@ const DashboardContent = ({
 
       {/* Dog reminder */}
       {reminder && <motion.div variants={itemVariants}>
-          <Card className="card-soft p-6">
+          <Card className="card-soft p-6 bg-orange-100">
             <div className="flex items-start space-x-3">
               <div className="text-2xl">🐶</div>
               <div>
@@ -140,7 +141,7 @@ const DashboardContent = ({
 
       {/* Daily mission */}
       {mission && <motion.div variants={itemVariants}>
-          <Card className="card-soft p-6">
+          <Card className="card-soft p-6 bg-orange-100">
             <div className="flex items-start space-x-3">
               <div className="text-2xl">🎯</div>
               <div className="flex-1">
