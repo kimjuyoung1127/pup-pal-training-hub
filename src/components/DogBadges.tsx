@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DogBadge } from '@/hooks/useDogBadges';
@@ -6,10 +7,12 @@ import { Badge as UiBadge } from "@/components/ui/badge";
 import { Award } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 import { motion } from 'framer-motion';
+
 interface DogBadgesProps {
   badges: DogBadge[];
   isLoading: boolean;
 }
+
 const DogBadges = ({
   badges,
   isLoading
@@ -47,7 +50,7 @@ const DogBadges = ({
   }}>
       <Card className="mb-6">
         <CardHeader className="bg-orange-100">
-          <CardTitle className="flex items-center text-xl font-bold text-gray-800">
+          <CardTitle className="flex items-center text-xl font-bold text-black">
             <Award className="mr-2 h-6 w-6 text-yellow-500" />
             획득한 뱃지
           </CardTitle>
@@ -68,7 +71,7 @@ const DogBadges = ({
                   delay: index * 0.05
                 }}>
                       <span className="text-4xl filter grayscale hover:grayscale-0 transition-all duration-300">{badge.icon || '🏅'}</span>
-                      <UiBadge variant="secondary" className="text-xs px-2 py-0.5 whitespace-nowrap bg-slate-50">{badge.name}</UiBadge>
+                      <UiBadge variant="secondary" className="text-xs px-2 py-0.5 whitespace-nowrap bg-slate-50 text-black">{badge.name}</UiBadge>
                     </motion.div>
                   </TooltipTrigger>
                   <TooltipContent className="bg-gray-800 text-white rounded-md p-2">
@@ -82,4 +85,5 @@ const DogBadges = ({
       </Card>
     </motion.div>;
 };
+
 export default DogBadges;
