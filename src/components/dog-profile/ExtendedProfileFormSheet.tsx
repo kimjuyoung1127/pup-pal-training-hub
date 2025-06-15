@@ -12,7 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useMutation } from '@tanstack/react-query';
 
-export type MissionKey = keyof Omit<FullDogExtendedProfile, 'id' | 'dog_id' | 'created_at' | 'updated_at' | '[key: string]'>;
+export type MissionKey = keyof Omit<FullDogExtendedProfile, 'id' | 'dog_id' | 'created_at' | 'updated_at' | 'favorite_snacks' | 'sensitive_factors' | 'past_history' | '[key: string]'>;
 
 interface ExtendedProfileFormSheetProps {
     isOpen: boolean;
@@ -35,7 +35,14 @@ const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedPro
     
     React.useEffect(() => {
         if (mission && extendedProfile) {
-            form.setValue('value', extendedProfile[mission.key] || '');
+            const value = extendedProfile[mission.key];
+            if (Array.isArray(value)) {
+                form.setValue('value', value.join(', '));
+            } else if (typeof value === 'boolean') {
+                form.setValue('value', value ? '예' : '아니오');
+            } else {
+                form.setValue('value', value || '');
+            }
         } else if (mission) {
             form.reset({ value: '' });
         }
@@ -86,40 +93,92 @@ const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedPro
 
     const onSubmit = (values: z.infer<typeof formSchema>) => {
         if (!mission) return;
-        updateProfileMutation.mutate({ [mission.key]: values.value });
+
+        let processedValue: any = values.value;
+        const arrayKeys: (string)[] = ['known_behaviors', 'favorites', 'sensitive_items', 'preferred_play'];
+        const booleanKeys: (string)[] = ['family_kids', 'family_elderly'];
+
+        if (arrayKeys.includes(mission.key)) {
+            processedValue = values.value.split(',').map(s => s.trim()).filter(Boolean);
+            if (processedValue.length === 0) processedValue = null;
+        } else if (booleanKeys.includes(mission.key)) {
+            processedValue = values.value === '예';
+        }
+        
+        updateProfileMutation.mutate({ [mission.key]: processedValue });
     };
 
     const renderFormField = () => {
         if (!mission) return null;
 
+        const RadioGroupField = ({ items }: { items: string[] }) => (
+            <FormField
+                control={form.control}
+                name="value"
+                render={({ field }) => (
+                    <FormItem className="space-y-3">
+                        <FormLabel>{mission.question}</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-col space-y-1"
+                            >
+                                {items.map(item => (
+                                    <FormItem key={item} className="flex items-center space-x-3 space-y-0">
+                                        <FormControl><RadioGroupItem value={item} /></FormControl>
+                                        <FormLabel className="font-normal">{item}</FormLabel>
+                                    </FormItem>
+                                ))}
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+        );
+
+        const TextArrayField = ({ placeholder }: { placeholder: string }) => (
+            <FormField
+                control={form.control}
+                name="value"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>{mission.question}</FormLabel>
+                        <FormControl>
+                            <Textarea placeholder={placeholder} {...field} className="min-h-[100px]" />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+        );
+
         switch(mission.key) {
             case 'living_environment':
-                return (
-                    <FormField
-                        control={form.control}
-                        name="value"
-                        render={({ field }) => (
-                            <FormItem className="space-y-3">
-                                <FormLabel>어디에 살고 있나요?</FormLabel>
-                                <FormControl>
-                                    <RadioGroup
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value}
-                                        className="flex flex-col space-y-1"
-                                    >
-                                        {['아파트', '단독주택', '농가주택'].map(item => (
-                                            <FormItem key={item} className="flex items-center space-x-3 space-y-0">
-                                                <FormControl><RadioGroupItem value={item} /></FormControl>
-                                                <FormLabel className="font-normal">{item}</FormLabel>
-                                            </FormItem>
-                                        ))}
-                                    </RadioGroup>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                );
+                return <RadioGroupField items={['아파트', '단독주택', '농가주택']} />;
+            case 'leash_type':
+                return <RadioGroupField items={['목줄', '하네스', '둘 다 사용']} />;
+            case 'toilet_type':
+                return <RadioGroupField items={['실내', '실외', '혼합']} />;
+            case 'social_level':
+                return <RadioGroupField items={['좋음', '보통', '부족']} />;
+            case 'meal_habit':
+                return <RadioGroupField items={['잘 먹음', '입이 짧음', '편식 심함']} />;
+            case 'owner_proximity':
+                return <RadioGroupField items={['항상 함께 있음', '혼자 있는 시간 많음']} />;
+            case 'activity_level':
+                return <RadioGroupField items={['많이 움직임', '보통', '적음']} />;
+            case 'past_experience':
+                return <RadioGroupField items={['입양', '유기', '가정견', '모름']} />;
+            case 'family_kids':
+            case 'family_elderly':
+                return <RadioGroupField items={['예', '아니오']} />;
+            case 'known_behaviors':
+            case 'favorites':
+            case 'sensitive_items':
+            case 'preferred_play':
+                return <TextArrayField placeholder="쉼표(,)로 구분하여 입력해주세요." />;
             default:
                 return (
                     <FormField

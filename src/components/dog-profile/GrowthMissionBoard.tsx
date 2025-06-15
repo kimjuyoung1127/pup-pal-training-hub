@@ -14,10 +14,20 @@ interface GrowthMissionBoardProps {
 
 const missions: { key: MissionKey; title: string; question: string; }[] = [
     { key: 'living_environment', title: '🏠 생활 환경', question: '딩딩이는 어디에서 살고 있나요?' },
-    { key: 'family_composition', title: '👨‍👩‍👧 가족 구성', question: '가족 구성원에 대해 알려주세요.' },
-    { key: 'favorite_snacks', title: '🍗 좋아하는 간식', question: '어떤 간식을 가장 좋아하나요?' },
-    { key: 'sensitive_factors', title: '😰 민감한 요소', question: '딩딩이는 무엇에 예민한가요?' },
-    { key: 'past_history', title: '🐕 과거 히스토리', question: '입양 또는 과거 훈련 경험이 있나요?' },
+    { key: 'family_composition', title: '👨‍👩‍👧‍👦 가족 구성', question: '함께 사는 가족 구성원에 대해 알려주세요.' },
+    { key: 'known_behaviors', title: '👍 잘하는 행동', question: '이미 잘하는 행동들을 알려주세요.' },
+    { key: 'leash_type', title: '🦮 산책 장비', question: '산책 시 어떤 장비를 사용하나요?' },
+    { key: 'toilet_type', title: '🚽 배변 습관', question: '배변은 주로 어디서 해결하나요?' },
+    { key: 'social_level', title: '🐾 사회성', question: '다른 강아지나 사람들과의 사회성은 어떤가요?' },
+    { key: 'meal_habit', title: '🍚 식사 습관', question: '식사 습관은 어떤 편인가요?' },
+    { key: 'favorites', title: '💖 최애템', question: '가장 좋아하는 간식이나 장난감은 무엇인가요?' },
+    { key: 'owner_proximity', title: '🤝 보호자와의 관계', question: '보호자와의 거리감은 어느 정도인가요?' },
+    { key: 'activity_level', title: '⚡️ 활동량', question: '하루 평균 활동량은 어느 정도인가요?' },
+    { key: 'past_experience', title: '📜 과거 경험', question: '딩딩이에게 특별한 과거 경험이 있나요?' },
+    { key: 'sensitive_items', title: '🤫 민감 요소', question: '특별히 민감하게 반응하는 것이 있나요?' },
+    { key: 'family_kids', title: '👶 아이 동거 여부', question: '가족 중에 아이가 함께 사나요?' },
+    { key: 'family_elderly', title: '👵 어르신 동거 여부', question: '가족 중에 어르신이 함께 사나요?' },
+    { key: 'preferred_play', title: '🎾 선호하는 놀이', question: '어떤 놀이를 가장 좋아하나요?' },
 ];
 
 const GrowthMissionBoard = ({ extendedProfile, dogId, onUpdate }: GrowthMissionBoardProps) => {

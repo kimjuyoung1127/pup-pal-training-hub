@@ -14,6 +14,20 @@ export interface FullDogExtendedProfile {
   favorite_snacks: string | null;
   sensitive_factors: string | null;
   past_history: string | null;
+  // New fields
+  known_behaviors: string[] | null;
+  leash_type: string | null;
+  toilet_type: string | null;
+  social_level: string | null;
+  meal_habit: string | null;
+  favorites: string[] | null;
+  owner_proximity: string | null;
+  activity_level: string | null;
+  past_experience: string | null;
+  sensitive_items: string[] | null;
+  family_kids: boolean | null;
+  family_elderly: boolean | null;
+  preferred_play: string[] | null;
   created_at: string;
   updated_at: string;
   [key: string]: any;

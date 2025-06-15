@@ -131,36 +131,75 @@ export type Database = {
       }
       dog_extended_profile: {
         Row: {
+          activity_level: string | null
           created_at: string
           dog_id: string
           family_composition: string | null
+          family_elderly: boolean | null
+          family_kids: boolean | null
           favorite_snacks: string | null
+          favorites: string[] | null
           id: string
+          known_behaviors: string[] | null
+          leash_type: string | null
           living_environment: string | null
+          meal_habit: string | null
+          owner_proximity: string | null
+          past_experience: string | null
           past_history: string | null
+          preferred_play: string[] | null
           sensitive_factors: string | null
+          sensitive_items: string[] | null
+          social_level: string | null
+          toilet_type: string | null
           updated_at: string
         }
         Insert: {
+          activity_level?: string | null
           created_at?: string
           dog_id: string
           family_composition?: string | null
+          family_elderly?: boolean | null
+          family_kids?: boolean | null
           favorite_snacks?: string | null
+          favorites?: string[] | null
           id?: string
+          known_behaviors?: string[] | null
+          leash_type?: string | null
           living_environment?: string | null
+          meal_habit?: string | null
+          owner_proximity?: string | null
+          past_experience?: string | null
           past_history?: string | null
+          preferred_play?: string[] | null
           sensitive_factors?: string | null
+          sensitive_items?: string[] | null
+          social_level?: string | null
+          toilet_type?: string | null
           updated_at?: string
         }
         Update: {
+          activity_level?: string | null
           created_at?: string
           dog_id?: string
           family_composition?: string | null
+          family_elderly?: boolean | null
+          family_kids?: boolean | null
           favorite_snacks?: string | null
+          favorites?: string[] | null
           id?: string
+          known_behaviors?: string[] | null
+          leash_type?: string | null
           living_environment?: string | null
+          meal_habit?: string | null
+          owner_proximity?: string | null
+          past_experience?: string | null
           past_history?: string | null
+          preferred_play?: string[] | null
           sensitive_factors?: string | null
+          sensitive_items?: string[] | null
+          social_level?: string | null
+          toilet_type?: string | null
           updated_at?: string
         }
         Relationships: [
