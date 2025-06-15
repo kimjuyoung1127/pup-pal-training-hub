@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import OnboardingPage from '@/components/OnboardingPage';
 import LoginPage from '@/components/LoginPage';
@@ -60,7 +59,7 @@ const Index = () => {
       case 'dog-info':
         return <DogInfoPage onComplete={handleDogInfoComplete} />;
       case 'dog-profile':
-        return <DogProfilePage onNavigate={handleNavigate} dogInfo={dogInfo} />;
+        return <DogProfilePage onNavigate={handleNavigate} />;
       case 'training':
         return <TrainingStartPage onNavigate={handleNavigate} />;
       case 'settings':

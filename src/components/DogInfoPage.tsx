@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -8,6 +7,14 @@ import { DogInfo } from '@/types/dog';
 import Step1_BasicInfo from './dog-info-steps/Step1_BasicInfo';
 import Step2_DogFeatures from './dog-info-steps/Step2_DogFeatures';
 import Step3_TrainingGoals from './dog-info-steps/Step3_TrainingGoals';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from "sonner";
+
+type Option = {
+  id: number;
+  label: string;
+  icon: string;
+};
 
 const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void }) => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -21,30 +28,42 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
     healthStatus: [],
     trainingGoals: []
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const healthOptions = [
-    { id: '건강함', label: '건강함', icon: '💚' },
-    { id: '관절 문제', label: '관절 문제', icon: '🦴' },
-    { id: '알레르기', label: '알레르기', icon: '🤧' },
-    { id: '소화 문제', label: '소화 문제', icon: '🤱' },
-    { id: '피부 질환', label: '피부 질환', icon: '🐕' },
-    { id: '과체중', label: '과체중', icon: '⚖️' },
-    { id: '저체중', label: '저체중', icon: '📏' },
-    { id: '기타', label: '기타', icon: '🏥' }
-  ];
+  const [healthOptions, setHealthOptions] = useState<Option[]>([]);
+  const [trainingGoalOptions, setTrainingGoalOptions] = useState<Option[]>([]);
 
-  const trainingGoalOptions = [
-    { id: '기본 예절 훈련', label: '기본 예절 훈련', icon: '🎓' },
-    { id: '배변 훈련', label: '배변 훈련', icon: '🚽' },
-    { id: '짖음 줄이기', label: '짖음 줄이기', icon: '🤫' },
-    { id: '산책 훈련', label: '산책 훈련', icon: '🚶' },
-    { id: '사회성 훈련', label: '사회성 훈련', icon: '👥' },
-    { id: '분리불안 해결', label: '분리불안 해결', icon: '💔' },
-    { id: '물어뜯기 교정', label: '물어뜯기 교정', icon: '🚫' },
-    { id: '손 올리기/앉기', label: '손 올리기/앉기', icon: '✋' },
-    { id: '기다려', label: '기다려', icon: '⏱️' },
-    { id: '이리와', label: '이리와', icon: '🤗' }
-  ];
+  const healthIcons: Record<string, string> = {
+    '건강함': '💚', '관절 문제': '🦴', '알레르기': '🤧', '소화 문제': '🤱',
+    '피부 질환': '🐕', '과체중': '⚖️', '저체중': '📏', '기타': '🏥'
+  };
+
+  const trainingGoalIcons: Record<string, string> = {
+    '기본 예절 훈련': '🎓', '배변 훈련': '🚽', '짖음 줄이기': '🤫', '산책 훈련': '🚶',
+    '사회성 훈련': '👥', '분리불안 해결': '💔', '물어뜯기 교정': '🚫',
+    '손 올리기/앉기': '✋', '기다려': '⏱️', '이리와': '🤗'
+  };
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      const { data: healthData, error: healthError } = await supabase.from('health_status_options').select('id, name');
+      if (healthError) {
+        console.error('Error fetching health options:', healthError);
+        toast.error("건강 상태 목록을 불러오는데 실패했습니다.");
+      } else {
+        setHealthOptions(healthData.map(o => ({ id: o.id, label: o.name, icon: healthIcons[o.name] || '❓' })));
+      }
+
+      const { data: trainingData, error: trainingError } = await supabase.from('behavior_options').select('id, name');
+      if (trainingError) {
+        console.error('Error fetching training options:', trainingError);
+        toast.error("훈련 목표 목록을 불러오는데 실패했습니다.");
+      } else {
+        setTrainingGoalOptions(trainingData.map(o => ({ id: o.id, label: o.name, icon: trainingGoalIcons[o.name] || '❓' })));
+      }
+    };
+    fetchOptions();
+  }, []);
 
   const handleHealthStatusChange = (status: string, checked: boolean) => {
     setDogInfo(prev => ({
@@ -64,11 +83,71 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
     }));
   };
 
-  const nextStep = () => {
+  const handleComplete = async () => {
+    setIsLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      toast.error("로그인이 필요합니다. 로그인 후 다시 시도해주세요.");
+      console.error("User not logged in. Cannot save dog info.");
+      setIsLoading(false);
+      return;
+    }
+
+    const { data: dogData, error: dogError } = await supabase
+      .from('dogs')
+      .insert({
+        name: dogInfo.name,
+        age: dogInfo.age,
+        gender: dogInfo.gender,
+        breed: dogInfo.breed,
+        weight: dogInfo.weight,
+        user_id: user.id
+      })
+      .select()
+      .single();
+
+    if (dogError || !dogData) {
+      console.error('Error saving dog info:', dogError);
+      toast.error("강아지 정보 저장에 실패했습니다.");
+      setIsLoading(false);
+      return;
+    }
+
+    const dogId = dogData.id;
+
+    const selectedHealthOptions = healthOptions.filter(option => dogInfo.healthStatus.includes(option.label));
+    const healthStatusInserts = selectedHealthOptions.map(option => ({
+      dog_id: dogId,
+      health_status_option_id: option.id
+    }));
+    
+    if (healthStatusInserts.length > 0) {
+      const { error: healthStatusError } = await supabase.from('dog_health_status').insert(healthStatusInserts);
+      if (healthStatusError) console.error('Error saving health status:', healthStatusError);
+    }
+
+    const selectedTrainingGoals = trainingGoalOptions.filter(option => dogInfo.trainingGoals.includes(option.label));
+    const trainingGoalsInserts = selectedTrainingGoals.map(option => ({
+      dog_id: dogId,
+      behavior_option_id: option.id
+    }));
+
+    if (trainingGoalsInserts.length > 0) {
+      const { error: trainingGoalsError } = await supabase.from('dog_desired_behaviors').insert(trainingGoalsInserts);
+      if (trainingGoalsError) console.error('Error saving training goals:', trainingGoalsError);
+    }
+    
+    toast.success("강아지 정보가 성공적으로 저장되었습니다!");
+    setIsLoading(false);
+    onComplete(dogInfo);
+  };
+
+  const nextStep = async () => {
     if (currentStep < 2) {
       setCurrentStep(currentStep + 1);
     } else {
-      onComplete(dogInfo);
+      await handleComplete();
     }
   };
 
@@ -112,8 +191,8 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
       case 2:
         return <Step3_TrainingGoals 
           dogInfo={dogInfo} 
-          healthOptions={healthOptions}
-          trainingGoalOptions={trainingGoalOptions}
+          healthOptions={healthOptions.map(o => ({ ...o, id: o.label }))}
+          trainingGoalOptions={trainingGoalOptions.map(o => ({ ...o, id: o.label }))}
           handleHealthStatusChange={handleHealthStatusChange} 
           handleTrainingGoalChange={handleTrainingGoalChange} 
         />;
@@ -195,10 +274,10 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
 
           <Button
             onClick={nextStep}
-            disabled={!canProceed()}
+            disabled={!canProceed() || isLoading}
             className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white font-pretendard"
           >
-            <span>{currentStep === 2 ? '완료' : '다음'}</span>
+            <span>{currentStep === 2 ? (isLoading ? '저장 중...' : '완료') : '다음'}</span>
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>

@@ -1,40 +1,74 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Edit, Heart, Target, Calendar, Trophy, Bone } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-interface DogInfo {
-  name: string;
-  age: string;
-  gender: string;
-  breed: string;
-  weight: string;
-  healthStatus: string[];
-  trainingGoals: string[];
-}
+import { DogInfo } from '@/types/dog';
+import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface DogProfilePageProps {
   onNavigate: (page: string) => void;
-  dogInfo?: DogInfo;
 }
 
-const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
-  // 기본 데이터 (실제로는 저장된 데이터를 사용)
-  const defaultDogInfo: DogInfo = {
-    name: '바둑이',
-    age: 'adult',
-    gender: 'male',
-    breed: '믹스견',
-    weight: 'medium',
-    healthStatus: ['건강함'],
-    trainingGoals: ['기본 예절 훈련', '산책 훈련']
-  };
+const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
+  const [dogInfo, setDogInfo] = useState<DogInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const currentDogInfo = dogInfo || defaultDogInfo;
+  useEffect(() => {
+    const fetchDogProfile = async () => {
+      setIsLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
+      
+      const { data: dogData, error: dogError } = await supabase
+        .from('dogs')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (dogError || !dogData) {
+        if (dogError && dogError.code !== 'PGRST116') { // Ignore 'exact one row' error
+            console.error('Error fetching dog data:', dogError);
+        }
+        setDogInfo(null);
+        setIsLoading(false);
+        return;
+      }
+
+      const { data: healthLinks } = await supabase.from('dog_health_status').select('health_status_option_id').eq('dog_id', dogData.id);
+      const healthStatusIds = healthLinks?.map(l => l.health_status_option_id) || [];
+      const { data: healthStatusData } = healthStatusIds.length > 0 ? await supabase.from('health_status_options').select('name').in('id', healthStatusIds) : { data: [] };
+      const healthStatusNames = healthStatusData?.map(s => s.name) || [];
+        
+      const { data: behaviorLinks } = await supabase.from('dog_desired_behaviors').select('behavior_option_id').eq('dog_id', dogData.id);
+      const behaviorIds = behaviorLinks?.map(l => l.behavior_option_id) || [];
+      const { data: behaviorData } = behaviorIds.length > 0 ? await supabase.from('behavior_options').select('name').in('id', behaviorIds) : { data: [] };
+      const trainingGoalNames = behaviorData?.map(g => g.name) || [];
+      
+      const fullDogInfo: DogInfo = {
+        name: dogData.name || '',
+        age: dogData.age || '',
+        gender: dogData.gender || '',
+        breed: dogData.breed || '',
+        weight: dogData.weight || '',
+        healthStatus: healthStatusNames,
+        trainingGoals: trainingGoalNames
+      };
+
+      setDogInfo(fullDogInfo);
+      setIsLoading(false);
+    };
+
+    fetchDogProfile();
+  }, []);
 
   const getAgeLabel = (age: string) => {
     switch (age) {
@@ -58,6 +92,29 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
   const getGenderEmoji = (gender: string) => {
     return gender === 'male' ? '🐕' : '🐕‍🦺';
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-cream-50 to-orange-50 p-6 space-y-6">
+        <Skeleton className="h-16 w-full" />
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-24 w-full" />
+      </div>
+    );
+  }
+
+  if (!dogInfo) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-cream-50 to-orange-50 p-6 text-center">
+        <h2 className="text-2xl font-bold text-cream-800 mb-2 font-pretendard">프로필이 없어요!</h2>
+        <p className="text-cream-700 mb-6 font-pretendard">먼저 우리 아이 정보를 등록해주세요.</p>
+        <Button onClick={() => onNavigate('dog-info')}>
+            강아지 정보 등록하기
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream-50 to-orange-50 pb-24">
@@ -95,22 +152,22 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
               <div className="flex items-center space-x-4">
                 <Avatar className="w-20 h-20">
                   <AvatarFallback className="bg-orange-200 text-2xl">
-                    {getGenderEmoji(currentDogInfo.gender)}
+                    {getGenderEmoji(dogInfo.gender)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-cream-800 mb-1 font-pretendard">
-                    {currentDogInfo.name}
+                    {dogInfo.name}
                   </h2>
                   <p className="text-cream-700 mb-2 font-pretendard">
-                    {currentDogInfo.breed} • {currentDogInfo.gender === 'male' ? '남아' : '여아'}
+                    {dogInfo.breed} • {dogInfo.gender === 'male' ? '남아' : '여아'}
                   </p>
                   <div className="flex space-x-2">
                     <Badge variant="secondary" className="bg-cream-200 text-cream-800">
-                      {getAgeLabel(currentDogInfo.age)}
+                      {getAgeLabel(dogInfo.age)}
                     </Badge>
                     <Badge variant="secondary" className="bg-cream-200 text-cream-800">
-                      {getWeightLabel(currentDogInfo.weight)}
+                      {getWeightLabel(dogInfo.weight)}
                     </Badge>
                   </div>
                 </div>
@@ -134,7 +191,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
-                {currentDogInfo.healthStatus.map((status, index) => (
+                {dogInfo.healthStatus.map((status, index) => (
                   <Badge 
                     key={index} 
                     variant="outline" 
@@ -163,7 +220,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 gap-3">
-                {currentDogInfo.trainingGoals.map((goal, index) => (
+                {dogInfo.trainingGoals.map((goal, index) => (
                   <div 
                     key={index}
                     className="flex items-center space-x-3 p-3 bg-orange-50 rounded-lg border border-orange-100"
