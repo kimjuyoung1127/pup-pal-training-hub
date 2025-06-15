@@ -1,21 +1,21 @@
-
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Heart, Target, Calendar, Trophy, Bone } from 'lucide-react';
+import { Edit, Heart, Target, Calendar, Trophy, Bone, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { DogInfo } from '@/types/dog';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from 'sonner';
 
 interface DogProfilePageProps {
   onNavigate: (page: string) => void;
 }
 
 const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
-  const [dogInfo, setDogInfo] = useState<DogInfo | null>(null);
+  const [dogInfo, setDogInfo] = useState<(DogInfo & { id: string; image_url: string | null; }) | null>(null);
   const [healthStatusNames, setHealthStatusNames] = useState<string[]>([]);
   const [trainingGoalNames, setTrainingGoalNames] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,14 +56,16 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
       const { data: behaviorData } = behaviorIds.length > 0 ? await supabase.from('behavior_options').select('name').in('id', behaviorIds) : { data: [] };
       const fetchedTrainingGoalNames = behaviorData?.map(g => g.name) || [];
       
-      const fullDogInfo: DogInfo = {
+      const fullDogInfo: DogInfo & { id: string; image_url: string | null; } = {
+        id: dogData.id,
         name: dogData.name || '',
         age: dogData.age || '',
         gender: dogData.gender || '',
         breed: dogData.breed || '',
         weight: dogData.weight || '',
         healthStatus: healthStatusIds,
-        trainingGoals: behaviorIds
+        trainingGoals: behaviorIds,
+        image_url: dogData.image_url
       };
 
       setDogInfo(fullDogInfo);
@@ -74,6 +76,95 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
 
     fetchDogProfile();
   }, []);
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || event.target.files.length === 0 || !dogInfo) {
+      return;
+    }
+    const file = event.target.files[0];
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      toast.error('로그인이 필요합니다.');
+      return;
+    }
+
+    // 기존 이미지가 있다면 삭제
+    if (dogInfo.image_url) {
+      try {
+        const oldPath = new URL(dogInfo.image_url).pathname.replace(`/storage/v1/object/public/dog-profiles/`, '');
+        await supabase.storage.from('dog-profiles').remove([oldPath]);
+      } catch (error) {
+        console.warn('Could not delete old image, continuing upload.', error);
+      }
+    }
+
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = `${user.id}/${fileName}`;
+    
+    const { error: uploadError } = await supabase.storage
+      .from('dog-profiles')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error('Error uploading image:', uploadError);
+      toast.error('이미지 업로드에 실패했습니다.');
+      return;
+    }
+
+    const { data } = supabase.storage
+      .from('dog-profiles')
+      .getPublicUrl(filePath);
+    
+    const publicUrl = data.publicUrl;
+
+    const { error: dbError } = await supabase
+      .from('dogs')
+      .update({ image_url: publicUrl })
+      .eq('id', dogInfo.id);
+
+    if (dbError) {
+      console.error('Error updating dog profile:', dbError);
+      toast.error('프로필 업데이트에 실패했습니다.');
+      return;
+    }
+    
+    setDogInfo({ ...dogInfo, image_url: publicUrl });
+    toast.success('프로필 이미지가 업데이트되었습니다.');
+  };
+
+  const handleImageDelete = async () => {
+    if (!dogInfo || !dogInfo.image_url) return;
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error('로그인이 필요합니다.');
+      return;
+    }
+    
+    try {
+      const oldPath = new URL(dogInfo.image_url).pathname.replace(`/storage/v1/object/public/dog-profiles/`, '');
+      const { error: storageError } = await supabase.storage.from('dog-profiles').remove([oldPath]);
+      if (storageError) {
+        console.error('Error deleting storage image:', storageError);
+        // Not returning here, to allow DB update even if file deletion fails
+      }
+    } catch (error) {
+       console.error('Error parsing image url for deletion', error);
+    }
+    
+    const { error: dbError } = await supabase.from('dogs').update({ image_url: null }).eq('id', dogInfo.id);
+
+    if (dbError) {
+      console.error('Error updating dog profile:', dbError);
+      toast.error('이미지 삭제 중 오류가 발생했습니다.');
+      return;
+    }
+
+    setDogInfo({ ...dogInfo, image_url: null });
+    toast.success('프로필 이미지가 삭제되었습니다.');
+  };
 
   const getAgeLabel = (age: string) => {
     switch (age) {
@@ -155,11 +246,28 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
           <Card className="card-soft overflow-hidden bg-gradient-to-r from-orange-100 to-cream-200">
             <CardContent className="p-6">
               <div className="flex items-center space-x-4">
-                <Avatar className="w-20 h-20">
-                  <AvatarFallback className="bg-orange-200 text-2xl">
-                    {getGenderEmoji(dogInfo.gender)}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="relative">
+                  <Avatar className="w-20 h-20 border-2 border-white shadow-lg">
+                    {dogInfo.image_url ? (
+                      <AvatarImage src={dogInfo.image_url} alt={dogInfo.name} className="object-cover" />
+                    ) : (
+                      <AvatarFallback className="bg-orange-200 text-2xl">
+                        {getGenderEmoji(dogInfo.gender)}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  <div className="absolute -bottom-1 -right-1 flex items-center">
+                    <label htmlFor="dog-image-upload" className="bg-white rounded-full p-1.5 cursor-pointer shadow-md hover:bg-gray-100 transition-colors">
+                      <Edit className="w-4 h-4 text-cream-800" />
+                      <input id="dog-image-upload" type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                    </label>
+                    {dogInfo.image_url && (
+                      <Button variant="ghost" size="icon" className="bg-white rounded-full p-1.5 cursor-pointer shadow-md hover:bg-gray-100 transition-colors ml-1 w-7 h-7" onClick={handleImageDelete}>
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-cream-800 mb-1 font-pretendard">
                     {dogInfo.name}
