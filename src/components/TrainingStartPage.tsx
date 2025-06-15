@@ -16,7 +16,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
       duration: '10-15분',
       difficulty: '초급',
       icon: '🎯',
-      color: 'bg-gradient-to-br from-blue-50 to-blue-100'
+      color: 'bg-gradient-to-br from-blue-100 to-blue-200'
     },
     {
       id: 'toilet',
@@ -25,7 +25,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
       duration: '5-10분',
       difficulty: '초급',
       icon: '🏠',
-      color: 'bg-gradient-to-br from-green-50 to-green-100'
+      color: 'bg-gradient-to-br from-green-100 to-green-200'
     },
     {
       id: 'walk',
@@ -34,7 +34,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
       duration: '15-20분',
       difficulty: '중급',
       icon: '🚶‍♂️',
-      color: 'bg-gradient-to-br from-emerald-50 to-emerald-100'
+      color: 'bg-gradient-to-br from-purple-100 to-purple-200'
     },
     {
       id: 'social',
@@ -43,7 +43,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
       duration: '20-25분',
       difficulty: '중급',
       icon: '🤝',
-      color: 'bg-gradient-to-br from-indigo-50 to-indigo-100'
+      color: 'bg-gradient-to-br from-orange-100 to-orange-200'
     }
   ];
 
@@ -63,52 +63,52 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-100 pb-32">
+    <div className="min-h-screen bg-gradient-to-br from-cream-50 to-orange-50">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-4">
+      <div className="bg-white/80 backdrop-blur-sm border-b border-cream-200 px-6 py-4">
         <div className="flex items-center space-x-3">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => onNavigate('dashboard')}
-            className="text-gray-600 hover:text-gray-800"
+            className="text-cream-600 hover:text-cream-800"
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex items-center space-x-3">
             <div className="text-xl">🎓</div>
             <div>
-              <h1 className="text-lg font-bold text-gray-800">오늘의 훈련</h1>
-              <p className="text-sm text-gray-600">함께 성장해봐요!</p>
+              <h1 className="text-lg font-bold text-cream-800">오늘의 훈련</h1>
+              <p className="text-sm text-cream-600">함께 성장해봐요!</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6 pb-32">
         {/* Today's Progress */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Card className="card-soft p-6 bg-gradient-to-br from-blue-50 to-sky-100 border-blue-200/50">
+          <Card className="card-soft p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-800">오늘의 진행상황</h2>
+              <h2 className="text-xl font-bold text-cream-800">오늘의 진행상황</h2>
               <div className="text-2xl">📊</div>
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">2</div>
-                <p className="text-sm text-gray-600">완료한 훈련</p>
+                <div className="text-2xl font-bold text-orange-600">2</div>
+                <p className="text-sm text-cream-600">완료한 훈련</p>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">25분</div>
-                <p className="text-sm text-gray-600">훈련 시간</p>
+                <div className="text-2xl font-bold text-orange-600">25분</div>
+                <p className="text-sm text-cream-600">훈련 시간</p>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">85%</div>
-                <p className="text-sm text-gray-600">성공률</p>
+                <div className="text-2xl font-bold text-orange-600">85%</div>
+                <p className="text-sm text-cream-600">성공률</p>
               </div>
             </div>
           </Card>
@@ -119,9 +119,8 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl p-4 border border-gray-200/50"
         >
-          <h2 className="text-xl font-bold text-gray-800 mb-4">훈련 선택하기</h2>
+          <h2 className="text-xl font-bold text-cream-800 mb-4">훈련 선택하기</h2>
           <div className="space-y-4">
             {trainingTypes.map((training, index) => (
               <motion.div
@@ -133,7 +132,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
                 <Card
                   className={`p-4 cursor-pointer transition-all duration-200 ${
                     selectedTraining === training.id
-                      ? 'ring-2 ring-blue-400 bg-blue-50 border-blue-200'
+                      ? 'ring-2 ring-orange-400 bg-orange-50 border-orange-200'
                       : 'card-soft hover:shadow-md'
                   }`}
                   onClick={() => setSelectedTraining(training.id)}
@@ -144,18 +143,18 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-bold text-gray-800">{training.title}</h3>
-                        <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <h3 className="font-bold text-cream-800">{training.title}</h3>
+                        <div className="flex items-center space-x-2 text-sm text-cream-600">
                           <Clock className="w-4 h-4" />
                           <span>{training.duration}</span>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-700 mb-2">{training.description}</p>
+                      <p className="text-sm text-cream-700 mb-2">{training.description}</p>
                       <div className="flex items-center justify-between">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                           training.difficulty === '초급' 
                             ? 'bg-green-100 text-green-700'
-                            : 'bg-blue-100 text-blue-700'
+                            : 'bg-orange-100 text-orange-700'
                         }`}>
                           {training.difficulty}
                         </span>
@@ -163,7 +162,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
                           <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center"
+                            className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center"
                           >
                             <div className="w-2 h-2 bg-white rounded-full"></div>
                           </motion.div>
@@ -183,10 +182,10 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card className="card-soft p-6 bg-gradient-to-r from-slate-100 to-gray-100">
-            <div className="flex items-center justify-center space-x-3 mb-4">
+          <Card className="card-soft p-6 bg-gradient-to-r from-orange-100 to-cream-200">
+            <div className="flex items-center space-x-3 mb-4">
               <div className="text-2xl">💡</div>
-              <h3 className="font-bold text-gray-800">훈련 전 체크리스트</h3>
+              <h3 className="font-bold text-cream-800">훈련 전 체크리스트</h3>
             </div>
             <div className="space-y-2">
               {quickTips.map((tip, index) => (
@@ -195,10 +194,10 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: 0.3 + index * 0.1 }}
-                  className="flex items-center justify-center space-x-2"
+                  className="flex items-center space-x-2"
                 >
-                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                  <p className="text-sm text-gray-700">{tip}</p>
+                  <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+                  <p className="text-sm text-cream-700">{tip}</p>
                 </motion.div>
               ))}
             </div>
@@ -206,15 +205,15 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
         </motion.div>
       </div>
 
-      {/* Fixed Bottom Button - positioned above bottom navigation */}
-      <div className="fixed bottom-16 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-200 p-6">
+      {/* Fixed Bottom Button */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-cream-200 p-6">
         <Button
           onClick={handleStartTraining}
           disabled={!selectedTraining}
           className={`w-full py-4 text-lg font-bold transition-all duration-200 ${
             selectedTraining
               ? 'btn-primary'
-              : 'bg-gray-300 text-gray-600 cursor-not-allowed hover:bg-gray-300 hover:scale-100'
+              : 'bg-cream-300 text-cream-600 cursor-not-allowed hover:bg-cream-300 hover:scale-100'
           }`}
         >
           <div className="flex items-center justify-center space-x-2">
