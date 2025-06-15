@@ -5,6 +5,7 @@ import DashboardPage from '@/components/DashboardPage';
 import DogInfoPage from '@/components/DogInfoPage';
 import DogProfilePage from '@/components/DogProfilePage';
 import TrainingStartPage from '@/components/TrainingStartPage';
+import SettingsPage from '@/components/SettingsPage';
 import BottomNavigation from '@/components/BottomNavigation';
 
 const Index = () => {
@@ -58,6 +59,8 @@ const Index = () => {
         return <DogProfilePage onNavigate={handleNavigate} dogInfo={dogInfo} />;
       case 'training':
         return <TrainingStartPage onNavigate={handleNavigate} />;
+      case 'settings':
+        return <SettingsPage />;
       default:
         return <DashboardPage onNavigate={handleNavigate} />;
     }
