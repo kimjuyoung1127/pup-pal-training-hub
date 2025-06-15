@@ -8,24 +8,24 @@
 @layer base {
   :root {
     --background: 248 250 252; /* slate-50 */
-    --foreground: 15 23 42; /* slate-900 */
+    --foreground: 30 41 59;    /* slate-800 */
 
     --card: 255 255 255; /* white */
-    --card-foreground: 15 23 42; /* slate-900 */
+    --card-foreground: 30 41 59; /* slate-800 */
 
     --popover: 255 255 255; /* white */
-    --popover-foreground: 15 23 42; /* slate-900 */
+    --popover-foreground: 30 41 59; /* slate-800 */
 
-    --primary: 37 99 235; /* blue-600 */
+    --primary: 59 130 246; /* blue-500 */
     --primary-foreground: 248 250 252; /* slate-50 */
 
     --secondary: 241 245 249; /* slate-100 */
-    --secondary-foreground: 30 41 59; /* slate-800 */
+    --secondary-foreground: 51 65 85; /* slate-700 */
 
     --muted: 241 245 249; /* slate-100 */
     --muted-foreground: 100 116 139; /* slate-500 */
 
-    --accent: 241 245 249; /* slate-100 */
+    --accent: 226 232 240; /* slate-200 */
     --accent-foreground: 30 41 59; /* slate-800 */
 
     --destructive: 0 84.2% 60.2%;
@@ -37,11 +37,11 @@
 
     --radius: 0.75rem;
 
-    --sidebar-background: 255 255 255; /* white */
-    --sidebar-foreground: 15 23 42; /* slate-900 */
-    --sidebar-primary: 37 99 235; /* blue-600 */
+    --sidebar-background: 241 245 249; /* slate-100 */
+    --sidebar-foreground: 30 41 59;    /* slate-800 */
+    --sidebar-primary: 59 130 246; /* blue-500 */
     --sidebar-primary-foreground: 248 250 252; /* slate-50 */
-    --sidebar-accent: 241 245 249; /* slate-100 */
+    --sidebar-accent: 226 232 240; /* slate-200 */
     --sidebar-accent-foreground: 30 41 59; /* slate-800 */
     --sidebar-border: 226 232 240; /* slate-200 */
     --sidebar-ring: 59 130 246; /* blue-500 */
@@ -49,19 +49,19 @@
 
   .dark {
     --background: 15 23 42; /* slate-900 */
-    --foreground: 248 250 252; /* slate-50 */
+    --foreground: 226 232 240; /* slate-200 */
 
-    --card: 2 6 23; /* slate-950 */
-    --card-foreground: 248 250 252; /* slate-50 */
+    --card: 15 23 42; /* slate-900 */
+    --card-foreground: 226 232 240; /* slate-200 */
 
-    --popover: 2 6 23; /* slate-950 */
-    --popover-foreground: 248 250 252; /* slate-50 */
+    --popover: 15 23 42; /* slate-900 */
+    --popover-foreground: 226 232 240; /* slate-200 */
 
     --primary: 59 130 246; /* blue-500 */
     --primary-foreground: 248 250 252; /* slate-50 */
 
     --secondary: 30 41 59; /* slate-800 */
-    --secondary-foreground: 248 250 252; /* slate-50 */
+    --secondary-foreground: 226 232 240; /* slate-200 */
 
     --muted: 30 41 59; /* slate-800 */
     --muted-foreground: 148 163 184; /* slate-400 */
@@ -76,10 +76,10 @@
     --input: 30 41 59; /* slate-800 */
     --ring: 59 130 246; /* blue-500 */
 
-    --sidebar-background: 2 6 23; /* slate-950 */
-    --sidebar-foreground: 248 250 252; /* slate-50 */
+    --sidebar-background: 15 23 42; /* slate-900 */
+    --sidebar-foreground: 226 232 240; /* slate-200 */
     --sidebar-primary: 59 130 246; /* blue-500 */
-    --sidebar-primary-foreground: 15 23 42; /* slate-900 */
+    --sidebar-primary-foreground: 248 250 252; /* slate-50 */
     --sidebar-accent: 30 41 59; /* slate-800 */
     --sidebar-accent-foreground: 248 250 252; /* slate-50 */
     --sidebar-border: 30 41 59; /* slate-800 */
@@ -103,14 +103,35 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-slate-100 dark:bg-slate-800;
+    @apply bg-slate-100;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-300 dark:bg-slate-600 rounded-full;
+    @apply bg-blue-300 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-400 dark:bg-slate-500;
+    @apply bg-blue-400;
+  }
+}
+
+@layer components {
+  /* 공통 버튼 스타일 */
+  .btn-primary {
+    @apply bg-blue-500 hover:bg-blue-600 text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl;
+  }
+
+  .btn-secondary {
+    @apply bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-105;
+  }
+
+  /* 카드 스타일 */
+  .card-soft {
+    @apply bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200;
+  }
+
+  /* 입력 필드 스타일 */
+  .input-soft {
+    @apply bg-white border-2 border-slate-200 focus:border-blue-400 rounded-xl px-4 py-3 transition-all duration-200 focus:ring-2 focus:ring-blue-200;
   }
 }
