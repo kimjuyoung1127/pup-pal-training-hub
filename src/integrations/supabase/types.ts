@@ -45,6 +45,24 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_missions: {
+        Row: {
+          created_at: string | null
+          id: number
+          mission: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          mission: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          mission?: string
+        }
+        Relationships: []
+      }
       dog_badges: {
         Row: {
           achieved_at: string
@@ -192,6 +210,30 @@ export type Database = {
         }
         Relationships: []
       }
+      recommended_videos: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: number
+          title: string
+          youtube_video_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          title: string
+          youtube_video_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          title?: string
+          youtube_video_id?: string
+        }
+        Relationships: []
+      }
       training_history: {
         Row: {
           created_at: string
@@ -232,6 +274,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      training_tips: {
+        Row: {
+          created_at: string | null
+          id: number
+          tip: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          tip: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          tip?: string
+        }
+        Relationships: []
       }
     }
     Views: {
