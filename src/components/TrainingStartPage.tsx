@@ -1,12 +1,14 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ArrowLeft, Play, Clock, Target, Trophy, Heart } from 'lucide-react';
+import { ArrowLeft, Play, Clock } from 'lucide-react';
+import { useTodaysTrainingStats } from '@/hooks/useTodaysTrainingStats';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void }) => {
   const [selectedTraining, setSelectedTraining] = useState<string | null>(null);
+  const { data: stats, isLoading } = useTodaysTrainingStats();
 
   const trainingTypes = [
     {
@@ -98,18 +100,37 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
               <div className="text-2xl">📊</div>
             </div>
             <div className="grid grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">2</div>
-                <p className="text-sm text-gray-600">완료한 훈련</p>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">25분</div>
-                <p className="text-sm text-gray-600">훈련 시간</p>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">85%</div>
-                <p className="text-sm text-gray-600">성공률</p>
-              </div>
+              {isLoading ? (
+                <>
+                  <div className="text-center space-y-2">
+                    <Skeleton className="h-7 w-1/2 mx-auto" />
+                    <Skeleton className="h-4 w-full mx-auto" />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <Skeleton className="h-7 w-1/2 mx-auto" />
+                    <Skeleton className="h-4 w-full mx-auto" />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <Skeleton className="h-7 w-1/2 mx-auto" />
+                    <Skeleton className="h-4 w-full mx-auto" />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">{stats?.completedTrainings ?? 0}</div>
+                    <p className="text-sm text-gray-600">완료한 훈련</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">{stats?.totalDuration ?? 0}분</div>
+                    <p className="text-sm text-gray-600">훈련 시간</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">{stats?.averageSuccessRate ?? 0}%</div>
+                    <p className="text-sm text-gray-600">성공률</p>
+                  </div>
+                </>
+              )}
             </div>
           </Card>
         </motion.div>
