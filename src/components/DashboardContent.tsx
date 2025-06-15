@@ -79,7 +79,7 @@ const DashboardContent = ({
   return <motion.div className="p-6 space-y-6" variants={containerVariants} initial="hidden" animate="visible">
       {/* Welcome card */}
       <motion.div variants={itemVariants}>
-        <Card className="card-soft p-6 bg-amber-200">
+        <Card className="card-soft p-6 bg-orange-100">
           <div className="flex items-center space-x-4">
             <div className="text-4xl">💬</div>
             <div className="flex-1">
@@ -113,7 +113,7 @@ const DashboardContent = ({
       {video && <motion.div variants={itemVariants}>
           <Card className="card-soft overflow-hidden">
             <img src={`https://i.ytimg.com/vi/${video.youtube_video_id}/hqdefault.jpg`} alt={video.title} className="w-full h-40 object-cover" />
-            <CardContent className="p-4 bg-amber-200">
+            <CardContent className="p-4 bg-orange-100">
               <h3 className="font-bold text-cream-800 mb-2">{video.title}</h3>
               <p className="text-sm text-cream-600 mb-4 h-10 overflow-hidden">{video.description}</p>
               <Button onClick={() => window.open(`https://www.youtube.com/watch?v=${video.youtube_video_id}`, '_blank')} className="w-full btn-primary">
