@@ -144,14 +144,14 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
                       value={dogInfo.name}
                       onChange={(e) => setDogInfo(prev => ({ ...prev, name: e.target.value }))}
                       placeholder="예: 바둑이"
-                      className="mt-2 border-cream-300 focus:border-orange-400"
+                      className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 focus:ring-2 focus:ring-orange-100 rounded-xl"
                     />
                   </div>
 
                   <div>
                     <Label htmlFor="age" className="text-cream-800 font-medium">나이</Label>
                     <Select onValueChange={(value) => setDogInfo(prev => ({ ...prev, age: value }))}>
-                      <SelectTrigger className="mt-2 border-cream-300 focus:border-orange-400">
+                      <SelectTrigger className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl">
                         <SelectValue placeholder="나이를 선택해주세요" />
                       </SelectTrigger>
                       <SelectContent>
@@ -200,14 +200,14 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
                       value={dogInfo.breed}
                       onChange={(e) => setDogInfo(prev => ({ ...prev, breed: e.target.value }))}
                       placeholder="예: 골든 리트리버, 믹스견 등"
-                      className="mt-2 border-cream-300 focus:border-orange-400"
+                      className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 focus:ring-2 focus:ring-orange-100 rounded-xl"
                     />
                   </div>
 
                   <div>
                     <Label htmlFor="weight" className="text-cream-800 font-medium">체중</Label>
                     <Select onValueChange={(value) => setDogInfo(prev => ({ ...prev, weight: value }))}>
-                      <SelectTrigger className="mt-2 border-cream-300 focus:border-orange-400">
+                      <SelectTrigger className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl">
                         <SelectValue placeholder="체중을 선택해주세요" />
                       </SelectTrigger>
                       <SelectContent>
