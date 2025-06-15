@@ -19,10 +19,18 @@ const LoginPage = ({ onLogin }: { onLogin: () => void }) => {
     }
   };
 
-  const handleKakaoLogin = () => {
-    // TODO: Supabase Kakao OAuth 연동
-    console.log('Kakao 로그인 시도');
-    onLogin(); // 임시로 바로 로그인 처리
+  const handleKakaoLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'kakao',
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+
+    if (error) {
+      console.error('카카오 로그인 중 오류 발생:', error);
+      toast.error('로그인 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    }
   };
 
   return (
