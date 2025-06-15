@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -6,7 +5,7 @@ import { BookOpen, Calendar, BarChart3, Settings } from 'lucide-react';
 
 const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream-50 to-orange-50 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-cream-50 to-orange-50">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-cream-200 px-6 py-4">
         <div className="flex items-center justify-between">

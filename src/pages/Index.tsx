@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import OnboardingPage from '@/components/OnboardingPage';
 import LoginPage from '@/components/LoginPage';
@@ -64,7 +65,7 @@ const Index = () => {
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className={`relative min-h-screen ${showBottomNav ? 'pb-20' : ''}`}>
       {renderPage()}
       {showBottomNav && (
         <BottomNavigation 
