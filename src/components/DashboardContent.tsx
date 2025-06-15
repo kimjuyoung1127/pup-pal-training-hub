@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { BookOpen, BarChart3, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
 const DashboardContent = ({
   onNavigate
 }: {
@@ -26,7 +25,6 @@ const DashboardContent = ({
     resetMissionIfNeeded
   } = useDashboardStore();
   const navigate = useNavigate();
-
   useEffect(() => {
     resetMissionIfNeeded();
   }, [resetMissionIfNeeded]);
@@ -81,7 +79,7 @@ const DashboardContent = ({
   return <motion.div className="p-6 space-y-6" variants={containerVariants} initial="hidden" animate="visible">
       {/* Welcome card */}
       <motion.div variants={itemVariants}>
-        <Card className="card-soft p-6">
+        <Card className="card-soft p-6 bg-amber-200">
           <div className="flex items-center space-x-4">
             <div className="text-4xl">💬</div>
             <div className="flex-1">
