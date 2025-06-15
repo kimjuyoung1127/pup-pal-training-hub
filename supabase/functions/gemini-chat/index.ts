@@ -39,9 +39,9 @@ serve(async (req) => {
         contents: contents,
         system_instruction: system_instruction,
         generationConfig: {
-            temperature: 0.7,
-            topK: 1,
-            topP: 1,
+            temperature: 0.8,
+            topK: 40,
+            topP: 0.95,
             maxOutputTokens: 2048,
         },
         safetySettings: [

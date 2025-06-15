@@ -37,7 +37,7 @@ const AiTrainingRecommender = ({ onSelectTraining, selectedTrainingTitle }: AiTr
       delete fullProfile.created_at;
       delete fullProfile.updated_at;
       
-      const prompt = `강아지 프로필: ${JSON.stringify(fullProfile, null, 2)}. 이 프로필을 바탕으로 개인화된 훈련 3가지를 추천해주세요. 각 훈련은 제목, 설명, 난이도('초급', '중급', '고급' 중 하나), 예상 소요 시간(예: '10-15분'), 그리고 단계별 지침 배열(각 단계는 제목, 지침, 팁 포함)을 포함해야 합니다. 전체 응답은 반드시 다음 구조의 JSON 배열이어야 합니다: [{title: string, description: string, difficulty: '초급' | '중급' | '고급', duration: string, steps: [{title: string, instruction: string, tip: string | null}]}]`;
+      const prompt = `강아지 프로필: ${JSON.stringify(fullProfile, null, 2)}. 이 프로필을 바탕으로 개인화된 훈련 3가지를 추천해주세요. 이전에 추천했던 훈련과는 다른, 다양하고 새로운 훈련을 추천하는 것이 중요합니다. 각 훈련은 제목, 설명, 난이도('초급', '중급', '고급' 중 하나), 예상 소요 시간(예: '10-15분'), 그리고 단계별 지침 배열(각 단계는 제목, 지침, 팁 포함)을 포함해야 합니다. 전체 응답은 반드시 다음 구조의 JSON 배열이어야 합니다: [{title: string, description: string, difficulty: '초급' | '중급' | '고급', duration: string, steps: [{title: string, instruction: string, tip: string | null}]}]`;
 
       const { data, error } = await supabase.functions.invoke('gemini-chat', {
         body: { history: [{ role: 'user', parts: [{ text: prompt }] }] },
