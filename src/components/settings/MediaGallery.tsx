@@ -73,7 +73,7 @@ export const MediaGallery = () => {
                                 ) : (
                                     <video src={item.file_url} className="w-full h-full object-cover rounded-md" controls />
                                 )}
-                                <AlertDialog onCancel={() => setMediaToDelete(null)}>
+                                <AlertDialog onOpenChange={(isOpen) => !isOpen && setMediaToDelete(null)}>
                                     <AlertDialogTrigger asChild>
                                         <Button
                                             variant="destructive"
