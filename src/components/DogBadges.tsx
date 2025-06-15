@@ -52,7 +52,7 @@ const DogBadges = ({
             획득한 뱃지
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="bg-orange-100">
           <TooltipProvider delayDuration={100}>
             <div className="grid grid-cols-4 sm:grid-cols-5 gap-y-4 gap-x-2">
               {badges.map((badge, index) => <Tooltip key={index}>
