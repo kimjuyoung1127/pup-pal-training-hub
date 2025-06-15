@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -60,7 +59,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream-50 to-orange-50 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-cream-50 to-cream-100 pb-24">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-cream-200 px-6 py-4">
         <div className="flex items-center justify-between">
@@ -90,11 +89,11 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Card className="card-soft overflow-hidden bg-gradient-to-r from-orange-100 to-cream-200">
+          <Card className="card-soft overflow-hidden bg-gradient-to-r from-cream-100 to-cream-200">
             <CardContent className="p-6">
               <div className="flex items-center space-x-4">
                 <Avatar className="w-20 h-20">
-                  <AvatarFallback className="bg-orange-200 text-2xl">
+                  <AvatarFallback className="bg-cream-300 text-2xl">
                     {getGenderEmoji(currentDogInfo.gender)}
                   </AvatarFallback>
                 </Avatar>
