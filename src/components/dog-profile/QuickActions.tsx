@@ -24,7 +24,7 @@ const QuickActions = ({
           <Button onClick={() => onNavigate('history')} variant="outline" className="w-full border-cream-300 text-cream-700 justify-between py-3 bg-orange-400 hover:bg-orange-300">
             <div className="flex items-center space-x-2">
               <History className="w-4 h-4" />
-              <span className="font-pretendard">훈련 기록 보기</span>
+              <span className="font-pretendard text-slate-950">훈련 기록 보기</span>
             </div>
             <span>📊</span>
           </Button>
