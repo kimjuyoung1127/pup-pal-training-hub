@@ -68,7 +68,7 @@ const DogBadges = ({
                   delay: index * 0.05
                 }}>
                       <span className="text-4xl filter grayscale hover:grayscale-0 transition-all duration-300">{badge.icon || '🏅'}</span>
-                      <UiBadge variant="secondary" className="text-xs px-2 py-0.5 whitespace-nowrap">{badge.name}</UiBadge>
+                      <UiBadge variant="secondary" className="text-xs px-2 py-0.5 whitespace-nowrap bg-slate-50">{badge.name}</UiBadge>
                     </motion.div>
                   </TooltipTrigger>
                   <TooltipContent className="bg-gray-800 text-white rounded-md p-2">
