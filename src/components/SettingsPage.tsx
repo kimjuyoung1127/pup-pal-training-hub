@@ -46,7 +46,7 @@ const SettingsPage = () => {
             </Avatar>
             <div>
               <p className="text-lg font-semibold">{userName || '사용자'}</p>
-              <p className="text-sm text-muted-foreground">{userEmail || '이메일을 찾을 수 없습니다.'}</p>
+              <p className="text-sm text-slate-950">{userEmail || '이메일을 찾을 수 없습니다.'}</p>
             </div>
           </div>
         </CardHeader>
