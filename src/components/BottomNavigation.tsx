@@ -17,10 +17,10 @@ const BottomNavigation = ({ currentPage, onNavigate }: BottomNavigationProps) =>
       page: 'dashboard'
     },
     {
-      id: 'dog-info',
+      id: 'dog-profile',
       label: '강아지',
       icon: User,
-      page: 'dog-info'
+      page: 'dog-profile'
     },
     {
       id: 'training',
