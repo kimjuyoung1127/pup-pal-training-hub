@@ -7,83 +7,83 @@
 
 @layer base {
   :root {
-    --background: 255 252 249; /* cream-50 */
-    --foreground: 153 117 82; /* cream-900 */
+    --background: 248 250 252; /* slate-50 */
+    --foreground: 15 23 42; /* slate-900 */
 
-    --card: 255 246 238; /* cream-100 */
-    --card-foreground: 153 117 82; /* cream-900 */
+    --card: 255 255 255; /* white */
+    --card-foreground: 15 23 42; /* slate-900 */
 
-    --popover: 255 246 238; /* cream-100 */
-    --popover-foreground: 153 117 82; /* cream-900 */
+    --popover: 255 255 255; /* white */
+    --popover-foreground: 15 23 42; /* slate-900 */
 
-    --primary: 255 169 77; /* orange-500 */
-    --primary-foreground: 255 252 249; /* cream-50 */
+    --primary: 37 99 235; /* blue-600 */
+    --primary-foreground: 248 250 252; /* slate-50 */
 
-    --secondary: 255 235 216; /* cream-200 */
-    --secondary-foreground: 179 134 99; /* cream-800 */
+    --secondary: 241 245 249; /* slate-100 */
+    --secondary-foreground: 30 41 59; /* slate-800 */
 
-    --muted: 255 235 216; /* cream-200 */
-    --muted-foreground: 204 159 116; /* cream-700 */
+    --muted: 241 245 249; /* slate-100 */
+    --muted-foreground: 100 116 139; /* slate-500 */
 
-    --accent: 255 213 172; /* cream-400 */
-    --accent-foreground: 179 134 99; /* cream-800 */
+    --accent: 241 245 249; /* slate-100 */
+    --accent-foreground: 30 41 59; /* slate-800 */
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 255 224 194; /* cream-300 */
-    --input: 255 224 194; /* cream-300 */
-    --ring: 255 169 77; /* orange-500 */
+    --border: 226 232 240; /* slate-200 */
+    --input: 226 232 240; /* slate-200 */
+    --ring: 59 130 246; /* blue-500 */
 
     --radius: 0.75rem;
 
-    --sidebar-background: 255 246 238; /* cream-100 */
-    --sidebar-foreground: 153 117 82; /* cream-900 */
-    --sidebar-primary: 255 169 77; /* orange-500 */
-    --sidebar-primary-foreground: 255 252 249; /* cream-50 */
-    --sidebar-accent: 255 235 216; /* cream-200 */
-    --sidebar-accent-foreground: 179 134 99; /* cream-800 */
-    --sidebar-border: 255 224 194; /* cream-300 */
-    --sidebar-ring: 255 169 77; /* orange-500 */
+    --sidebar-background: 255 255 255; /* white */
+    --sidebar-foreground: 15 23 42; /* slate-900 */
+    --sidebar-primary: 37 99 235; /* blue-600 */
+    --sidebar-primary-foreground: 248 250 252; /* slate-50 */
+    --sidebar-accent: 241 245 249; /* slate-100 */
+    --sidebar-accent-foreground: 30 41 59; /* slate-800 */
+    --sidebar-border: 226 232 240; /* slate-200 */
+    --sidebar-ring: 59 130 246; /* blue-500 */
   }
 
   .dark {
-    --background: 179 134 99; /* cream-800 */
-    --foreground: 255 252 249; /* cream-50 */
+    --background: 15 23 42; /* slate-900 */
+    --foreground: 248 250 252; /* slate-50 */
 
-    --card: 153 117 82; /* cream-900 */
-    --card-foreground: 255 252 249; /* cream-50 */
+    --card: 2 6 23; /* slate-950 */
+    --card-foreground: 248 250 252; /* slate-50 */
 
-    --popover: 153 117 82; /* cream-900 */
-    --popover-foreground: 255 252 249; /* cream-50 */
+    --popover: 2 6 23; /* slate-950 */
+    --popover-foreground: 248 250 252; /* slate-50 */
 
-    --primary: 255 169 77; /* orange-500 */
-    --primary-foreground: 153 117 82; /* cream-900 */
+    --primary: 59 130 246; /* blue-500 */
+    --primary-foreground: 248 250 252; /* slate-50 */
 
-    --secondary: 204 159 116; /* cream-700 */
-    --secondary-foreground: 255 252 249; /* cream-50 */
+    --secondary: 30 41 59; /* slate-800 */
+    --secondary-foreground: 248 250 252; /* slate-50 */
 
-    --muted: 204 159 116; /* cream-700 */
-    --muted-foreground: 255 224 194; /* cream-300 */
+    --muted: 30 41 59; /* slate-800 */
+    --muted-foreground: 148 163 184; /* slate-400 */
 
-    --accent: 204 159 116; /* cream-700 */
-    --accent-foreground: 255 252 249; /* cream-50 */
+    --accent: 30 41 59; /* slate-800 */
+    --accent-foreground: 248 250 252; /* slate-50 */
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 204 159 116; /* cream-700 */
-    --input: 204 159 116; /* cream-700 */
-    --ring: 255 169 77; /* orange-500 */
+    --border: 30 41 59; /* slate-800 */
+    --input: 30 41 59; /* slate-800 */
+    --ring: 59 130 246; /* blue-500 */
 
-    --sidebar-background: 153 117 82; /* cream-900 */
-    --sidebar-foreground: 255 252 249; /* cream-50 */
-    --sidebar-primary: 255 169 77; /* orange-500 */
-    --sidebar-primary-foreground: 153 117 82; /* cream-900 */
-    --sidebar-accent: 204 159 116; /* cream-700 */
-    --sidebar-accent-foreground: 255 252 249; /* cream-50 */
-    --sidebar-border: 204 159 116; /* cream-700 */
-    --sidebar-ring: 255 169 77; /* orange-500 */
+    --sidebar-background: 2 6 23; /* slate-950 */
+    --sidebar-foreground: 248 250 252; /* slate-50 */
+    --sidebar-primary: 59 130 246; /* blue-500 */
+    --sidebar-primary-foreground: 15 23 42; /* slate-900 */
+    --sidebar-accent: 30 41 59; /* slate-800 */
+    --sidebar-accent-foreground: 248 250 252; /* slate-50 */
+    --sidebar-border: 30 41 59; /* slate-800 */
+    --sidebar-ring: 59 130 246; /* blue-500 */
   }
 }
 
@@ -103,35 +103,14 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-cream-100;
+    @apply bg-slate-100 dark:bg-slate-800;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-orange-300 rounded-full;
+    @apply bg-slate-300 dark:bg-slate-600 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-orange-400;
-  }
-}
-
-@layer components {
-  /* 공통 버튼 스타일 */
-  .btn-primary {
-    @apply bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl;
-  }
-
-  .btn-secondary {
-    @apply bg-cream-200 hover:bg-cream-300 text-cream-800 font-medium px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-105;
-  }
-
-  /* 카드 스타일 */
-  .card-soft {
-    @apply bg-cream-50 border border-cream-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200;
-  }
-
-  /* 입력 필드 스타일 */
-  .input-soft {
-    @apply bg-cream-50 border-2 border-cream-200 focus:border-orange-400 rounded-xl px-4 py-3 transition-all duration-200 focus:ring-2 focus:ring-orange-200;
+    @apply bg-slate-400 dark:bg-slate-500;
   }
 }

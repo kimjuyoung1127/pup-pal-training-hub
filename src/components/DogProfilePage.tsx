@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Heart, Target, Calendar, Trophy, Bone } from 'lucide-react';
+import { Edit, Heart, Target, Calendar, Trophy, Bone, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface DogInfo {
@@ -59,9 +59,9 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pb-24">
+    <div className="min-h-screen bg-slate-50 pb-24">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-slate-200 px-6 py-4">
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="text-xl">🐾</div>
@@ -74,7 +74,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
             variant="outline"
             size="sm"
             onClick={() => onNavigate('dog-info')}
-            className="text-slate-600 hover:text-slate-800 border-slate-300"
+            className="text-slate-700 hover:text-blue-600 border-slate-300 hover:bg-blue-50"
           >
             <Edit className="w-4 h-4 mr-1" />
             편집
@@ -89,7 +89,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Card className="card-soft overflow-hidden bg-gradient-to-r from-blue-100 to-slate-100">
+          <Card className="overflow-hidden bg-gradient-to-r from-blue-100 to-slate-100">
             <CardContent className="p-6">
               <div className="flex items-center space-x-4">
                 <Avatar className="w-20 h-20">
@@ -124,7 +124,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          <Card className="card-soft">
+          <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center space-x-2 text-slate-800 font-pretendard">
                 <Heart className="w-5 h-5 text-blue-500" />
@@ -136,8 +136,8 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
                 {currentDogInfo.healthStatus.map((status, index) => (
                   <Badge 
                     key={index} 
-                    variant="outline" 
-                    className="bg-blue-50 border-blue-200 text-blue-800"
+                    variant="secondary" 
+                    className="bg-blue-100 text-blue-800"
                   >
                     {status}
                   </Badge>
@@ -153,7 +153,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <Card className="card-soft">
+          <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center space-x-2 text-slate-800 font-pretendard">
                 <Target className="w-5 h-5 text-blue-500" />
@@ -165,7 +165,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
                 {currentDogInfo.trainingGoals.map((goal, index) => (
                   <div 
                     key={index}
-                    className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-100"
+                    className="flex items-center space-x-3 p-3 bg-slate-100 rounded-lg border border-slate-200"
                   >
                     <Target className="w-4 h-4 text-blue-500" />
                     <span className="text-slate-700 font-pretendard">{goal}</span>
@@ -183,18 +183,18 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
           transition={{ duration: 0.6, delay: 0.3 }}
         >
           <div className="grid grid-cols-3 gap-4">
-            <Card className="card-soft text-center p-4">
-              <div className="text-2xl mb-2">📅</div>
+            <Card className="text-center p-4">
+              <Calendar className="w-8 h-8 mx-auto mb-2 text-blue-500" />
               <p className="text-lg font-bold text-blue-600">7일</p>
               <p className="text-xs text-slate-600 font-pretendard">연속 훈련</p>
             </Card>
-            <Card className="card-soft text-center p-4">
-              <div className="text-2xl mb-2">🏆</div>
+            <Card className="text-center p-4">
+              <Trophy className="w-8 h-8 mx-auto mb-2 text-blue-500" />
               <p className="text-lg font-bold text-blue-600">85%</p>
               <p className="text-xs text-slate-600 font-pretendard">성공률</p>
             </Card>
-            <Card className="card-soft text-center p-4">
-              <div className="text-2xl mb-2">⭐</div>
+            <Card className="text-center p-4">
+              <Star className="w-8 h-8 mx-auto mb-2 text-blue-500" />
               <p className="text-lg font-bold text-blue-600">12</p>
               <p className="text-xs text-slate-600 font-pretendard">획득 뱃지</p>
             </Card>
@@ -207,7 +207,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <Card className="card-soft">
+          <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-slate-800 font-pretendard">빠른 액션</CardTitle>
             </CardHeader>
@@ -215,24 +215,26 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
               <div className="space-y-3">
                 <Button
                   onClick={() => onNavigate('training')}
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white justify-between py-3"
+                  className="w-full justify-between py-6"
+                  size="lg"
                 >
                   <div className="flex items-center space-x-2">
-                    <Bone className="w-4 h-4" />
-                    <span className="font-pretendard">오늘의 훈련 시작</span>
+                    <Bone className="w-5 h-5" />
+                    <span className="font-pretendard font-bold">오늘의 훈련 시작</span>
                   </div>
-                  <span>🎯</span>
+                  <span className="text-xl">🎯</span>
                 </Button>
                 <Button
                   onClick={() => onNavigate('dashboard')}
                   variant="outline"
-                  className="w-full border-slate-300 text-slate-700 hover:bg-slate-100 justify-between py-3"
+                  className="w-full justify-between py-6"
+                  size="lg"
                 >
                   <div className="flex items-center space-x-2">
-                    <Calendar className="w-4 h-4" />
-                    <span className="font-pretendard">훈련 기록 보기</span>
+                    <Calendar className="w-5 h-5" />
+                    <span className="font-pretendard font-semibold">훈련 기록 보기</span>
                   </div>
-                  <span>📊</span>
+                  <span className="text-xl">📊</span>
                 </Button>
               </div>
             </CardContent>
