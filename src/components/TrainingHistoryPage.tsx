@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from 'lucide-react';
@@ -7,7 +6,6 @@ import { useDogBadges } from '@/hooks/useDogBadges';
 import DogBadges from './DogBadges';
 import DeleteTrainingLogDialog from './DeleteTrainingLogDialog';
 import EditTrainingLogDialog from './EditTrainingLogDialog';
-import TodaysProgressCard from './training-history/TodaysProgressCard';
 import TrainingHistorySkeleton from './training-history/TrainingHistorySkeleton';
 import EmptyTrainingHistory from './training-history/EmptyTrainingHistory';
 import TrainingHistoryList from './training-history/TrainingHistoryList';
@@ -52,8 +50,6 @@ const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
         </Button>
         <h1 className="text-2xl font-bold text-gray-800 ml-2">훈련 기록</h1>
       </div>
-      
-      <TodaysProgressCard />
       
       <DogBadges badges={badges || []} isLoading={isLoadingBadges} />
 
