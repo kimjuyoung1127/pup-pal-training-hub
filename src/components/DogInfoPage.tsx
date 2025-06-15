@@ -65,21 +65,21 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
     fetchOptions();
   }, []);
 
-  const handleHealthStatusChange = (status: string, checked: boolean) => {
+  const handleHealthStatusChange = (statusId: number, checked: boolean) => {
     setDogInfo(prev => ({
       ...prev,
       healthStatus: checked 
-        ? [...prev.healthStatus, status]
-        : prev.healthStatus.filter(s => s !== status)
+        ? [...prev.healthStatus, statusId]
+        : prev.healthStatus.filter(id => id !== statusId)
     }));
   };
 
-  const handleTrainingGoalChange = (goal: string, checked: boolean) => {
+  const handleTrainingGoalChange = (goalId: number, checked: boolean) => {
     setDogInfo(prev => ({
       ...prev,
       trainingGoals: checked 
-        ? [...prev.trainingGoals, goal]
-        : prev.trainingGoals.filter(g => g !== goal)
+        ? [...prev.trainingGoals, goalId]
+        : prev.trainingGoals.filter(id => id !== goalId)
     }));
   };
 
@@ -116,10 +116,9 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
 
     const dogId = dogData.id;
 
-    const selectedHealthOptions = healthOptions.filter(option => dogInfo.healthStatus.includes(option.label));
-    const healthStatusInserts = selectedHealthOptions.map(option => ({
+    const healthStatusInserts = dogInfo.healthStatus.map(optionId => ({
       dog_id: dogId,
-      health_status_option_id: option.id
+      health_status_option_id: optionId
     }));
     
     if (healthStatusInserts.length > 0) {
@@ -127,10 +126,9 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
       if (healthStatusError) console.error('Error saving health status:', healthStatusError);
     }
 
-    const selectedTrainingGoals = trainingGoalOptions.filter(option => dogInfo.trainingGoals.includes(option.label));
-    const trainingGoalsInserts = selectedTrainingGoals.map(option => ({
+    const trainingGoalsInserts = dogInfo.trainingGoals.map(optionId => ({
       dog_id: dogId,
-      behavior_option_id: option.id
+      behavior_option_id: optionId
     }));
 
     if (trainingGoalsInserts.length > 0) {
@@ -191,8 +189,8 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
       case 2:
         return <Step3_TrainingGoals 
           dogInfo={dogInfo} 
-          healthOptions={healthOptions.map(o => ({ ...o, id: o.label }))}
-          trainingGoalOptions={trainingGoalOptions.map(o => ({ ...o, id: o.label }))}
+          healthOptions={healthOptions}
+          trainingGoalOptions={trainingGoalOptions}
           handleHealthStatusChange={handleHealthStatusChange} 
           handleTrainingGoalChange={handleTrainingGoalChange} 
         />;

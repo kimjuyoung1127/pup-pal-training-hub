@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +16,8 @@ interface DogProfilePageProps {
 
 const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
   const [dogInfo, setDogInfo] = useState<DogInfo | null>(null);
+  const [healthStatusNames, setHealthStatusNames] = useState<string[]>([]);
+  const [trainingGoalNames, setTrainingGoalNames] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -46,12 +49,12 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
       const { data: healthLinks } = await supabase.from('dog_health_status').select('health_status_option_id').eq('dog_id', dogData.id);
       const healthStatusIds = healthLinks?.map(l => l.health_status_option_id) || [];
       const { data: healthStatusData } = healthStatusIds.length > 0 ? await supabase.from('health_status_options').select('name').in('id', healthStatusIds) : { data: [] };
-      const healthStatusNames = healthStatusData?.map(s => s.name) || [];
+      const fetchedHealthStatusNames = healthStatusData?.map(s => s.name) || [];
         
       const { data: behaviorLinks } = await supabase.from('dog_desired_behaviors').select('behavior_option_id').eq('dog_id', dogData.id);
       const behaviorIds = behaviorLinks?.map(l => l.behavior_option_id) || [];
       const { data: behaviorData } = behaviorIds.length > 0 ? await supabase.from('behavior_options').select('name').in('id', behaviorIds) : { data: [] };
-      const trainingGoalNames = behaviorData?.map(g => g.name) || [];
+      const fetchedTrainingGoalNames = behaviorData?.map(g => g.name) || [];
       
       const fullDogInfo: DogInfo = {
         name: dogData.name || '',
@@ -59,11 +62,13 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
         gender: dogData.gender || '',
         breed: dogData.breed || '',
         weight: dogData.weight || '',
-        healthStatus: healthStatusNames,
-        trainingGoals: trainingGoalNames
+        healthStatus: healthStatusIds,
+        trainingGoals: behaviorIds
       };
 
       setDogInfo(fullDogInfo);
+      setHealthStatusNames(fetchedHealthStatusNames);
+      setTrainingGoalNames(fetchedTrainingGoalNames);
       setIsLoading(false);
     };
 
@@ -191,7 +196,7 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
-                {dogInfo.healthStatus.map((status, index) => (
+                {healthStatusNames.map((status, index) => (
                   <Badge 
                     key={index} 
                     variant="outline" 
@@ -220,7 +225,7 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 gap-3">
-                {dogInfo.trainingGoals.map((goal, index) => (
+                {trainingGoalNames.map((goal, index) => (
                   <div 
                     key={index}
                     className="flex items-center space-x-3 p-3 bg-orange-50 rounded-lg border border-orange-100"

@@ -5,8 +5,8 @@ export interface DogInfo {
   gender: string;
   breed: string;
   weight: string;
-  healthStatus: string[];
-  trainingGoals: string[];
+  healthStatus: number[];
+  trainingGoals: number[];
 }
 
 export const dogBreeds = [

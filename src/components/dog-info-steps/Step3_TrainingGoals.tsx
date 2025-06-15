@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { DogInfo } from '@/types/dog';
 
 type Option = {
-  id: string;
+  id: number;
   label: string;
   icon: string;
 };
@@ -17,8 +17,8 @@ interface Props {
   dogInfo: DogInfo;
   healthOptions: Option[];
   trainingGoalOptions: Option[];
-  handleHealthStatusChange: (status: string, checked: boolean) => void;
-  handleTrainingGoalChange: (goal: string, checked: boolean) => void;
+  handleHealthStatusChange: (statusId: number, checked: boolean) => void;
+  handleTrainingGoalChange: (goalId: number, checked: boolean) => void;
 }
 
 const Step3_TrainingGoals: React.FC<Props> = ({ 
