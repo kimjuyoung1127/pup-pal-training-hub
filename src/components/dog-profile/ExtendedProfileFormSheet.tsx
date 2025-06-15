@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -93,16 +92,12 @@ const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedPro
     const renderFormField = () => {
         if (!mission) return null;
 
-        const commonProps = {
-            name: 'value',
-            control: form.control
-        };
-
         switch(mission.key) {
             case 'living_environment':
                 return (
                     <FormField
-                        {...commonProps}
+                        control={form.control}
+                        name="value"
                         render={({ field }) => (
                             <FormItem className="space-y-3">
                                 <FormLabel>어디에 살고 있나요?</FormLabel>
@@ -128,7 +123,8 @@ const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedPro
             default:
                 return (
                     <FormField
-                        {...commonProps}
+                        control={form.control}
+                        name="value"
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>{mission.question}</FormLabel>
