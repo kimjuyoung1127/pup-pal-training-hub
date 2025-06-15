@@ -64,6 +64,8 @@ const AiTrainingRecommender = ({ onSelectTraining, selectedTrainingTitle }: AiTr
   const handleSelect = (aiTraining: AiTrainingProgram) => {
     const trainingProgram: TrainingProgram = {
       ...aiTraining,
+      id: `ai-${aiTraining.title}`,
+      color: 'orange',
       Icon: Star,
     };
     onSelectTraining(trainingProgram);
@@ -124,4 +126,3 @@ const AiTrainingRecommender = ({ onSelectTraining, selectedTrainingTitle }: AiTr
 };
 
 export default AiTrainingRecommender;
-
