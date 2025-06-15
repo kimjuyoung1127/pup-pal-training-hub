@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { checkAndAwardBadges } from '@/lib/badgeManager';
 
 export interface TrainingLog {
   id: string;
@@ -98,11 +99,19 @@ export const useTrainingHistory = () => {
             }
             return data;
         },
-        onSuccess: () => {
+        onSuccess: (newLog: any) => {
             toast.success('훈련 기록이 저장되었습니다.');
+            
+            if (newLog && newLog.dog_id) {
+                checkAndAwardBadges(newLog.dog_id).finally(() => {
+                    queryClient.invalidateQueries({ queryKey: ['dogBadges'] });
+                    queryClient.invalidateQueries({ queryKey: ['dogProfile'] });
+                });
+            } else {
+                queryClient.invalidateQueries({ queryKey: ['dogBadges'] });
+                queryClient.invalidateQueries({ queryKey: ['dogProfile'] });
+            }
             queryClient.invalidateQueries({ queryKey: ['trainingHistory'] });
-            queryClient.invalidateQueries({ queryKey: ['dogBadges'] });
-            queryClient.invalidateQueries({ queryKey: ['dogProfile'] });
         },
         onError: (error) => {
             console.error('Error adding training log:', error);
