@@ -17,7 +17,7 @@ const QuickActions = ({
           <Button onClick={() => onNavigate('training')} className="w-full bg-orange-500 hover:bg-orange-600 text-white justify-between py-3">
             <div className="flex items-center space-x-2">
               <Bone className="w-4 h-4" />
-              <span className="font-pretendard">오늘의 훈련 시작</span>
+              <span className="font-pretendard text-slate-950">오늘의 훈련 시작</span>
             </div>
             <span>🎯</span>
           </Button>
