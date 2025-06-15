@@ -52,19 +52,6 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				// 강아지 앱 전용 컬러 팔레트
-				cream: {
-					50: '#FFFCF9',
-					100: '#FFF6EE',
-					200: '#FFEBD8',
-					300: '#FFE0C2',
-					400: '#FFD5AC',
-					500: '#FFCA96',
-					600: '#E6B585',
-					700: '#CC9F74',
-					800: '#B38A63',
-					900: '#997552',
-				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',

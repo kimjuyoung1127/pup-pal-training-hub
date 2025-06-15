@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -60,22 +59,22 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream-50 to-cream-100 pb-24">
+    <div className="min-h-screen bg-slate-50 pb-24">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-cream-200 px-6 py-4">
+      <div className="bg-white/80 backdrop-blur-sm border-b border-slate-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="text-xl">🐾</div>
             <div>
-              <h1 className="text-lg font-bold text-cream-800 font-pretendard">우리 아이 프로필</h1>
-              <p className="text-sm text-cream-600 font-pretendard">소중한 가족을 소개합니다</p>
+              <h1 className="text-lg font-bold text-slate-800 font-pretendard">우리 아이 프로필</h1>
+              <p className="text-sm text-slate-600 font-pretendard">소중한 가족을 소개합니다</p>
             </div>
           </div>
           <Button
             variant="outline"
             size="sm"
             onClick={() => onNavigate('dog-info')}
-            className="text-cream-600 hover:text-cream-800 border-cream-300"
+            className="text-slate-600 hover:text-slate-800 border-slate-300"
           >
             <Edit className="w-4 h-4 mr-1" />
             편집
@@ -90,26 +89,26 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Card className="card-soft overflow-hidden bg-gradient-to-r from-cream-100 to-cream-200">
+          <Card className="card-soft overflow-hidden bg-gradient-to-r from-white to-slate-50">
             <CardContent className="p-6">
               <div className="flex items-center space-x-4">
                 <Avatar className="w-20 h-20">
-                  <AvatarFallback className="bg-cream-300 text-2xl">
+                  <AvatarFallback className="bg-blue-100 text-blue-600 text-2xl">
                     {getGenderEmoji(currentDogInfo.gender)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-cream-800 mb-1 font-pretendard">
+                  <h2 className="text-2xl font-bold text-slate-800 mb-1 font-pretendard">
                     {currentDogInfo.name}
                   </h2>
-                  <p className="text-cream-700 mb-2 font-pretendard">
+                  <p className="text-slate-700 mb-2 font-pretendard">
                     {currentDogInfo.breed} • {currentDogInfo.gender === 'male' ? '남아' : '여아'}
                   </p>
                   <div className="flex space-x-2">
-                    <Badge variant="secondary" className="bg-cream-200 text-cream-800">
+                    <Badge variant="secondary">
                       {getAgeLabel(currentDogInfo.age)}
                     </Badge>
-                    <Badge variant="secondary" className="bg-cream-200 text-cream-800">
+                    <Badge variant="secondary">
                       {getWeightLabel(currentDogInfo.weight)}
                     </Badge>
                   </div>
@@ -127,7 +126,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
         >
           <Card className="card-soft">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center space-x-2 text-cream-800 font-pretendard">
+              <CardTitle className="flex items-center space-x-2 text-slate-800 font-pretendard">
                 <Heart className="w-5 h-5 text-blue-500" />
                 <span>건강 상태</span>
               </CardTitle>
@@ -156,7 +155,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
         >
           <Card className="card-soft">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center space-x-2 text-cream-800 font-pretendard">
+              <CardTitle className="flex items-center space-x-2 text-slate-800 font-pretendard">
                 <Target className="w-5 h-5 text-blue-500" />
                 <span>훈련 목표</span>
               </CardTitle>
@@ -169,7 +168,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
                     className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-100"
                   >
                     <Target className="w-4 h-4 text-blue-500" />
-                    <span className="text-cream-700 font-pretendard">{goal}</span>
+                    <span className="text-slate-700 font-pretendard">{goal}</span>
                   </div>
                 ))}
               </div>
@@ -187,17 +186,17 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
             <Card className="card-soft text-center p-4">
               <div className="text-2xl mb-2">📅</div>
               <p className="text-lg font-bold text-blue-600">7일</p>
-              <p className="text-xs text-cream-600 font-pretendard">연속 훈련</p>
+              <p className="text-xs text-slate-600 font-pretendard">연속 훈련</p>
             </Card>
             <Card className="card-soft text-center p-4">
               <div className="text-2xl mb-2">🏆</div>
               <p className="text-lg font-bold text-blue-600">85%</p>
-              <p className="text-xs text-cream-600 font-pretendard">성공률</p>
+              <p className="text-xs text-slate-600 font-pretendard">성공률</p>
             </Card>
             <Card className="card-soft text-center p-4">
               <div className="text-2xl mb-2">⭐</div>
               <p className="text-lg font-bold text-blue-600">12</p>
-              <p className="text-xs text-cream-600 font-pretendard">획득 뱃지</p>
+              <p className="text-xs text-slate-600 font-pretendard">획득 뱃지</p>
             </Card>
           </div>
         </motion.div>
@@ -210,7 +209,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
         >
           <Card className="card-soft">
             <CardHeader className="pb-3">
-              <CardTitle className="text-cream-800 font-pretendard">빠른 액션</CardTitle>
+              <CardTitle className="text-slate-800 font-pretendard">빠른 액션</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -227,7 +226,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
                 <Button
                   onClick={() => onNavigate('dashboard')}
                   variant="outline"
-                  className="w-full border-cream-300 text-cream-700 hover:bg-cream-100 justify-between py-3"
+                  className="w-full border-slate-300 text-slate-700 hover:bg-slate-100 justify-between py-3"
                 >
                   <div className="flex items-center space-x-2">
                     <Calendar className="w-4 h-4" />
