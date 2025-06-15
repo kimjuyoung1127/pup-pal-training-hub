@@ -75,8 +75,8 @@ const GeminiChatPage = () => {
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-full">
-                <Dog className="w-6 h-6 text-blue-600" />
+            <div className="p-2 bg-orange-100 rounded-full">
+                <Dog className="w-6 h-6 text-orange-600" />
             </div>
             <div>
               <h1 className="text-lg font-bold text-gray-800">AI 훈련 코치</h1>
@@ -98,11 +98,11 @@ const GeminiChatPage = () => {
               className={`flex items-end gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {msg.role === 'model' && (
-                  <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-orange-200 flex items-center justify-center text-orange-700 shrink-0">
                       <Dog size={20} />
                   </div>
               )}
-              <Card className={`max-w-xs md:max-w-md p-3 rounded-2xl ${msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-white'}`}>
+              <Card className={`max-w-xs md:max-w-md p-3 rounded-2xl ${msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-white text-cream-900'}`}>
                 <p className="whitespace-pre-wrap">{msg.parts[0].text}</p>
               </Card>
             </motion.div>
@@ -114,7 +114,7 @@ const GeminiChatPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="flex items-end gap-2 justify-start"
           >
-            <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white shrink-0">
+            <div className="w-8 h-8 rounded-full bg-orange-200 flex items-center justify-center text-orange-700 shrink-0">
                 <Dog size={20} />
             </div>
             <Card className="max-w-xs md:max-w-md p-3 rounded-2xl bg-white">
