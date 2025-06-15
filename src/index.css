@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -16,7 +15,7 @@
     --popover: 255 246 238; /* cream-100 */
     --popover-foreground: 153 117 82; /* cream-900 */
 
-    --primary: 255 169 77; /* orange-500 */
+    --primary: 59 130 246; /* blue-500 */
     --primary-foreground: 255 252 249; /* cream-50 */
 
     --secondary: 255 235 216; /* cream-200 */
@@ -33,18 +32,18 @@
 
     --border: 255 224 194; /* cream-300 */
     --input: 255 224 194; /* cream-300 */
-    --ring: 255 169 77; /* orange-500 */
+    --ring: 59 130 246; /* blue-500 */
 
     --radius: 0.75rem;
 
     --sidebar-background: 255 246 238; /* cream-100 */
     --sidebar-foreground: 153 117 82; /* cream-900 */
-    --sidebar-primary: 255 169 77; /* orange-500 */
+    --sidebar-primary: 59 130 246; /* blue-500 */
     --sidebar-primary-foreground: 255 252 249; /* cream-50 */
     --sidebar-accent: 255 235 216; /* cream-200 */
     --sidebar-accent-foreground: 179 134 99; /* cream-800 */
     --sidebar-border: 255 224 194; /* cream-300 */
-    --sidebar-ring: 255 169 77; /* orange-500 */
+    --sidebar-ring: 59 130 246; /* blue-500 */
   }
 
   .dark {
@@ -57,8 +56,8 @@
     --popover: 153 117 82; /* cream-900 */
     --popover-foreground: 255 252 249; /* cream-50 */
 
-    --primary: 255 169 77; /* orange-500 */
-    --primary-foreground: 153 117 82; /* cream-900 */
+    --primary: 59 130 246; /* blue-500 */
+    --primary-foreground: 255 252 249; /* cream-50 */
 
     --secondary: 204 159 116; /* cream-700 */
     --secondary-foreground: 255 252 249; /* cream-50 */
@@ -74,16 +73,16 @@
 
     --border: 204 159 116; /* cream-700 */
     --input: 204 159 116; /* cream-700 */
-    --ring: 255 169 77; /* orange-500 */
+    --ring: 59 130 246; /* blue-500 */
 
     --sidebar-background: 153 117 82; /* cream-900 */
     --sidebar-foreground: 255 252 249; /* cream-50 */
-    --sidebar-primary: 255 169 77; /* orange-500 */
-    --sidebar-primary-foreground: 153 117 82; /* cream-900 */
+    --sidebar-primary: 59 130 246; /* blue-500 */
+    --sidebar-primary-foreground: 255 252 249; /* cream-50 */
     --sidebar-accent: 204 159 116; /* cream-700 */
     --sidebar-accent-foreground: 255 252 249; /* cream-50 */
     --sidebar-border: 204 159 116; /* cream-700 */
-    --sidebar-ring: 255 169 77; /* orange-500 */
+    --sidebar-ring: 59 130 246; /* blue-500 */
   }
 }
 
@@ -107,18 +106,18 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-orange-300 rounded-full;
+    @apply bg-blue-300 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-orange-400;
+    @apply bg-blue-400;
   }
 }
 
 @layer components {
   /* 공통 버튼 스타일 */
   .btn-primary {
-    @apply bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl;
+    @apply bg-blue-500 hover:bg-blue-600 text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl;
   }
 
   .btn-secondary {

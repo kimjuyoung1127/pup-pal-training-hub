@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -65,18 +64,6 @@ export default {
 					700: '#CC9F74',
 					800: '#B38A63',
 					900: '#997552',
-				},
-				orange: {
-					50: '#FFF7F0',
-					100: '#FFEDE0',
-					200: '#FFD4B8',
-					300: '#FFBB90',
-					400: '#FFA268',
-					500: '#FFA94D', // 메인 오렌지
-					600: '#E6983D',
-					700: '#CC872D',
-					800: '#B3761D',
-					900: '#99650D',
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',

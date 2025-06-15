@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -127,7 +128,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
           <Card className="card-soft">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center space-x-2 text-cream-800 font-pretendard">
-                <Heart className="w-5 h-5 text-orange-500" />
+                <Heart className="w-5 h-5 text-blue-500" />
                 <span>건강 상태</span>
               </CardTitle>
             </CardHeader>
@@ -156,7 +157,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
           <Card className="card-soft">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center space-x-2 text-cream-800 font-pretendard">
-                <Target className="w-5 h-5 text-orange-500" />
+                <Target className="w-5 h-5 text-blue-500" />
                 <span>훈련 목표</span>
               </CardTitle>
             </CardHeader>
@@ -165,9 +166,9 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
                 {currentDogInfo.trainingGoals.map((goal, index) => (
                   <div 
                     key={index}
-                    className="flex items-center space-x-3 p-3 bg-orange-50 rounded-lg border border-orange-100"
+                    className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-100"
                   >
-                    <Target className="w-4 h-4 text-orange-500" />
+                    <Target className="w-4 h-4 text-blue-500" />
                     <span className="text-cream-700 font-pretendard">{goal}</span>
                   </div>
                 ))}
@@ -185,17 +186,17 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
           <div className="grid grid-cols-3 gap-4">
             <Card className="card-soft text-center p-4">
               <div className="text-2xl mb-2">📅</div>
-              <p className="text-lg font-bold text-orange-600">7일</p>
+              <p className="text-lg font-bold text-blue-600">7일</p>
               <p className="text-xs text-cream-600 font-pretendard">연속 훈련</p>
             </Card>
             <Card className="card-soft text-center p-4">
               <div className="text-2xl mb-2">🏆</div>
-              <p className="text-lg font-bold text-orange-600">85%</p>
+              <p className="text-lg font-bold text-blue-600">85%</p>
               <p className="text-xs text-cream-600 font-pretendard">성공률</p>
             </Card>
             <Card className="card-soft text-center p-4">
               <div className="text-2xl mb-2">⭐</div>
-              <p className="text-lg font-bold text-orange-600">12</p>
+              <p className="text-lg font-bold text-blue-600">12</p>
               <p className="text-xs text-cream-600 font-pretendard">획득 뱃지</p>
             </Card>
           </div>
@@ -215,7 +216,7 @@ const DogProfilePage = ({ onNavigate, dogInfo }: DogProfilePageProps) => {
               <div className="space-y-3">
                 <Button
                   onClick={() => onNavigate('training')}
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white justify-between py-3"
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white justify-between py-3"
                 >
                   <div className="flex items-center space-x-2">
                     <Bone className="w-4 h-4" />
