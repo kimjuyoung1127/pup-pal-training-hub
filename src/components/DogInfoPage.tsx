@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -7,14 +8,8 @@ import { DogInfo } from '@/types/dog';
 import Step1_BasicInfo from './dog-info-steps/Step1_BasicInfo';
 import Step2_DogFeatures from './dog-info-steps/Step2_DogFeatures';
 import Step3_TrainingGoals from './dog-info-steps/Step3_TrainingGoals';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from "sonner";
-
-type Option = {
-  id: number;
-  label: string;
-  icon: string;
-};
+import { useDogInfoOptions } from '@/hooks/useDogInfoOptions';
+import { useSaveDogInfo } from '@/hooks/useSaveDogInfo';
 
 const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void }) => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -28,56 +23,14 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
     healthStatus: [],
     trainingGoals: []
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [optionsLoading, setOptionsLoading] = useState(true);
 
-  const [healthOptions, setHealthOptions] = useState<Option[]>([]);
-  const [trainingGoalOptions, setTrainingGoalOptions] = useState<Option[]>([]);
+  const { healthOptions, trainingGoalOptions, isLoading: optionsLoading } = useDogInfoOptions();
 
-  const healthIcons: Record<string, string> = {
-    '건강함': '💚', '관절 문제': '🦴', '알레르기': '🤧', '소화 문제': '🤱',
-    '피부 질환': '🐕', '과체중': '⚖️', '저체중': '📏', '기타': '🏥'
-  };
-
-  const trainingGoalIcons: Record<string, string> = {
-    '기본 예절 훈련': '🎓', '배변 훈련': '🚽', '짖음 줄이기': '🤫', '산책 훈련': '🚶',
-    '사회성 훈련': '👥', '분리불안 해결': '💔', '물어뜯기 교정': '🚫',
-    '손 올리기/앉기': '✋', '기다려': '⏱️', '이리와': '🤗'
-  };
-
-  useEffect(() => {
-    const fetchOptions = async () => {
-      setOptionsLoading(true);
-      try {
-        const [healthResult, trainingResult] = await Promise.all([
-          supabase.from('health_status_options').select('id, name'),
-          supabase.from('behavior_options').select('id, name')
-        ]);
-
-        const { data: healthData, error: healthError } = healthResult;
-        if (healthError) {
-          console.error('Error fetching health options:', healthError);
-          toast.error("건강 상태 목록을 불러오는데 실패했습니다.");
-        } else if (healthData) {
-          setHealthOptions(healthData.map(o => ({ id: o.id, label: o.name, icon: healthIcons[o.name] || '❓' })));
-        }
-
-        const { data: trainingData, error: trainingError } = trainingResult;
-        if (trainingError) {
-          console.error('Error fetching training options:', trainingError);
-          toast.error("훈련 목표 목록을 불러오는데 실패했습니다.");
-        } else if (trainingData) {
-          setTrainingGoalOptions(trainingData.map(o => ({ id: o.id, label: o.name, icon: trainingGoalIcons[o.name] || '❓' })));
-        }
-      } catch (error) {
-        console.error("Error fetching options:", error);
-        toast.error("옵션 목록을 불러오는 중 오류가 발생했습니다.");
-      } finally {
-        setOptionsLoading(false);
-      }
-    };
-    fetchOptions();
-  }, []);
+  const { mutate: saveDog, isPending: isSaving } = useSaveDogInfo({
+    onSuccess: (savedDogInfo) => {
+      onComplete(savedDogInfo);
+    },
+  });
 
   const handleHealthStatusChange = (statusIds: string[]) => {
     setDogInfo(prev => ({
@@ -93,69 +46,11 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
     }));
   };
 
-  const handleComplete = async () => {
-    setIsLoading(true);
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      toast.error("로그인이 필요합니다. 로그인 후 다시 시도해주세요.");
-      console.error("User not logged in. Cannot save dog info.");
-      setIsLoading(false);
-      return;
-    }
-
-    const { data: dogData, error: dogError } = await supabase
-      .from('dogs')
-      .insert({
-        name: dogInfo.name,
-        age: dogInfo.age,
-        gender: dogInfo.gender,
-        breed: dogInfo.breed,
-        weight: dogInfo.weight,
-        user_id: user.id
-      })
-      .select()
-      .single();
-
-    if (dogError || !dogData) {
-      console.error('Error saving dog info:', dogError);
-      toast.error("강아지 정보 저장에 실패했습니다.");
-      setIsLoading(false);
-      return;
-    }
-
-    const dogId = dogData.id;
-
-    const healthStatusInserts = dogInfo.healthStatus.map(optionId => ({
-      dog_id: dogId,
-      health_status_option_id: optionId
-    }));
-    
-    if (healthStatusInserts.length > 0) {
-      const { error: healthStatusError } = await supabase.from('dog_health_status').insert(healthStatusInserts);
-      if (healthStatusError) console.error('Error saving health status:', healthStatusError);
-    }
-
-    const trainingGoalsInserts = dogInfo.trainingGoals.map(optionId => ({
-      dog_id: dogId,
-      behavior_option_id: optionId
-    }));
-
-    if (trainingGoalsInserts.length > 0) {
-      const { error: trainingGoalsError } = await supabase.from('dog_desired_behaviors').insert(trainingGoalsInserts);
-      if (trainingGoalsError) console.error('Error saving training goals:', trainingGoalsError);
-    }
-    
-    toast.success("강아지 정보가 성공적으로 저장되었습니다!");
-    setIsLoading(false);
-    onComplete(dogInfo);
-  };
-
-  const nextStep = async () => {
+  const nextStep = () => {
     if (currentStep < 2) {
       setCurrentStep(currentStep + 1);
     } else {
-      await handleComplete();
+      saveDog(dogInfo);
     }
   };
 
@@ -283,10 +178,10 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
 
           <Button
             onClick={nextStep}
-            disabled={!canProceed() || isLoading}
+            disabled={!canProceed() || isSaving}
             className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white font-pretendard"
           >
-            <span>{currentStep === 2 ? (isLoading ? '저장 중...' : '완료') : '다음'}</span>
+            <span>{currentStep === 2 ? (isSaving ? '저장 중...' : '완료') : '다음'}</span>
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
