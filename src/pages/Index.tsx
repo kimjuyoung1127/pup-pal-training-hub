@@ -1,6 +1,4 @@
-
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import OnboardingPage from '@/components/OnboardingPage';
 import LoginPage from '@/components/LoginPage';
 import DashboardPage from '@/components/DashboardPage';
@@ -115,17 +113,7 @@ const Index = () => {
 
   return (
     <div className={`relative min-h-screen ${showBottomNav ? 'pb-20' : ''}`}>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentPage}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2, ease: "easeInOut" }}
-        >
-          {renderPage()}
-        </motion.div>
-      </AnimatePresence>
+      {renderPage()}
       {showBottomNav && (
         <BottomNavigation 
           currentPage={currentPage}
