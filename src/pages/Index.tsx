@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import OnboardingPage from '@/components/OnboardingPage';
 import LoginPage from '@/components/LoginPage';
@@ -38,8 +37,8 @@ const Index = () => {
   const handleDogInfoComplete = (completedDogInfo: any) => {
     console.log('Dog info completed:', completedDogInfo);
     setDogInfo(completedDogInfo);
-    // 강아지 정보 입력 완료 후 프로필 페이지로 이동
-    setCurrentPage('dog-profile');
+    // 강아지 정보 입력 완료 후 훈련 페이지로 이동
+    setCurrentPage('training');
   };
 
   // 하단 네비게이션을 보여줄 페이지들
