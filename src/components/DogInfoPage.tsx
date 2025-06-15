@@ -270,7 +270,7 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
                                     setDogInfo(prev => ({ ...prev, breed: currentValue === dogInfo.breed ? "" : currentValue }));
                                     setBreedOpen(false);
                                   }}
-                                  className="text-cream-800 hover:bg-orange-100 cursor-pointer"
+                                  className="text-cream-800 hover:bg-orange-100 cursor-pointer data-[selected=true]:bg-orange-100"
                                 >
                                   <Check
                                     className={cn(
