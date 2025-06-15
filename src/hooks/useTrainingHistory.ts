@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -76,7 +77,7 @@ export const useTrainingHistory = () => {
             const { data, error } = await supabase
                 .from('training_history')
                 .insert([{ ...newLog, dog_id: dog.id, user_id: user.id }])
-                .select()
+                .select('*, notes')
                 .single();
 
             if (error) {
@@ -124,7 +125,7 @@ export const useTrainingHistory = () => {
                 .from('training_history')
                 .update(updateData)
                 .eq('id', id)
-                .select()
+                .select('*, notes')
                 .single();
             
             if (error) {

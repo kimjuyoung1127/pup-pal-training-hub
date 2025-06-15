@@ -88,6 +88,11 @@ const TrainingHistoryCard = ({ item, onEdit, onDelete }: { item: TrainingLog, on
                   <Progress value={item.success_rate} className="h-2 bg-cream-200" indicatorClassName="bg-orange-400" />
                 </div>
               )}
+              {item.notes && (
+                <p className="mt-3 text-sm text-gray-700 bg-cream-100 p-3 rounded-md border border-cream-200 whitespace-pre-wrap">
+                  {item.notes}
+                </p>
+              )}
             </div>
           </div>
         </CardContent>

@@ -240,6 +240,7 @@ export type Database = {
           dog_id: string
           duration_minutes: number | null
           id: string
+          notes: string | null
           session_date: string
           success_rate: number | null
           training_type: string | null
@@ -250,6 +251,7 @@ export type Database = {
           dog_id: string
           duration_minutes?: number | null
           id?: string
+          notes?: string | null
           session_date?: string
           success_rate?: number | null
           training_type?: string | null
@@ -260,6 +262,7 @@ export type Database = {
           dog_id?: string
           duration_minutes?: number | null
           id?: string
+          notes?: string | null
           session_date?: string
           success_rate?: number | null
           training_type?: string | null
