@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -34,7 +33,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
       duration: '15-20분',
       difficulty: '중급',
       icon: '🚶‍♂️',
-      color: 'bg-gradient-to-br from-purple-100 to-purple-200'
+      color: 'bg-gradient-to-br from-sky-100 to-sky-200'
     },
     {
       id: 'social',
@@ -43,7 +42,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
       duration: '20-25분',
       difficulty: '중급',
       icon: '🤝',
-      color: 'bg-gradient-to-br from-orange-100 to-orange-200'
+      color: 'bg-gradient-to-br from-cyan-100 to-cyan-200'
     }
   ];
 
@@ -63,7 +62,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-cream-50 to-sky-50 pb-32">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-cream-200 px-6 py-4">
         <div className="flex items-center space-x-3">
@@ -85,7 +84,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
         </div>
       </div>
 
-      <div className="p-6 space-y-6 pb-32">
+      <div className="p-6 space-y-6">
         {/* Today's Progress */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -99,15 +98,15 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600">2</div>
+                <div className="text-2xl font-bold text-sky-600">2</div>
                 <p className="text-sm text-cream-600">완료한 훈련</p>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600">25분</div>
+                <div className="text-2xl font-bold text-sky-600">25분</div>
                 <p className="text-sm text-cream-600">훈련 시간</p>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600">85%</div>
+                <div className="text-2xl font-bold text-sky-600">85%</div>
                 <p className="text-sm text-cream-600">성공률</p>
               </div>
             </div>
@@ -132,7 +131,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
                 <Card
                   className={`p-4 cursor-pointer transition-all duration-200 ${
                     selectedTraining === training.id
-                      ? 'ring-2 ring-orange-400 bg-orange-50 border-orange-200'
+                      ? 'ring-2 ring-sky-400 bg-sky-50 border-sky-200'
                       : 'card-soft hover:shadow-md'
                   }`}
                   onClick={() => setSelectedTraining(training.id)}
@@ -154,7 +153,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                           training.difficulty === '초급' 
                             ? 'bg-green-100 text-green-700'
-                            : 'bg-orange-100 text-orange-700'
+                            : 'bg-sky-100 text-sky-700'
                         }`}>
                           {training.difficulty}
                         </span>
@@ -162,7 +161,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
                           <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center"
+                            className="w-6 h-6 bg-sky-500 rounded-full flex items-center justify-center"
                           >
                             <div className="w-2 h-2 bg-white rounded-full"></div>
                           </motion.div>
@@ -182,7 +181,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card className="card-soft p-6 bg-gradient-to-r from-orange-100 to-cream-200">
+          <Card className="card-soft p-6 bg-gradient-to-r from-sky-100 to-cyan-100">
             <div className="flex items-center space-x-3 mb-4">
               <div className="text-2xl">💡</div>
               <h3 className="font-bold text-cream-800">훈련 전 체크리스트</h3>
@@ -196,7 +195,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
                   transition={{ duration: 0.3, delay: 0.3 + index * 0.1 }}
                   className="flex items-center space-x-2"
                 >
-                  <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+                  <div className="w-2 h-2 bg-sky-400 rounded-full"></div>
                   <p className="text-sm text-cream-700">{tip}</p>
                 </motion.div>
               ))}
@@ -205,8 +204,8 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
         </motion.div>
       </div>
 
-      {/* Fixed Bottom Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-cream-200 p-6">
+      {/* Fixed Bottom Button - positioned above bottom navigation */}
+      <div className="fixed bottom-16 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-cream-200 p-6">
         <Button
           onClick={handleStartTraining}
           disabled={!selectedTraining}
