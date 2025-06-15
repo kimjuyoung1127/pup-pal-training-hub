@@ -42,7 +42,7 @@ const Index = () => {
   };
 
   // 하단 네비게이션을 보여줄 페이지들
-  const showBottomNav = ['dashboard', 'dog-profile', 'training', 'settings'].includes(currentPage);
+  const showBottomNav = ['dashboard', 'dog-info', 'dog-profile', 'training', 'settings'].includes(currentPage);
 
   const renderPage = () => {
     switch (currentPage) {

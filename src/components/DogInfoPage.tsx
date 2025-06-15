@@ -147,7 +147,7 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-cream-50 to-orange-50 p-4 pb-24">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-cream-50 to-orange-50 p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-2">
@@ -439,11 +439,11 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
         </motion.div>
       </div>
 
-      {/* Fixed Navigation Buttons */}
+      {/* Navigation Buttons */}
       <motion.div 
-        className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-cream-200 p-4"
-        initial={{ y: 100 }}
-        animate={{ y: 0 }}
+        className="mt-auto pt-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
       >
         <div className="flex justify-between items-center max-w-md mx-auto">
