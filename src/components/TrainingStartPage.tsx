@@ -16,7 +16,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
       duration: '10-15분',
       difficulty: '초급',
       icon: '🎯',
-      color: 'bg-gradient-to-br from-slate-100 to-slate-200'
+      color: 'bg-gradient-to-br from-blue-50 to-blue-100'
     },
     {
       id: 'toilet',
@@ -25,7 +25,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
       duration: '5-10분',
       difficulty: '초급',
       icon: '🏠',
-      color: 'bg-gradient-to-br from-green-100 to-green-200'
+      color: 'bg-gradient-to-br from-green-50 to-green-100'
     },
     {
       id: 'walk',
@@ -34,7 +34,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
       duration: '15-20분',
       difficulty: '중급',
       icon: '🚶‍♂️',
-      color: 'bg-gradient-to-br from-blue-100 to-blue-200'
+      color: 'bg-gradient-to-br from-emerald-50 to-emerald-100'
     },
     {
       id: 'social',
@@ -43,7 +43,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
       duration: '20-25분',
       difficulty: '중급',
       icon: '🤝',
-      color: 'bg-gradient-to-br from-purple-100 to-purple-200'
+      color: 'bg-gradient-to-br from-indigo-50 to-indigo-100'
     }
   ];
 
@@ -92,7 +92,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Card className="card-soft p-6">
+          <Card className="card-soft p-6 bg-gradient-to-br from-blue-50 to-sky-100 border-blue-200/50">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-800">오늘의 진행상황</h2>
               <div className="text-2xl">📊</div>
@@ -119,6 +119,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
+          className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl p-4 border border-gray-200/50"
         >
           <h2 className="text-xl font-bold text-gray-800 mb-4">훈련 선택하기</h2>
           <div className="space-y-4">
