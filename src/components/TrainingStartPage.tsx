@@ -154,7 +154,7 @@ const TrainingStartPage = ({ onNavigate }: { onNavigate: (page: string) => void 
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                           training.difficulty === '초급' 
                             ? 'bg-green-100 text-green-700'
-                            : 'bg-yellow-100 text-yellow-700'
+                            : 'bg-orange-100 text-orange-700'
                         }`}>
                           {training.difficulty}
                         </span>
