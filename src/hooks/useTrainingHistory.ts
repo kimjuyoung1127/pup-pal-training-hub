@@ -126,6 +126,7 @@ export const useTrainingHistory = () => {
         onSuccess: () => {
             toast.success('훈련 기록이 삭제되었습니다.');
             queryClient.invalidateQueries({ queryKey: ['trainingHistory'] });
+            queryClient.invalidateQueries({ queryKey: ['todaysTrainingStats'] });
         },
         onError: (error) => {
             console.error('Error deleting training log:', error);
