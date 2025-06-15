@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -52,6 +53,31 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// 강아지 앱 전용 컬러 팔레트
+				cream: {
+					50: '#FFFCF9',
+					100: '#FFF6EE',
+					200: '#FFEBD8',
+					300: '#FFE0C2',
+					400: '#FFD5AC',
+					500: '#FFCA96',
+					600: '#E6B585',
+					700: '#CC9F74',
+					800: '#B38A63',
+					900: '#997552',
+				},
+				orange: {
+					50: '#FFF7F0',
+					100: '#FFEDE0',
+					200: '#FFD4B8',
+					300: '#FFBB90',
+					400: '#FFA268',
+					500: '#FFA94D', // 메인 오렌지
+					600: '#E6983D',
+					700: '#CC872D',
+					800: '#B3761D',
+					900: '#99650D',
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -67,6 +93,9 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			fontFamily: {
+				'pretendard': ['Pretendard', 'system-ui', '-apple-system', 'sans-serif'],
 			},
 			keyframes: {
 				'accordion-down': {
@@ -84,11 +113,33 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in-up': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(20px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
+				},
+				'bounce-gentle': {
+					'0%, 100%': {
+						transform: 'translateY(0)',
+						'animation-timing-function': 'cubic-bezier(0.8, 0, 1, 1)'
+					},
+					'50%': {
+						transform: 'translateY(-5px)',
+						'animation-timing-function': 'cubic-bezier(0, 0, 0.2, 1)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in-up': 'fade-in-up 0.6s ease-out',
+				'bounce-gentle': 'bounce-gentle 2s infinite'
 			}
 		}
 	},
