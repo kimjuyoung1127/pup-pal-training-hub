@@ -289,7 +289,7 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
             variant="outline"
             onClick={prevStep}
             disabled={currentStep === 0}
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white border-0"
           >
             <ChevronLeft className="w-4 h-4" />
             <span>이전</span>
