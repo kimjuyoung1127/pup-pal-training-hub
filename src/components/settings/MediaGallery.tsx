@@ -49,7 +49,7 @@ export const MediaGallery = () => {
 
     return (
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-row items-center justify-between bg-amber-100">
                 <CardTitle>추억 저장소</CardTitle>
                 <Button onClick={handleUploadClick} disabled={uploadMutation.isPending}>
                     {uploadMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
@@ -63,7 +63,7 @@ export const MediaGallery = () => {
                     accept="image/*,video/*"
                 />
             </CardHeader>
-            <CardContent>
+            <CardContent className="bg-amber-100">
                 {media && media.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {media.map((item) => (
