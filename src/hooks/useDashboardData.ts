@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Tables } from '@/integrations/supabase/types';
+import { useEffect, useState } from 'react';
+
 
 const fetchDog = async () => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -37,6 +39,37 @@ const fetchRandom = async <T extends TableName>(tableName: T): Promise<Tables<T>
     return data[Math.floor(Math.random() * data.length)] as Tables<T>;
 }
 
+async function fetchRandomYoutubeVideo() {
+  const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
+  if (!apiKey) {
+    console.error('YouTube API key is not set.');
+    return null;
+  }
+
+  const query = '강아지 훈련';
+  const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
+    query,
+  )}&type=video&maxResults=50&key=${apiKey}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.items && data.items.length > 0) {
+      const randomIndex = Math.floor(Math.random() * data.items.length);
+      const randomVideo = data.items[randomIndex];
+      return {
+        youtube_video_id: randomVideo.id.videoId,
+        title: randomVideo.snippet.title,
+        description: randomVideo.snippet.description,
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching YouTube video:', error);
+    return null;
+  }
+}
+
 export const useDashboardData = () => {
   const { data: dog, isLoading: isDogLoading } = useQuery({
     queryKey: ['dog'],
@@ -50,8 +83,8 @@ export const useDashboardData = () => {
   });
 
   const { data: video, isLoading: isVideoLoading } = useQuery({
-    queryKey: ['random-video'],
-    queryFn: () => fetchRandom('recommended_videos'),
+    queryKey: ['random-youtube-video'],
+    queryFn: fetchRandomYoutubeVideo,
     staleTime: 1000 * 60 * 60 * 24, // 24 hours
   });
 

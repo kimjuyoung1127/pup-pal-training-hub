@@ -132,23 +132,22 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
       {/* Recommended video */}
       {video && (
         <motion.div variants={itemVariants}>
-          <Card className="card-soft overflow-hidden">
-            <img
-              src={`https://i.ytimg.com/vi/${video.youtube_video_id}/hqdefault.jpg`}
-              alt={video.title}
-              className="w-full h-40 object-cover"
-            />
-            <CardContent className="p-4 bg-orange-100">
-              <h3 className="font-bold text-cream-800 mb-2">{video.title}</h3>
-              <p className="text-sm text-cream-600 mb-4 h-10 overflow-hidden">
+          <Card className="card-soft overflow-hidden bg-orange-50">
+            <div className="w-full aspect-video">
+              <iframe
+                className="w-full h-full"
+                src={`https://www.youtube.com/embed/${video.youtube_video_id}`}
+                title={video.title}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            <CardContent className="p-4">
+              <h3 className="font-bold text-brown-800 mb-2 truncate">{video.title}</h3>
+              <p className="text-sm text-brown-600 line-clamp-2">
                 {video.description}
               </p>
-              <Button
-                onClick={() => window.open(`https://www.youtube.com/watch?v=${video.youtube_video_id}`, '_blank')}
-                className="w-full btn-primary"
-              >
-                영상 보기
-              </Button>
             </CardContent>
           </Card>
         </motion.div>
