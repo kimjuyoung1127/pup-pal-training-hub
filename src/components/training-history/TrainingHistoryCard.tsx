@@ -56,16 +56,16 @@ const TrainingHistoryCard = ({ item, onEdit, onDelete }: TrainingHistoryCardProp
       exit={{ opacity: 0, x: -30, transition: { duration: 0.2 } }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="shadow-none border border-white border-cream-200 bg-white">
+      <Card className="shadow-none border border-gray-200 bg-white hover:bg-gray-50 transition-colors">
         <CardContent className="p-4">
           <div className="flex items-start space-x-4">
-            <div className="text-3xl p-3 bg-white rounded-xl border border-cream-200">{icon}</div>
+            <div className="text-3xl p-3 bg-gray-100 rounded-xl border border-gray-200">{icon}</div>
             <div className="flex-1">
               <div className="flex justify-between items-start">
                 <p className="font-bold text-lg text-gray-800">{item.training_type || '알 수 없는 훈련'}</p>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0 text-gray-600 hover:bg-gray-100">
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -99,11 +99,11 @@ const TrainingHistoryCard = ({ item, onEdit, onDelete }: TrainingHistoryCardProp
                     <span className="text-sm font-medium text-gray-600">성공률</span>
                     {renderStars(item.success_rate)}
                   </div>
-                  <Progress value={item.success_rate} className="h-2 bg-cream-200" indicatorClassName="bg-gradient-to-r from-orange-300 to-orange-500" />
+                  <Progress value={item.success_rate} className="h-2 bg-gray-200" indicatorClassName="bg-blue-500" />
                 </div>
               )}
               {item.notes && (
-                <p className="mt-3 text-sm text-gray-700 bg-white p-3 rounded-lg border border-cream-200 whitespace-pre-wrap">
+                <p className="mt-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-200 whitespace-pre-wrap">
                   {item.notes}
                 </p>
               )}

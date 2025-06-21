@@ -55,7 +55,11 @@ const GeminiChatPage = () => {
         throw error;
       }
 
-      const botMessage: Message = { role: 'model', parts: [{ text: data.response }] };
+      // API로부터 받은 텍스트 응답을 바로 사용합니다.
+      const botMessage: Message = { 
+        role: 'model', 
+        parts: [{ text: data.response }] 
+      };
       setMessages(prev => [...prev, botMessage]);
     } catch (err: any) {
       console.error(err);
@@ -102,12 +106,15 @@ const GeminiChatPage = () => {
                       <Dog size={20} />
                   </div>
               )}
-              <Card className={`max-w-xs md:max-w-md p-3 rounded-2xl ${msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-white text-cream-900'}`}>
+              <Card className={`max-w-xs md:max-w-md p-3 rounded-2xl ${msg.role === 'user' ? 'bg-white text-black' : 'bg-white text-black'}`}>
+
                 <p className="whitespace-pre-wrap">{msg.parts[0].text}</p>
               </Card>
             </motion.div>
           ))}
         </AnimatePresence>
+      
+    
         {isLoading && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -138,7 +145,7 @@ const GeminiChatPage = () => {
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder="멍멍코치에게 메시지 보내기..."
-            className="flex-1"
+            className="flex-1 border-gray-200 focus:border-orange-400 bg-white text-black"
             disabled={isLoading}
           />
           <Button onClick={handleSendMessage} disabled={isLoading || input.trim() === ''}>

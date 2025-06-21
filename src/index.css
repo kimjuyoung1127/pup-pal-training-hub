@@ -1,17 +1,29 @@
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
 
 @layer base {
   :root {
-    --background: 255 255 255; /* white */
-    --foreground: 153 117 82; /* cream-900 */
-
-    --card: 255 246 238; /* cream-100 */
-    --card-foreground: 153 117 82; /* cream-900 */
+    /* 기본 색상 팔레트 정의 */
+    --white: 255 255 255;
+    --cream-100: 255 246 238;
+    --cream-200: 255 235 216;
+    --cream-300: 255 224 194;
+    --cream-400: 255 213 172;
+    --cream-700: 204 159 116;
+    --cream-800: 179 134 99;
+    --cream-900: 153 117 82;
+    --orange-500: 255 169 77;
+    --gray-200: 229 231 235;
+    
+    /* 시스템 변수는 팔레트 참조 */
+    --background: var(--white);
+    --foreground: var(--cream-900);
+    --card: var(--white);
+    --card-foreground: var(--cream-900);
 
     --popover: 255 246 238; /* cream-100 */
     --popover-foreground: 153 117 82; /* cream-900 */
@@ -49,7 +61,8 @@
 
   .dark {
     --background: 51 51 51; /* dark gray */
-    --foreground: 255 255 255; /* white */
+    --card: var(--cream-900);
+    --foreground: var(--white);
 
     --card: 153 117 82; /* cream-900 */
     --card-foreground: 255 255 255; /* white */
@@ -73,7 +86,7 @@
     --destructive-foreground: 210 40% 98%;
 
     --border: 204 159 116; /* cream-700 */
-    --input: 204 159 116; /* cream-700 */
+    --input: 229 231 235; /* gray-200으로 변경 */
     --ring: 255 169 77; /* orange-500 */
 
     --sidebar-background: 153 117 82; /* cream-900 */
@@ -83,6 +96,31 @@
     --sidebar-accent: 204 159 116; /* cream-700 */
     --sidebar-accent-foreground: 255 255 255; /* white */
     --sidebar-border: 204 159 116; /* cream-700 */
+    --sidebar-ring: 255 169 77; /* orange-500 */
+  }
+}
+
+@layer base {
+  :root {
+    /* 기본 UI */
+    --radius: 0.75rem;
+    
+    /* 메인 테마 */
+    --background: var(--white);
+    --foreground: var(--cream-900);
+    
+    /* 카드 컴포넌트 */
+    --card: var(--white);
+    --card-foreground: var(--cream-900);
+    
+    /* 사이드바 컴포넌트 */
+    --sidebar-background: var(--cream-100);
+    --sidebar-foreground: var(--cream-900);
+    --sidebar-primary: 255 169 77; /* orange-500 */
+    --sidebar-primary-foreground: 255 255 255; /* white */
+    --sidebar-accent: 255 235 216; /* cream-200 */
+    --sidebar-accent-foreground: 179 134 99; /* cream-800 */
+    --sidebar-border: 255 224 194; /* cream-300 */
     --sidebar-ring: 255 169 77; /* orange-500 */
   }
 }
@@ -98,16 +136,17 @@
   }
 
   /* 커스텀 스크롤바 */
+  /* 커스텀 스크롤바 */
   ::-webkit-scrollbar {
     width: 6px;
   }
-
+  
   ::-webkit-scrollbar-track {
-    @apply bg-cream-100;
+    @apply bg-gray-100/50; /* 투명도 추가로 더 부드러운 느낌 */
   }
-
+  
   ::-webkit-scrollbar-thumb {
-    @apply bg-orange-300 rounded-full;
+    @apply bg-gray-300 rounded-full; /* 스크롤바 썸네일 스타일 추가 */
   }
 
   ::-webkit-scrollbar-thumb:hover {

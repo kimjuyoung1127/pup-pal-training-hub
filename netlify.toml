@@ -1,0 +1,12 @@
+[build]
+  command = "vite build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "18" # Specify a Node.js version if your project requires it, common for Vite/React
+  # NPM_VERSION = "8" # Optionally specify npm version
+
+[[redirects]]Add commentMore actions
+  from = "/*"
+  to = "/index.html"
+  status = 200

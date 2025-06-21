@@ -9,6 +9,7 @@ import EditTrainingLogDialog from './EditTrainingLogDialog';
 import TrainingHistorySkeleton from './training-history/TrainingHistorySkeleton';
 import EmptyTrainingHistory from './training-history/EmptyTrainingHistory';
 import TrainingHistoryList from './training-history/TrainingHistoryList';
+import { motion } from 'framer-motion';
 
 interface TrainingHistoryPageProps {
   onNavigate: (page: string) => void;
@@ -43,10 +44,15 @@ const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
   };
 
   return (
-    <div className="p-4 bg-white min-h-screen">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="container mx-auto p-4 bg-white min-h-screen"
+    >
       <div className="flex items-center mb-6">
         <Button variant="ghost" size="icon" onClick={() => onNavigate('dashboard')}>
-          <ArrowLeft className="h-6 w-6" />
+          <ArrowLeft className="h-6 w-6 text-gray-700" />
         </Button>
         <h1 className="text-2xl font-bold text-gray-800 ml-2">훈련 기록</h1>
       </div>
@@ -63,7 +69,7 @@ const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
         log={logToEdit}
         onOpenChange={(open) => !open && setLogToEdit(null)}
       />
-    </div>
+    </motion.div>
   );
 };
 
