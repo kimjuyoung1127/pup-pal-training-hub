@@ -201,7 +201,7 @@ const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedPro
 
     return (
         <Sheet open={isOpen} onOpenChange={(open) => { if (!open) { onClose(); }}}>
-            <SheetContent className="bg-cream-50">
+            <SheetContent className="bg-white">
                 <SheetHeader>
                     <SheetTitle className="font-pretendard text-cream-800">{mission?.title}</SheetTitle>
                     <SheetDescription className="font-pretendard text-cream-600">{mission?.question}</SheetDescription>

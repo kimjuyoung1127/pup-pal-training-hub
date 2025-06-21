@@ -43,7 +43,7 @@ const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
   };
 
   return (
-    <div className="p-4 bg-cream-50 min-h-screen">
+    <div className="p-4 bg-white min-h-screen">
       <div className="flex items-center mb-6">
         <Button variant="ghost" size="icon" onClick={() => onNavigate('dashboard')}>
           <ArrowLeft className="h-6 w-6" />

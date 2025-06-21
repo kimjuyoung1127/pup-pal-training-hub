@@ -56,7 +56,7 @@ const TrainingHistoryCard = ({ item, onEdit, onDelete }: TrainingHistoryCardProp
       exit={{ opacity: 0, x: -30, transition: { duration: 0.2 } }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="shadow-none border border-cream-200 bg-cream-50">
+      <Card className="shadow-none border border-white border-cream-200 bg-white">
         <CardContent className="p-4">
           <div className="flex items-start space-x-4">
             <div className="text-3xl p-3 bg-white rounded-xl border border-cream-200">{icon}</div>

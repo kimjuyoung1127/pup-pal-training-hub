@@ -151,6 +151,8 @@ export const useDogProfile = () => {
   const { data: profileData, isLoading } = useQuery({
     queryKey: ['dogProfile'],
     queryFn: fetchDogProfileData,
+    staleTime: 1000 * 60 * 5, // 5분 동안 fresh 상태 유지
+    cacheTime: 1000 * 60 * 30, // 30분 동안 캐시 유지
   });
 
   const uploadImageMutation = useMutation({

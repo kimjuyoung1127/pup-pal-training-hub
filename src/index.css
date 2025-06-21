@@ -7,7 +7,7 @@
 
 @layer base {
   :root {
-    --background: 255 252 249; /* cream-50 */
+    --background: 255 255 255; /* white */
     --foreground: 153 117 82; /* cream-900 */
 
     --card: 255 246 238; /* cream-100 */
@@ -17,7 +17,7 @@
     --popover-foreground: 153 117 82; /* cream-900 */
 
     --primary: 255 169 77; /* orange-500 */
-    --primary-foreground: 255 252 249; /* cream-50 */
+    --primary-foreground: 255 255 255; /* white */
 
     --secondary: 255 235 216; /* cream-200 */
     --secondary-foreground: 179 134 99; /* cream-800 */
@@ -40,7 +40,7 @@
     --sidebar-background: 255 246 238; /* cream-100 */
     --sidebar-foreground: 153 117 82; /* cream-900 */
     --sidebar-primary: 255 169 77; /* orange-500 */
-    --sidebar-primary-foreground: 255 252 249; /* cream-50 */
+    --sidebar-primary-foreground: 255 255 255; /* white */
     --sidebar-accent: 255 235 216; /* cream-200 */
     --sidebar-accent-foreground: 179 134 99; /* cream-800 */
     --sidebar-border: 255 224 194; /* cream-300 */
@@ -48,26 +48,26 @@
   }
 
   .dark {
-    --background: 179 134 99; /* cream-800 */
-    --foreground: 255 252 249; /* cream-50 */
+    --background: 51 51 51; /* dark gray */
+    --foreground: 255 255 255; /* white */
 
     --card: 153 117 82; /* cream-900 */
-    --card-foreground: 255 252 249; /* cream-50 */
+    --card-foreground: 255 255 255; /* white */
 
     --popover: 153 117 82; /* cream-900 */
-    --popover-foreground: 255 252 249; /* cream-50 */
+    --popover-foreground: 255 255 255; /* white */
 
     --primary: 255 169 77; /* orange-500 */
     --primary-foreground: 153 117 82; /* cream-900 */
 
     --secondary: 204 159 116; /* cream-700 */
-    --secondary-foreground: 255 252 249; /* cream-50 */
+    --secondary-foreground: 255 255 255; /* white */
 
     --muted: 204 159 116; /* cream-700 */
     --muted-foreground: 255 224 194; /* cream-300 */
 
     --accent: 204 159 116; /* cream-700 */
-    --accent-foreground: 255 252 249; /* cream-50 */
+    --accent-foreground: 255 255 255; /* white */
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
@@ -77,11 +77,11 @@
     --ring: 255 169 77; /* orange-500 */
 
     --sidebar-background: 153 117 82; /* cream-900 */
-    --sidebar-foreground: 255 252 249; /* cream-50 */
+    --sidebar-foreground: 255 255 255; /* white */
     --sidebar-primary: 255 169 77; /* orange-500 */
     --sidebar-primary-foreground: 153 117 82; /* cream-900 */
     --sidebar-accent: 204 159 116; /* cream-700 */
-    --sidebar-accent-foreground: 255 252 249; /* cream-50 */
+    --sidebar-accent-foreground: 255 255 255; /* white */
     --sidebar-border: 204 159 116; /* cream-700 */
     --sidebar-ring: 255 169 77; /* orange-500 */
   }
@@ -127,11 +127,11 @@
 
   /* 카드 스타일 */
   .card-soft {
-    @apply bg-cream-50 border border-cream-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200;
+    @apply bg-white border border-cream-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200;
   }
 
   /* 입력 필드 스타일 */
   .input-soft {
-    @apply bg-cream-50 border-2 border-cream-200 focus:border-orange-400 rounded-xl px-4 py-3 transition-all duration-200 focus:ring-2 focus:ring-orange-200;
+    @apply bg-white border-2 border-cream-200 focus:border-orange-400 rounded-xl px-4 py-3 transition-all duration-200 focus:ring-2 focus:ring-orange-200;
   }
 }

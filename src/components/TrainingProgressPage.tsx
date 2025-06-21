@@ -70,7 +70,7 @@ const TrainingProgressPage = ({ trainingId, onNavigate, onExit, trainingProgram 
   };
 
   return (
-    <div className="min-h-screen bg-cream-50 flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       <header className="p-4">
         <Button variant="ghost" size="icon" onClick={flowStep === 1 ? onExit : () => setFlowStep(prev => prev - 1)}>
           <ArrowLeft />
