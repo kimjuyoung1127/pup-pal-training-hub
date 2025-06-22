@@ -13,10 +13,7 @@ interface DogBadgesProps {
   isLoading: boolean;
 }
 
-const DogBadges = ({
-  badges,
-  isLoading
-}: DogBadgesProps) => {
+const DogBadges = ({ badges, isLoading }: DogBadgesProps) => {
   if (isLoading) {
     return <Card className="mb-6">
         <CardHeader>
@@ -52,31 +49,30 @@ const DogBadges = ({
         <CardHeader className="bg-orange-100">
           <CardTitle className="flex items-center text-xl font-bold text-black">
             <Award className="mr-2 h-6 w-6 text-yellow-500" />
-            획득한 뱃지
+            도전과제
           </CardTitle>
         </CardHeader>
         <CardContent className="bg-orange-100">
           <TooltipProvider delayDuration={100}>
             <div className="grid grid-cols-4 sm:grid-cols-5 gap-y-4 gap-x-2">
-              {badges.map((badge, index) => <Tooltip key={index}>
+              {badges.map((badge, index) => <Tooltip key={badge.id}>
                   <TooltipTrigger asChild>
-                    <motion.div className="flex flex-col items-center space-y-2 cursor-pointer text-center" initial={{
-                  opacity: 0,
-                  scale: 0.8
-                }} animate={{
-                  opacity: 1,
-                  scale: 1
-                }} transition={{
-                  duration: 0.3,
-                  delay: index * 0.05
-                }}>
-                      <span className="text-4xl filter grayscale hover:grayscale-0 transition-all duration-300">{badge.icon || '🏅'}</span>
+                    <motion.div 
+                      className="flex flex-col items-center space-y-2 cursor-pointer text-center"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3, delay: index * 0.05 }}
+                    >
+                      <span className={`text-4xl filter transition-all duration-300 ${badge.achieved ? 'grayscale-0' : 'grayscale hover:grayscale-0'}`}>
+                        {badge.icon || '🏅'}
+                      </span>
                       <UiBadge variant="secondary" className="text-xs px-2 py-0.5 whitespace-nowrap bg-slate-50 text-black">{badge.name}</UiBadge>
                     </motion.div>
                   </TooltipTrigger>
                   <TooltipContent className="bg-gray-800 text-white rounded-md p-2">
                     <p className="font-bold">{badge.name}</p>
                     {badge.description && <p className="text-sm">{badge.description}</p>}
+                    {!badge.achieved && <p className="text-xs text-yellow-400 mt-1">아직 획득하지 못했어요!</p>}
                   </TooltipContent>
                 </Tooltip>)}
             </div>

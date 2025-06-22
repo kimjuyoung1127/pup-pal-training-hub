@@ -42,7 +42,7 @@ const TrainingLog = ({ onSave, isSaving }: TrainingLogProps) => {
         <label htmlFor="notes" className="font-bold text-gray-800">오늘의 기록</label>
         <Textarea
           id="notes"
-          placeholder="딩딩이가 집중을 잘했어요!"
+          placeholder="댕댕이가 집중을 잘했어요!"
           className="mt-2 min-h-[120px] input-soft"
           value={trainingResult.notes}
           onChange={(e) => setTrainingResult(prev => ({...prev, notes: e.target.value}))}

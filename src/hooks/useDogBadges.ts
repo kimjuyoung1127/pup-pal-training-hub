@@ -4,10 +4,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export interface DogBadge {
+  id: number;
   name: string;
   description: string | null;
   icon: string | null;
-  achieved_at: string;
+  achieved: boolean;
+  achieved_at: string | null;
 }
 
 const fetchDogBadges = async (): Promise<DogBadge[]> => {
@@ -29,9 +31,27 @@ const fetchDogBadges = async (): Promise<DogBadge[]> => {
     toast.error('강아지 정보를 가져오는 데 실패했습니다.');
     throw dogError;
   }
-  
+
+  const { data: allBadges, error: badgesError } = await supabase
+    .from('badges')
+    .select('*');
+
+  if (badgesError) {
+    console.error('Error fetching all badges:', badgesError);
+    toast.error('전체 뱃지 목록을 가져오는 데 실패했습니다.');
+    throw badgesError;
+  }
+
+  if (!allBadges) {
+    return [];
+  }
+
   if (!dog) {
-      return [];
+    return allBadges.map(badge => ({
+      ...badge,
+      achieved: false,
+      achieved_at: null,
+    }));
   }
 
   const { data: dogBadgesData, error: dogBadgesError } = await supabase
@@ -44,39 +64,22 @@ const fetchDogBadges = async (): Promise<DogBadge[]> => {
     toast.error('획득한 뱃지 정보를 가져오는 데 실패했습니다.');
     throw dogBadgesError;
   }
-  
-  if (!dogBadgesData || dogBadgesData.length === 0) {
-      return [];
-  }
-  
-  const badgeIds = dogBadgesData.map(b => b.badge_id);
 
-  const { data: badgesData, error: badgesError } = await supabase
-    .from('badges')
-    .select('id, name, description, icon')
-    .in('id', badgeIds);
+  const achievedBadgeIds = new Set(dogBadgesData?.map(b => b.badge_id) || []);
+  const achievedBadgeMap = new Map(dogBadgesData?.map(b => [b.badge_id, b.achieved_at]) || []);
 
-  if (badgesError) {
-    console.error('Error fetching badges details:', badgesError);
-    toast.error('뱃지 상세 정보를 가져오는 데 실패했습니다.');
-    throw badgesError;
-  }
-
-  if (!badgesData) {
-    return [];
-  }
-  
-  const badgeMap = new Map(badgesData.map(b => [b.id, b]));
-
-  return dogBadgesData.map(db => {
-    const badgeDetails = badgeMap.get(db.badge_id);
-    return {
-      name: badgeDetails?.name || '알 수 없는 뱃지',
-      description: badgeDetails?.description || null,
-      icon: badgeDetails?.icon || null,
-      achieved_at: db.achieved_at,
-    };
-  }).sort((a, b) => new Date(b.achieved_at).getTime() - new Date(a.achieved_at).getTime());
+  return allBadges.map(badge => ({
+    ...badge,
+    achieved: achievedBadgeIds.has(badge.id),
+    achieved_at: achievedBadgeMap.get(badge.id) || null,
+  })).sort((a, b) => {
+    if (a.achieved && !b.achieved) return -1;
+    if (!a.achieved && b.achieved) return 1;
+    if (a.achieved_at && b.achieved_at) {
+      return new Date(b.achieved_at).getTime() - new Date(a.achieved_at).getTime();
+    }
+    return a.name.localeCompare(b.name);
+  });
 };
 
 export const useDogBadges = () => {

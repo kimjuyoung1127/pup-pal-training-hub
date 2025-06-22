@@ -39,7 +39,7 @@ const calculateConsecutiveDays = (trainingHistory: { session_date: string }[]): 
 
 export const checkAndAwardBadges = async (dogId: string) => {
     try {
-        const { data: allBadges, error: badgesError } = await supabase.from('badges').select('id, name');
+        const { data: allBadges, error: badgesError } = await supabase.from('badges').select('*');
         if (badgesError) throw badgesError;
         if (!allBadges) return;
 
@@ -54,7 +54,7 @@ export const checkAndAwardBadges = async (dogId: string) => {
             .order('created_at', { ascending: false });
 
         if (historyError) throw historyError;
-        if (!trainingHistory || trainingHistory.length === 0) return;
+        if (!trainingHistory || trainingHistory.length === 0) return [];
 
         const newBadgesToAward: { dog_id: string, badge_id: number }[] = [];
 
@@ -88,14 +88,20 @@ export const checkAndAwardBadges = async (dogId: string) => {
             const { error: insertError } = await supabase.from('dog_badges').insert(uniqueNewBadgesToAward.map(b => ({ dog_id: b.dog_id, badge_id: b.badge_id })));
             if (insertError) {
                 console.error("Error awarding badges:", insertError);
+                return [];
             } else {
-                uniqueNewBadgesToAward.forEach(b => {
-                    const awardedBadge = allBadges.find(ab => ab.id === b.badge_id);
-                    toast.success(`🎉 뱃지 획득: ${awardedBadge?.name}`);
-                });
+                const awardedBadges = uniqueNewBadgesToAward.map(b => {
+                    const awardedBadgeInfo = allBadges.find(ab => ab.id === b.badge_id);
+                    toast.success(`🎉 뱃지 획득: ${awardedBadgeInfo?.name}`);
+                    return awardedBadgeInfo;
+                }).filter(Boolean);
+
+                return awardedBadges;
             }
         }
+        return [];
     } catch (error: any) {
         console.error("Failed to check and award badges:", error);
+        return [];
     }
 };
