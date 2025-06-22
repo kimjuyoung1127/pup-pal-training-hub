@@ -39,14 +39,20 @@ const fetchRandom = async <T extends TableName>(tableName: T): Promise<Tables<T>
     return data[Math.floor(Math.random() * data.length)] as Tables<T>;
 }
 
-async function fetchYoutubeVideos() {
+async function fetchYoutubeVideos(origin: string) {
   const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
   if (!apiKey) {
     console.error('YouTube API key is not set.');
     return [];
   }
 
-  const query = '강아지 훈련';
+  let query = 'dog training';
+  if (origin === 'korean') {
+    query = '강아지 훈련';
+  } else if (origin === 'english') {
+    query = 'dog training';
+  }
+
   const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
     query,
   )}&type=video&maxResults=50&key=${apiKey}`;
@@ -62,6 +68,7 @@ async function fetchYoutubeVideos() {
         description: video.snippet.description,
         trainingTopic: index % 3 === 0 ? 'potty_training' : index % 3 === 1 ? 'barking_control' : 'separation_anxiety',
         trainingStyle: index % 2 === 0 ? 'positive' : 'mild_correction',
+        origin: index % 3 === 0 ? 'korean' : index % 3 === 1 ? 'english' : 'japanese',
       }));
     }
     return [];
@@ -71,7 +78,7 @@ async function fetchYoutubeVideos() {
   }
 }
 
-export const useDashboardData = () => {
+export const useDashboardData = (originFilter: string) => {
   const { data: dog, isLoading: isDogLoading } = useQuery({
     queryKey: ['dog'],
     queryFn: fetchDog,
@@ -84,9 +91,10 @@ export const useDashboardData = () => {
   });
 
   const { data: videos, isLoading: areVideosLoading } = useQuery({
-    queryKey: ['youtube-videos'],
-    queryFn: fetchYoutubeVideos,
+    queryKey: ['youtube-videos', originFilter],
+    queryFn: () => fetchYoutubeVideos(originFilter),
     staleTime: 1000 * 60 * 60 * 24, // 24 hours
+    enabled: !!originFilter, // originFilter가 있을 때만 쿼리 실행
   });
 
   const { data: mission, isLoading: isMissionLoading } = useQuery({

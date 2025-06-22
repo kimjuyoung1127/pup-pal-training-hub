@@ -10,6 +10,15 @@ import { BookOpen, BarChart3, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
+interface Video {
+  youtube_video_id: string;
+  title: string;
+  description: string;
+  trainingTopic: string;
+  trainingStyle: string;
+  origin: 'korean' | 'english' | 'japanese';
+}
+
 // 데이터 배열을 컴포넌트 외부로 분리
 const welcomeMessages = [
   '오늘도 {dogName}와 함께 즐거운 훈련 시간을 보내세요!',
@@ -35,16 +44,17 @@ interface DashboardContentProps {
 }
 
 const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
-  const { dog, tip, videos, mission, isLoading } = useDashboardData();
+  const [originFilter, setOriginFilter] = useState('all');
+  const { dog, tip, videos, mission, isLoading } = useDashboardData(originFilter);
   const { missionCompleted, toggleMissionCompleted, resetMissionIfNeeded } = useDashboardStore();
   const navigate = useNavigate();
 
   const [randomWelcome, setRandomWelcome] = useState('');
   const [randomTip, setRandomTip] = useState('');
-  const [filteredVideos, setFilteredVideos] = useState<typeof videos>([]);
-  const [topicFilter, setTopicFilter] = useState('all');
-  const [styleFilter, setStyleFilter] = useState('all');
+  const [originalVideos, setOriginalVideos] = useState<Video[] | undefined>([]);
+  const [filteredVideos, setFilteredVideos] = useState<Video[] | undefined>([]);
   const [showVideos, setShowVideos] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const dogName = dog?.name || '친구';
   const today = new Date();
@@ -62,17 +72,29 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
     setRandomTip(trainingTips[tipIndex]);
   }, [dogName]);
 
-  const handleSearchVideos = () => {
+  useEffect(() => {
     if (videos) {
-      let newFilteredVideos = videos;
-      if (topicFilter !== 'all') {
-        newFilteredVideos = newFilteredVideos.filter(video => video.trainingTopic === topicFilter);
+      setOriginalVideos(videos as Video[]);
+    }
+  }, [videos]);
+
+  useEffect(() => {
+    if (hasSearched) {
+      handleSearchVideos();
+    }
+  }, [originFilter]);
+
+  const handleSearchVideos = () => {
+    if (originalVideos) {
+      let newFilteredVideos: Video[] = [...originalVideos];
+
+      if (originFilter !== 'all') {
+        newFilteredVideos = newFilteredVideos.filter(video => video.origin === originFilter);
       }
-      if (styleFilter !== 'all') {
-        newFilteredVideos = newFilteredVideos.filter(video => video.trainingStyle === styleFilter);
-      }
-      setFilteredVideos(newFilteredVideos);
+
+      setFilteredVideos(newFilteredVideos.slice(0, 2));
       setShowVideos(true);
+      if (!hasSearched) setHasSearched(true);
     }
   };
 
@@ -152,26 +174,15 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
       <motion.div variants={itemVariants} className="space-y-4">
         <Card className="card-soft p-6 bg-blue-50">
           <h3 className="font-bold text-black mb-4">추천 영상 필터</h3>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Select value={topicFilter} onValueChange={setTopicFilter}>
+          <div className="flex flex-col sm:flex-row gap-4 text-black">
+            <Select value={originFilter} onValueChange={setOriginFilter}>
               <SelectTrigger className="bg-white">
-                <SelectValue placeholder="훈련 주제" />
+                <SelectValue placeholder="국가/언어" />
               </SelectTrigger>
               <SelectContent className="bg-white text-black">
-                <SelectItem value="all">모든 주제</SelectItem>
-                <SelectItem value="potty_training">배변 훈련</SelectItem>
-                <SelectItem value="barking_control">짖음 제어</SelectItem>
-                <SelectItem value="separation_anxiety">분리 불안</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={styleFilter} onValueChange={setStyleFilter}>
-              <SelectTrigger className="bg-white">
-                <SelectValue placeholder="훈련 스타일" />
-              </SelectTrigger>
-              <SelectContent className="bg-white text-black">
-                <SelectItem value="all">모든 스타일</SelectItem>
-                <SelectItem value="positive">긍정 강화</SelectItem>
-                <SelectItem value="mild_correction">순한 교정</SelectItem>
+                <SelectItem value="all">모든 국가</SelectItem>
+                <SelectItem value="korean">한국어</SelectItem>
+                <SelectItem value="english">영어</SelectItem>
               </SelectContent>
             </Select>
           </div>
