@@ -63,7 +63,7 @@ export const MediaGallery = () => {
                     accept="image/*,video/*"
                 />
             </CardHeader>
-            <CardContent className="bg-amber-100">
+            <CardContent className="bg-white">
                 {media && media.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {media.map((item) => (

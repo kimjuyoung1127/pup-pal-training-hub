@@ -1,10 +1,20 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { isWebView } from '@/lib/utils';
+import ExternalBrowserPrompt from './ui/ExternalBrowserPrompt';
 
 const LoginPage = ({ onLogin }: { onLogin: () => void }) => {
+  const [showWebViewPrompt, setShowWebViewPrompt] = useState(false);
+
+  useEffect(() => {
+    if (isWebView()) {
+      setShowWebViewPrompt(true);
+    }
+  }, []);
+
   const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -35,6 +45,7 @@ const LoginPage = ({ onLogin }: { onLogin: () => void }) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-cream-50 to-orange-50">
+      {showWebViewPrompt && <ExternalBrowserPrompt />}
       {/* Header */}
       <div className="flex items-center justify-center pt-12 pb-8">
         <div className="flex items-center space-x-2">
