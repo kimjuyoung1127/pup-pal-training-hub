@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { BookOpen, BarChart3, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // 데이터 배열을 컴포넌트 외부로 분리
 const welcomeMessages = [
@@ -34,12 +35,16 @@ interface DashboardContentProps {
 }
 
 const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
-  const { dog, tip, video, mission, isLoading } = useDashboardData();
+  const { dog, tip, videos, mission, isLoading } = useDashboardData();
   const { missionCompleted, toggleMissionCompleted, resetMissionIfNeeded } = useDashboardStore();
   const navigate = useNavigate();
 
   const [randomWelcome, setRandomWelcome] = useState('');
   const [randomTip, setRandomTip] = useState('');
+  const [filteredVideos, setFilteredVideos] = useState<typeof videos>([]);
+  const [topicFilter, setTopicFilter] = useState('all');
+  const [styleFilter, setStyleFilter] = useState('all');
+  const [showVideos, setShowVideos] = useState(false);
 
   const dogName = dog?.name || '친구';
   const today = new Date();
@@ -56,6 +61,20 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
     const tipIndex = Math.floor(Math.random() * trainingTips.length);
     setRandomTip(trainingTips[tipIndex]);
   }, [dogName]);
+
+  const handleSearchVideos = () => {
+    if (videos) {
+      let newFilteredVideos = videos;
+      if (topicFilter !== 'all') {
+        newFilteredVideos = newFilteredVideos.filter(video => video.trainingTopic === topicFilter);
+      }
+      if (styleFilter !== 'all') {
+        newFilteredVideos = newFilteredVideos.filter(video => video.trainingStyle === styleFilter);
+      }
+      setFilteredVideos(newFilteredVideos);
+      setShowVideos(true);
+    }
+  };
 
   const getDogReminder = () => {
     if (!dog?.weight) return null;
@@ -129,9 +148,42 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
         </Card>
       </motion.div>
 
-      {/* Recommended video */}
-      {video && (
-        <motion.div variants={itemVariants}>
+      {/* Recommended video filter */}
+      <motion.div variants={itemVariants} className="space-y-4">
+        <Card className="card-soft p-6 bg-blue-50">
+          <h3 className="font-bold text-black mb-4">추천 영상 필터</h3>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Select value={topicFilter} onValueChange={setTopicFilter}>
+              <SelectTrigger className="bg-white">
+                <SelectValue placeholder="훈련 주제" />
+              </SelectTrigger>
+              <SelectContent className="bg-white text-black">
+                <SelectItem value="all">모든 주제</SelectItem>
+                <SelectItem value="potty_training">배변 훈련</SelectItem>
+                <SelectItem value="barking_control">짖음 제어</SelectItem>
+                <SelectItem value="separation_anxiety">분리 불안</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={styleFilter} onValueChange={setStyleFilter}>
+              <SelectTrigger className="bg-white">
+                <SelectValue placeholder="훈련 스타일" />
+              </SelectTrigger>
+              <SelectContent className="bg-white text-black">
+                <SelectItem value="all">모든 스타일</SelectItem>
+                <SelectItem value="positive">긍정 강화</SelectItem>
+                <SelectItem value="mild_correction">순한 교정</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button onClick={handleSearchVideos} className="w-full btn-primary mt-4">
+            훈련 영상 찾아보기
+          </Button>
+        </Card>
+      </motion.div>
+
+      {/* Recommended video List */}
+      {showVideos && filteredVideos.map((video) => (
+        <motion.div variants={itemVariants} key={video.youtube_video_id}>
           <Card className="card-soft overflow-hidden bg-orange-50">
             <div className="w-full aspect-video">
               <iframe
@@ -151,7 +203,7 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
             </CardContent>
           </Card>
         </motion.div>
-      )}
+      ))}
 
       {/* Dog reminder */}
       {reminder && (

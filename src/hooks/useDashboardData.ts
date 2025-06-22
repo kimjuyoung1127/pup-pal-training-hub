@@ -39,11 +39,11 @@ const fetchRandom = async <T extends TableName>(tableName: T): Promise<Tables<T>
     return data[Math.floor(Math.random() * data.length)] as Tables<T>;
 }
 
-async function fetchRandomYoutubeVideo() {
+async function fetchYoutubeVideos() {
   const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
   if (!apiKey) {
     console.error('YouTube API key is not set.');
-    return null;
+    return [];
   }
 
   const query = '강아지 훈련';
@@ -55,18 +55,19 @@ async function fetchRandomYoutubeVideo() {
     const response = await fetch(url);
     const data = await response.json();
     if (data.items && data.items.length > 0) {
-      const randomIndex = Math.floor(Math.random() * data.items.length);
-      const randomVideo = data.items[randomIndex];
-      return {
-        youtube_video_id: randomVideo.id.videoId,
-        title: randomVideo.snippet.title,
-        description: randomVideo.snippet.description,
-      };
+      // Add mock data for filtering
+      return data.items.map((video: any, index: number) => ({
+        youtube_video_id: video.id.videoId,
+        title: video.snippet.title,
+        description: video.snippet.description,
+        trainingTopic: index % 3 === 0 ? 'potty_training' : index % 3 === 1 ? 'barking_control' : 'separation_anxiety',
+        trainingStyle: index % 2 === 0 ? 'positive' : 'mild_correction',
+      }));
     }
-    return null;
+    return [];
   } catch (error) {
     console.error('Error fetching YouTube video:', error);
-    return null;
+    return [];
   }
 }
 
@@ -82,9 +83,9 @@ export const useDashboardData = () => {
     staleTime: 1000 * 60 * 60 * 24, // 24 hours
   });
 
-  const { data: video, isLoading: isVideoLoading } = useQuery({
-    queryKey: ['random-youtube-video'],
-    queryFn: fetchRandomYoutubeVideo,
+  const { data: videos, isLoading: areVideosLoading } = useQuery({
+    queryKey: ['youtube-videos'],
+    queryFn: fetchYoutubeVideos,
     staleTime: 1000 * 60 * 60 * 24, // 24 hours
   });
 
@@ -97,8 +98,8 @@ export const useDashboardData = () => {
   return {
     dog,
     tip,
-    video,
+    videos,
     mission,
-    isLoading: isDogLoading || isTipLoading || isVideoLoading || isMissionLoading,
+    isLoading: isDogLoading || isTipLoading || areVideosLoading || isMissionLoading,
   };
 };

@@ -37,8 +37,8 @@
     --muted: 255 235 216; /* cream-200 */
     --muted-foreground: 204 159 116; /* cream-700 */
 
-    --accent: 255 213 172; /* cream-400 */
-    --accent-foreground: 179 134 99; /* cream-800 */
+    --accent: 255 255 255; /* white */
+    --accent-foreground: 0 0 0; /* black */
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -127,11 +127,13 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: var(--border);
   }
 
   body {
-    @apply bg-background text-foreground font-pretendard;
+    background-color: rgb(var(--background));
+    color: rgb(var(--foreground));
+    font-family: 'Pretendard', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
@@ -142,35 +144,62 @@
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-gray-100/50; /* 투명도 추가로 더 부드러운 느낌 */
+    background-color: rgba(243, 244, 246, 0.5); /* Added transparency for smoother feel */
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 rounded-full; /* 스크롤바 썸네일 스타일 추가 */
+    background-color: #d1d5db; /* gray-300 */
+    border-radius: 9999px; /* rounded-full */ /* 스크롤바 썸네일 스타일 추가 */
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-orange-400;
+    background-color: rgb(251 146 60); /* Equivalent to Tailwind's bg-orange-400 */
   }
 }
 
 @layer components {
   /* 공통 버튼 스타일 */
   .btn-primary {
-    @apply bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl;
+    background-color: rgb(255, 169, 77);
+    color: white;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    transition: all 200ms;
+    transform: scale(1);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   }
 
   .btn-secondary {
-    @apply bg-cream-200 hover:bg-cream-300 text-cream-800 font-medium px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-105;
+    background-color: rgb(var(--cream-200));
+    color: rgb(var(--cream-800));
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    transition: all 200ms;
+    transform: scale(1);
   }
 
   /* 카드 스타일 */
   .card-soft {
-    @apply bg-white border border-cream-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200;
+    background-color: white;
+    border: 1px solid rgb(var(--cream-200));
+    border-radius: 1rem;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    transition: all 200ms;
   }
 
   /* 입력 필드 스타일 */
   .input-soft {
-    @apply bg-white border-2 border-cream-200 focus:border-orange-400 rounded-xl px-4 py-3 transition-all duration-200 focus:ring-2 focus:ring-orange-200;
+    background-color: white;
+    border: 2px solid rgb(var(--cream-200));
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    transition: all 200ms;
+}
+
+.input-soft:focus {
+    border-color: rgb(255, 169, 77);
+    box-shadow: 0 0 0 2px rgba(255, 169, 77, 0.2);
   }
 }
