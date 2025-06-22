@@ -52,9 +52,9 @@ const DogBadges = ({ badges, isLoading }: DogBadgesProps) => {
             도전과제
           </CardTitle>
         </CardHeader>
-        <CardContent className="bg-orange-100">
+        <CardContent className="bg-orange-100 p-4">
           <TooltipProvider delayDuration={100}>
-            <div className="grid grid-cols-4 sm:grid-cols-5 gap-y-4 gap-x-2">
+            <div className="grid grid-cols-4 sm:grid-cols-5 gap-4">
               {badges.map((badge, index) => <Tooltip key={badge.id}>
                   <TooltipTrigger asChild>
                     <motion.div 
