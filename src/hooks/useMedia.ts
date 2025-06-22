@@ -26,7 +26,19 @@ const fetchMedia = async (): Promise<Media[]> => {
         toast.error('미디어를 불러오는데 실패했습니다.');
         throw error;
     }
-    return data;
+
+    // 각 미디어 파일에 대한 공개 URL을 동적으로 생성합니다.
+    const mediaWithUrls = data.map(item => {
+        const { data: publicUrlData } = supabase.storage
+            .from('media_storage')
+            .getPublicUrl(item.file_path);
+        return {
+            ...item,
+            file_url: publicUrlData.publicUrl,
+        };
+    });
+
+    return mediaWithUrls;
 };
 
 export const useMedia = () => {
