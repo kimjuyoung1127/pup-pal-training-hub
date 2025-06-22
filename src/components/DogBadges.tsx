@@ -15,11 +15,10 @@ interface DogBadgesProps {
 
 const DogBadges = ({ badges, isLoading }: DogBadgesProps) => {
   if (isLoading) {
-    return <Card className="mb-6">
+    return <Card className="mb-6 bg-white">
         <CardHeader>
           <CardTitle className="flex items-center">
             <Award className="mr-2 h-6 w-6 text-yellow-500" />
-            획득한 뱃지
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -46,13 +45,13 @@ const DogBadges = ({ badges, isLoading }: DogBadgesProps) => {
     delay: 0.2
   }}>
       <Card className="mb-6">
-        <CardHeader className="bg-orange-100">
+        <CardHeader className="bg-white">
           <CardTitle className="flex items-center text-xl font-bold text-black">
             <Award className="mr-2 h-6 w-6 text-yellow-500" />
             도전과제
           </CardTitle>
         </CardHeader>
-        <CardContent className="bg-orange-100 p-4">
+        <CardContent className="bg-white p-4">
           <TooltipProvider delayDuration={100}>
             <div className="grid grid-cols-4 sm:grid-cols-5 gap-4">
               {badges.map((badge, index) => <Tooltip key={badge.id}>

@@ -3,8 +3,6 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
-
 @layer base {
   :root {
     /* 기본 색상 팔레트 정의 */
@@ -21,13 +19,13 @@
     --gray-800: 55 65 81; /* 진한 회색 */
     
     /* 시스템 변수는 팔레트 참조 */
-    --background: var(--cream-100); /* 배경을 연한 크림색으로 변경 */
-    --foreground: var(--gray-800); /* 전경색(글자)을 진한 회색으로 변경 */
-    --card: var(--white);
-    --card-foreground: var(--gray-800); /* 카드 전경색 변경 */
+    --background: 255 255 255; /* white */
+    --foreground: 120 90 60; /* cream-900 */
+    --card: 255 255 255; /* white */
+    --card-foreground: 120 90 60; /* cream-900 */
 
     --popover: 255 246 238; /* cream-100 */
-    --popover-foreground: var(--gray-800); /* 팝오버 전경색 변경 */
+    --popover-foreground: 120 90 60; /* cream-900 */
 
     --primary: 255 169 77; /* orange-500 */
     --primary-foreground: 255 255 255; /* white */
@@ -39,7 +37,7 @@
     --muted-foreground: 204 159 116; /* cream-700 */
 
     --accent: 255 255 255; /* white */
-    --accent-foreground: var(--gray-800); /* 강조 전경색 변경 */
+    --accent-foreground: 120 90 60; /* cream-900 */
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -49,30 +47,20 @@
     --ring: 255 169 77; /* orange-500 */
 
     --radius: 0.75rem;
-
-    --sidebar-background: 255 246 238; /* cream-100 */
-    --sidebar-foreground: 153 117 82; /* cream-900 */
-    --sidebar-primary: 255 169 77; /* orange-500 */
-    --sidebar-primary-foreground: 255 255 255; /* white */
-    --sidebar-accent: 255 235 216; /* cream-200 */
-    --sidebar-accent-foreground: 179 134 99; /* cream-800 */
-    --sidebar-border: 255 224 194; /* cream-300 */
-    --sidebar-ring: 255 169 77; /* orange-500 */
   }
 
   .dark {
-    --background: 51 51 51; /* dark gray */
-    --card: var(--cream-900);
-    --foreground: var(--white);
+    --background: 55 65 81; /* dark gray */
+    --foreground: 255 255 255; /* white */
 
-    --card: 153 117 82; /* cream-900 */
+    --card: 120 90 60; /* cream-900 */
     --card-foreground: 255 255 255; /* white */
 
-    --popover: 153 117 82; /* cream-900 */
+    --popover: 120 90 60; /* cream-900 */
     --popover-foreground: 255 255 255; /* white */
 
     --primary: 255 169 77; /* orange-500 */
-    --primary-foreground: 153 117 82; /* cream-900 */
+    --primary-foreground: 120 90 60; /* cream-900 */
 
     --secondary: 204 159 116; /* cream-700 */
     --secondary-foreground: 255 255 255; /* white */
@@ -87,46 +75,10 @@
     --destructive-foreground: 210 40% 98%;
 
     --border: 204 159 116; /* cream-700 */
-    --input: 229 231 235; /* gray-200으로 변경 */
+    --input: 229 231 235; /* gray-200 */
     --ring: 255 169 77; /* orange-500 */
-
-    --sidebar-background: 153 117 82; /* cream-900 */
-    --sidebar-foreground: 255 255 255; /* white */
-    --sidebar-primary: 255 169 77; /* orange-500 */
-    --sidebar-primary-foreground: 153 117 82; /* cream-900 */
-    --sidebar-accent: 204 159 116; /* cream-700 */
-    --sidebar-accent-foreground: 255 255 255; /* white */
-    --sidebar-border: 204 159 116; /* cream-700 */
-    --sidebar-ring: 255 169 77; /* orange-500 */
   }
-}
 
-@layer base {
-  :root {
-    /* 기본 UI */
-    --radius: 0.75rem;
-    
-    /* 메인 테마 */
-    --background: var(--white);
-    --foreground: var(--cream-900);
-    
-    /* 카드 컴포넌트 */
-    --card: var(--white);
-    --card-foreground: var(--cream-900);
-    
-    /* 사이드바 컴포넌트 */
-    --sidebar-background: var(--cream-100);
-    --sidebar-foreground: var(--cream-900);
-    --sidebar-primary: 255 169 77; /* orange-500 */
-    --sidebar-primary-foreground: 255 255 255; /* white */
-    --sidebar-accent: 255 235 216; /* cream-200 */
-    --sidebar-accent-foreground: 179 134 99; /* cream-800 */
-    --sidebar-border: 255 224 194; /* cream-300 */
-    --sidebar-ring: 255 169 77; /* orange-500 */
-  }
-}
-
-@layer base {
   * {
     border-color: var(--border);
   }
@@ -139,22 +91,21 @@
   }
 
   /* 커스텀 스크롤바 */
-  /* 커스텀 스크롤바 */
   ::-webkit-scrollbar {
     width: 6px;
   }
   
   ::-webkit-scrollbar-track {
-    background-color: rgba(243, 244, 246, 0.5); /* Added transparency for smoother feel */
+    background-color: rgba(243, 244, 246, 0.5);
   }
   
   ::-webkit-scrollbar-thumb {
     background-color: #d1d5db; /* gray-300 */
-    border-radius: 9999px; /* rounded-full */ /* 스크롤바 썸네일 스타일 추가 */
+    border-radius: 9999px; /* rounded-full */
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: rgb(251 146 60); /* Equivalent to Tailwind's bg-orange-400 */
+    background-color: rgb(251 146 60); /* bg-orange-400 */
   }
 }
 
@@ -197,9 +148,9 @@
     border-radius: 0.75rem;
     padding: 0.75rem 1rem;
     transition: all 200ms;
-}
+  }
 
-.input-soft:focus {
+  .input-soft:focus {
     border-color: rgb(255, 169, 77);
     box-shadow: 0 0 0 2px rgba(255, 169, 77, 0.2);
   }

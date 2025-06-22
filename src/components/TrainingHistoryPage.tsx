@@ -48,18 +48,22 @@ const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="container mx-auto p-4 bg-white min-h-screen"
+      className="mx-auto bg-white min-h-screen"
     >
-      <div className="flex items-center mb-6">
-        <Button variant="ghost" size="icon" onClick={() => onNavigate('dashboard')}>
-          <ArrowLeft className="h-6 w-6 text-gray-700" />
-        </Button>
-        <h1 className="text-2xl font-bold text-gray-800 ml-2">훈련 기록</h1>
+      <div className="bg-white/80 backdrop-blur-sm border-b border-cream-200 px-4 py-4 sticky top-0 z-10">
+        <div className="flex items-center">
+          <Button variant="ghost" size="icon" onClick={() => onNavigate('dashboard')}>
+            <ArrowLeft className="h-6 w-6 text-gray-700" />
+          </Button>
+          <h1 className="text-lg font-bold text-cream-800 ml-2 font-pretendard">훈련 기록</h1>
+        </div>
       </div>
       
-      <DogBadges badges={badges || []} isLoading={isLoadingBadges} />
+      <div className="p-4 space-y-6">
+        <DogBadges badges={badges || []} isLoading={isLoadingBadges} />
 
-      {renderContent()}
+        {renderContent()}
+      </div>
 
       <DeleteTrainingLogDialog 
         log={logToDelete}
