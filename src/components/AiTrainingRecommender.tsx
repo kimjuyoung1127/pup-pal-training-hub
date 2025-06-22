@@ -42,8 +42,46 @@ const AiTrainingRecommender = ({ onSelectTraining, selectedTrainingTitle }: AiTr
       delete fullProfile.updated_at;
       
       // 확장된 프롬프트
-      const prompt = `당신은 반려견 행동 교정 및 피트니스 전문가입니다. 다음 강아지 프로필을 바탕으로, 전문적이고 과학적인 근거에 기반한 맞춤형 훈련 2가지를 추천해주세요. 이전에 추천했을 법한 일반적인 훈련이 아닌, 강아지의 특성(나이, 품종, 건강 상태, 활동 수준, 성격, 약한 부위)을 종합적으로 고려하여 창의적이고 효과적인 훈련을 제안해야 합니다. 특히, 약한 부위가 있다면 해당 부위를 직접적으로 자극하지 않으면서도 간접적으로 강화할 수 있는 운동을 포함해주세요.\n\n강아지 프로필: ${JSON.stringify(fullProfile, null, 2)}\n\n각 훈련 추천은 다음 항목을 반드시 포함해야 합니다:\n1.  **title**: 훈련의 이름 (예: '코어 강화를 위한 밸런스 보드 챌린지')\n2.  **description**: 훈련의 목적과 강아지에게 어떤 도움이 되는지에 대한 상세한 설명\n3.  **difficulty**: 난이도 ('초급', '중급', '고급')\n4.  **duration**: 예상 소요 시간 (예: '15-20분')\n5.  **benefits**: 이 훈련을 통해 얻을 수 있는 주요 이점 3가지 (배열 형태, 예: ["코어 근육 강화", "집중력 향상", "자신감 증진"])\n6.  **equipment**: 필요한 도구 (배열 형태, 없으면 빈 배열, 예: ["밸런스 보드", "간식"])\n7.  **caution**: 훈련 시 주의해야 할 사항이나 잠재적 위험\n8.  **steps**: 단계별 훈련 방법 (최소 5단계 이상, 각 단계는 title, instruction, tip 포함)\n\n전체 응답은 반드시 아래와 같은 JSON 배열 형식이어야 하며, 다른 설명 없이 JSON 데이터만 반환해주세요:\n[{ "title": string, "description": string, "difficulty": "초급" | "중급" | "고급", "duration": string, "benefits": string[], "equipment": string[], "caution": string, "steps": [{ "title": string, "instruction": string, "tip": string | null }] }]
-`;
+      const prompt = `당신은 반려견 행동 교정 및 피트니스 전문가입니다.
+
+      다음 강아지 프로필을 기반으로, **전문적이고 창의적인 맞춤형 훈련 2가지**를 추천해주세요. 
+      이전에도 흔히 추천했을 법한 훈련이 아닌, **강아지의 나이, 품종, 건강 상태, 활동 수준, 성격, 약한 부위**를 종합적으로 고려해 주세요.
+      
+      📌 주의사항:
+      - 약한 부위는 직접 자극하지 말고, 간접적으로 보완할 수 있는 훈련으로 구성해주세요.
+      - 사용자가 읽기 쉽도록 **짧은 문장**, **강조가 필요한 부분은 명확히**, **훈련 목적이 분명한 설명**을 작성해주세요.
+      
+      🐶 강아지 프로필:
+      ${JSON.stringify(fullProfile, null, 2)}
+      
+      📋 훈련 하나당 반드시 다음 구조를 따르세요:
+      {
+        "title": "훈련 이름 (예: '코어 강화를 위한 밸런스 보드 챌린지')",
+        "description": "훈련의 목적과 강아지에게 주는 효과를 간결하고 쉽게 설명",
+        "difficulty": "초급 | 중급 | 고급",
+        "duration": "예상 소요 시간 (예: '10~15분')",
+        "benefits": ["훈련을 통해 얻을 수 있는 핵심 효과 3가지", "예: '균형감각 향상'", "예: '자신감 증진'"],
+        "equipment": ["필요한 도구 목록. 없으면 빈 배열 []", "예: '도넛볼', '간식'"],
+        "caution": "훈련 중 주의할 점 또는 위험 요소",
+        "steps": [
+          {
+            "title": "단계 이름",
+            "instruction": "실행 방법 (짧고 명확하게)",
+            "tip": "부드러운 진행을 위한 팁 (없으면 null)"
+          },
+          ...최소 5단계 이상...
+        ]
+      }
+      
+      🎯 응답 전체는 반드시 아래와 같은 **JSON 배열 2개**로 구성된 **JSON만 반환**하세요.
+      (설명 없이 JSON만 제공해야 합니다):
+      
+      [
+        { ...훈련1 },
+        { ...훈련2 }
+      ]
+      `;
+      
 
       const { data, error } = await supabase.functions.invoke('gemini-chat', {
         body: { history: [{ role: 'user', parts: [{ text: prompt }] }] },
