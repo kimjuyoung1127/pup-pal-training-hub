@@ -100,7 +100,7 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
             <AccordionTrigger>
                 <div className="flex justify-between items-center w-full pr-4">
                     <span>{category.icon} {category.title}</span>
-                    <span className="text-sm text-gray-500">완성도 {completionPercent}%</span>
+                    <span className="text-sm text-orange-500 font-semibold">완성도 {completionPercent}%</span>
                 </div>
             </AccordionTrigger>
             <AccordionContent>
@@ -110,7 +110,7 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
                             <FormField
                                 key={mission.key}
                                 control={form.control}
-                                name={mission.key as keyof FormValues}
+                                name={mission.key as keyof FormValues & string}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>{mission.question}</FormLabel>
