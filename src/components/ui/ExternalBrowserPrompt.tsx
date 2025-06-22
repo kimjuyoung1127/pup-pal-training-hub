@@ -12,7 +12,7 @@ const ExternalBrowserPrompt = () => {
     <Alert className="fixed bottom-4 left-4 right-4 z-50 bg-yellow-100 border-yellow-300 text-yellow-900 max-w-md mx-auto shadow-lg">
       <AlertTitle className="font-bold">📢 외부 브라우저로 열어주세요</AlertTitle>
       <AlertDescription>
-        원활한 로그인을 위해 카카오톡/인스타그램 등의 인앱 브라우저가 아닌, Chrome이나 Safari와 같은 외부 브라우저에서 접속해주세요.
+        구글 로그인 시, Chrome이나 Safari와 같은 외부 브라우저에서 접속해주세요.
       </AlertDescription>
       {navigator.userAgent.match(/android/i) && (
         <Button onClick={handleOpenInBrowser} className="mt-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 w-full">
