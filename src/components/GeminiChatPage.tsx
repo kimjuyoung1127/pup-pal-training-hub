@@ -55,7 +55,7 @@ const GeminiChatPage = () => {
         throw error;
       }
 
-      // API로부터 받은 텍스트 응답을 바로 사용합니다.
+      // The 'data' object from the function contains a 'response' property.
       const botMessage: Message = { 
         role: 'model', 
         parts: [{ text: data.response }] 
