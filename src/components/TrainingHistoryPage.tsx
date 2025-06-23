@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from 'lucide-react';
 import { useTrainingHistory, TrainingLog } from '@/hooks/useTrainingHistory';
+import { useAiRecommendations, AiRecommendation } from '@/hooks/useAiRecommendations';
+import { useDogProfile } from '@/hooks/useDogProfile';
 import { useDogBadges } from '@/hooks/useDogBadges';
 import DogBadges from './DogBadges';
 import DeleteTrainingLogDialog from './DeleteTrainingLogDialog';
@@ -12,33 +14,70 @@ import TrainingHistoryList from './training-history/TrainingHistoryList';
 import { motion } from 'framer-motion';
 
 interface TrainingHistoryPageProps {
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, params?: any) => void;
 }
 
 const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
-  const { data: trainingHistory, isLoading, isError } = useTrainingHistory();
-  const { data: badges, isLoading: isLoadingBadges } = useDogBadges();
+  const { dogInfo, isLoading: isLoadingDogProfile } = useDogProfile();
+  const { data: trainingHistory, isLoading: isLoadingHistory, isError: isErrorHistory } = useTrainingHistory(dogInfo?.id);
+  const { data: aiRecommendations, isLoading: isLoadingAi, isError: isErrorAi } = useAiRecommendations(dogInfo?.id);
+  const { data: badges, isLoading: isLoadingBadges } = useDogBadges(dogInfo?.id);
   const [logToDelete, setLogToDelete] = useState<TrainingLog | null>(null);
   const [logToEdit, setLogToEdit] = useState<TrainingLog | null>(null);
 
+  useEffect(() => {
+    console.log('🐶 Dog Profile:', dogInfo);
+    console.log('📜 Training History:', trainingHistory);
+    console.log('🤖 AI Recommendations:', aiRecommendations);
+  }, [dogInfo, trainingHistory, aiRecommendations]);
+
+  const combinedHistory = useMemo(() => {
+    console.log('🔄 Combining history and recommendations...');
+    const processedAiRecs = (aiRecommendations || []).flatMap(rec => 
+      (rec.recommendations as any[])
+        .map((r: any, index: number) => ({
+          id: `ai-${rec.id}-${index}`,
+          session_date: rec.created_at,
+          training_type: r.program,
+          notes: r.description,
+          isAiTraining: true,
+          duration_minutes: null,
+          success_rate: null,
+        } as TrainingLog & { isAiTraining: boolean }))
+        .filter(item => item.training_type) // training_type이 있는 항목만 필터링
+    );
+    const combined = [...processedAiRecs, ...(trainingHistory || [])];
+    console.log('✅ Combined Data:', combined);
+    return combined;
+  }, [aiRecommendations, trainingHistory]);
+
+  const handleRetryTraining = (trainingType: string) => {
+    onNavigate('training', { trainingType });
+  };
+
   const renderContent = () => {
-    if (isLoading) {
+    if (isLoadingHistory || isLoadingAi || isLoadingDogProfile) {
+      console.log('⏳ Loading data...');
       return <TrainingHistorySkeleton />;
     }
 
-    if (isError) {
+    if (isErrorHistory || isErrorAi) {
+      console.error('❌ Error loading data. History Error:', isErrorHistory, 'AI Recs Error:', isErrorAi);
       return <div className="text-center text-red-500 p-8">훈련 기록을 불러오는 데 실패했습니다.</div>;
     }
 
-    if (!trainingHistory || trainingHistory.length === 0) {
-      return <EmptyTrainingHistory onNavigate={onNavigate} />;
+    if (!combinedHistory || combinedHistory.length === 0) {
+      console.log('텅 비었음! Empty data, showing empty component.');
+      return <EmptyTrainingHistory onNavigate={() => onNavigate('dashboard')} />;
     }
 
+    console.log('렌더링될 데이터:', combinedHistory);
     return (
       <TrainingHistoryList
-        trainingHistory={trainingHistory}
+        trainingHistory={combinedHistory}
         onEdit={setLogToEdit}
         onDelete={setLogToDelete}
+        onRetry={handleRetryTraining}
       />
     );
   };

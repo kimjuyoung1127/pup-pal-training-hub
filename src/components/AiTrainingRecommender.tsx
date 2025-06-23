@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useDogProfile } from '@/hooks/useDogProfile';
@@ -10,6 +10,7 @@ import { Loader2, Wand2, Star, CheckCircle, List, AlertTriangle } from 'lucide-r
 import { TrainingProgram } from '@/lib/trainingData';
 import { motion } from 'framer-motion';
 import { Badge } from './ui/badge';
+import { useAiRecommendations, useSaveAiRecommendations, AiRecommendation } from '@/hooks/useAiRecommendations';
 
 // 확장된 필드를 포함하도록 인터페이스 업데이트
 interface AiTrainingProgram {
@@ -30,6 +31,27 @@ interface AiTrainingRecommenderProps {
 
 const AiTrainingRecommender = ({ onSelectTraining, selectedTrainingTitle }: AiTrainingRecommenderProps) => {
   const { dogInfo, extendedProfile, isLoading: isProfileLoading } = useDogProfile();
+  const [aiRecommendations, setAiRecommendations] = useState<AiTrainingProgram[]>([]);
+
+  const { data: savedRecommendations, isLoading: isLoadingRecommendations } = useAiRecommendations(dogInfo?.id ? dogInfo.id : null);
+  const saveRecommendationsMutation = useSaveAiRecommendations();
+
+  useEffect(() => {
+    if (savedRecommendations && savedRecommendations.length > 0) {
+      // 여러 추천 기록의 recommendations 필드를 모두 합쳐서 하나의 배열로 만듭니다.
+      const allParsedRecommendations = savedRecommendations.flatMap(
+        (rec: AiRecommendation) => {
+          // First cast to unknown to avoid direct type assertion
+          const unknownRecs = rec.recommendations as unknown;
+          // Then safely cast to AiTrainingProgram[]
+          return unknownRecs as AiTrainingProgram[];
+        }
+      );
+      setAiRecommendations(allParsedRecommendations);
+    } else {
+      setAiRecommendations([]);
+    }
+  }, [savedRecommendations]);
 
   const recommendTrainingMutation = useMutation({
     mutationFn: async () => {
@@ -44,7 +66,7 @@ const AiTrainingRecommender = ({ onSelectTraining, selectedTrainingTitle }: AiTr
       // 확장된 프롬프트
       const prompt = `당신은 반려견 행동 수정 전문가입니다.
 
-      다음 강아지 프로필을 기반으로, **전문적이고 창의적인 맞춤형 훈련 2가지**를 추천해주세요. 
+      다음 강아지 프로필을 기반으로, **전문적이고 창의적인 맞춤형 훈련 초급,중급, 고급 중 2가지**를 추천해주세요. 
       이전에도 흔히 추천했을 법한 훈련이 아닌, **강아지의 나이, 품종, 건강 상태, 활동 수준, 성격, 약한 부위**를 종합적으로 고려해 주세요.
       
       📌 주의사항:
@@ -130,8 +152,13 @@ const AiTrainingRecommender = ({ onSelectTraining, selectedTrainingTitle }: AiTr
         throw new Error("AI로부터 유효한 훈련 계획을 받지 못했습니다.");
       }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success('AI 훈련 추천을 생성했습니다!');
+      // 새로 생성된 추천(data)을 기존 목록(aiRecommendations)의 맨 앞에 추가합니다.
+      setAiRecommendations(prev => [...data, ...prev]);
+      if (dogInfo?.id) {
+        saveRecommendationsMutation.mutate({ dogId: dogInfo.id, recommendations: data });
+      }
     },
     onError: (error: any) => {
       toast.error('AI 추천 생성에 실패했습니다.', { description: error.message });
@@ -160,7 +187,7 @@ const AiTrainingRecommender = ({ onSelectTraining, selectedTrainingTitle }: AiTr
           <CardDescription className="text-gray-600">우리 강아지의 프로필을 기반으로 AI가 맞춤 훈련을 추천해드려요.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {recommendTrainingMutation.isPending && (
+          {(recommendTrainingMutation.isPending || isLoadingRecommendations) && (
             <div className="flex justify-center items-center p-4">
               <Loader2 className="animate-spin w-8 h-8 text-orange-500" />
               <p className="ml-2 text-gray-700">AI가 열심히 훈련 계획을 짜고 있어요...</p>
@@ -169,9 +196,9 @@ const AiTrainingRecommender = ({ onSelectTraining, selectedTrainingTitle }: AiTr
           {recommendTrainingMutation.isError && (
              <p className="text-red-500 text-center">{recommendTrainingMutation.error.message}</p>
           )}
-          {recommendTrainingMutation.data && (
-            <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2"> 
-              {recommendTrainingMutation.data.map((training, index) => (
+          {aiRecommendations.length > 0 && (
+            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2"> 
+              {aiRecommendations.map((training, index) => (
                 <Card 
                   key={index} 
                   onClick={() => handleSelect(training)}
@@ -210,13 +237,15 @@ const AiTrainingRecommender = ({ onSelectTraining, selectedTrainingTitle }: AiTr
             </div>
           )}
 
-          <Button 
-            onClick={() => recommendTrainingMutation.mutate()} 
-            disabled={isProfileLoading || recommendTrainingMutation.isPending}
-            className="w-full btn-secondary"
-          >
-            {isProfileLoading ? '프로필 로딩 중...' : (recommendTrainingMutation.isPending ? '생성 중...' : 'AI 훈련 추천 받기')}
-          </Button>
+          {aiRecommendations.length === 0 && !recommendTrainingMutation.isPending && !isLoadingRecommendations && (
+            <div className="text-center p-4">
+              <p className="text-gray-600 mb-4">아직 생성된 AI 추천이 없어요. 버튼을 눌러 우리 강아지를 위한 맞춤 훈련을 받아보세요!</p>
+              <Button onClick={() => recommendTrainingMutation.mutate()} disabled={isProfileLoading || recommendTrainingMutation.isPending}>
+                {isProfileLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />} 
+                AI 추천 받기
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </motion.div>

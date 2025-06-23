@@ -15,34 +15,13 @@ export interface TrainingLog {
 export type TrainingLogUpdate = Partial<Omit<TrainingLog, 'id'>>;
 export type TrainingLogCreate = Omit<TrainingLog, 'id' | 'session_date'>;
 
-const fetchTrainingHistory = async (): Promise<TrainingLog[]> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return [];
-  }
-
-  const { data: dog, error: dogError } = await supabase
-    .from('dogs')
-    .select('id')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single();
-
-  if (dogError && dogError.code !== 'PGRST116') {
-    console.error('Error fetching dog:', dogError);
-    toast.error('강아지 정보를 가져오는 데 실패했습니다.');
-    throw dogError;
-  }
-  
-  if (!dog) {
-      return [];
-  }
+const fetchTrainingHistory = async (dogId: string | undefined): Promise<TrainingLog[]> => {
+  if (!dogId) return [];
 
   const { data, error } = await supabase
     .from('training_history')
     .select('id, session_date, duration_minutes, success_rate, training_type, notes')
-    .eq('dog_id', dog.id)
+    .eq('dog_id', dogId)
     .order('session_date', { ascending: false })
     .order('created_at', { ascending: false });
 
@@ -55,12 +34,13 @@ const fetchTrainingHistory = async (): Promise<TrainingLog[]> => {
   return data;
 };
 
-export const useTrainingHistory = () => {
+export const useTrainingHistory = (dogId: string | undefined) => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
-        queryKey: ['trainingHistory'],
-        queryFn: fetchTrainingHistory,
+        queryKey: ['trainingHistory', dogId],
+        queryFn: () => fetchTrainingHistory(dogId),
+        enabled: !!dogId,
     });
 
     const addMutation = useMutation({

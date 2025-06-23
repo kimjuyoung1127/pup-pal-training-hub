@@ -53,8 +53,15 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+
+				green: '#4A7A62',
+				amber: '#FAA935',
+				red: '#C45132',
+				rust: '#8A2504',
+
 				// 강아지 앱 전용 컬러 팔레트
 				cream: {
+					DEFAULT: '#FFF1B6',
 					50: '#FFFCF9',
 					100: '#FFF6EE',
 					200: '#FFEBD8',
@@ -78,6 +85,8 @@ export default {
 					800: '#B3761D',
 					900: '#99650D',
 				},
+
+				
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',

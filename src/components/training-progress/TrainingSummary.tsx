@@ -64,7 +64,7 @@ const TrainingSummary = ({ onNavigate, onExit, newlyAwardedBadges = [] }: Traini
           기록 페이지로 이동
         </Button>
         <Button onClick={onExit} size="lg" variant="ghost" className="w-full text-cream-600">
-          홈으로 돌아가기
+          다시 훈련해보기
         </Button>
       </div>
     </motion.div>

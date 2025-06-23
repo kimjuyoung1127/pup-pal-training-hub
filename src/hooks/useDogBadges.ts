@@ -12,7 +12,8 @@ export interface DogBadge {
   achieved_at: string | null;
 }
 
-const fetchDogBadges = async (): Promise<DogBadge[]> => {
+const fetchDogBadges = async (dogId: string | undefined): Promise<Badge[]> => {
+  if (!dogId) return [];
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return [];
@@ -82,9 +83,10 @@ const fetchDogBadges = async (): Promise<DogBadge[]> => {
   });
 };
 
-export const useDogBadges = () => {
-    return useQuery({
-        queryKey: ['dogBadges'],
-        queryFn: fetchDogBadges,
-    });
+export const useDogBadges = (dogId: string | undefined) => {
+  return useQuery<Badge[], Error>({
+    queryKey: ['dogBadges', dogId],
+    queryFn: () => fetchDogBadges(dogId),
+    enabled: !!dogId,
+  });
 };

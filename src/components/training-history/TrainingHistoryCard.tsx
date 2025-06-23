@@ -14,14 +14,16 @@ import {
 import { TrainingLog } from '@/hooks/useTrainingHistory';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { Repeat } from 'lucide-react';
 
 interface TrainingHistoryCardProps {
-  item: TrainingLog;
+  item: TrainingLog & { isAiTraining?: boolean };
   onEdit: () => void;
   onDelete: () => void;
+  onRetry: (trainingType: string) => void;
 }
 
-const TrainingHistoryCard = ({ item, onEdit, onDelete }: TrainingHistoryCardProps) => {
+const TrainingHistoryCard = ({ item, onEdit, onDelete, onRetry }: TrainingHistoryCardProps) => {
   const iconMap: { [key: string]: string } = {
     '기본 명령어': '🎯',
     '산책 예절': '🚶‍♂️',
@@ -33,21 +35,6 @@ const TrainingHistoryCard = ({ item, onEdit, onDelete }: TrainingHistoryCardProp
   };
   const icon = item.training_type ? (iconMap[item.training_type] || '⭐') : '⭐';
 
-  const renderStars = (rate: number | null) => {
-    if (rate === null) return null;
-    const rating = Math.max(0, Math.ceil(rate / 20));
-    return (
-      <div className="flex items-center">
-        {[...Array(5)].map((_, i) => (
-          <Star
-            key={i}
-            className={`w-5 h-5 transition-colors ${i < rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
-          />
-        ))}
-      </div>
-    );
-  };
-
   return (
     <motion.div
       layout
@@ -56,30 +43,37 @@ const TrainingHistoryCard = ({ item, onEdit, onDelete }: TrainingHistoryCardProp
       exit={{ opacity: 0, x: -30, transition: { duration: 0.2 } }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="shadow-none border border-gray-200 bg-white hover:bg-gray-50 transition-colors">
+      <Card className="shadow-none border border-gray-200 bg-white hover:bg-gray-50 transition-colors w-full">
         <CardContent className="p-4">
           <div className="flex items-start space-x-4">
             <div className="text-3xl p-3 bg-gray-100 rounded-xl border border-gray-200">{icon}</div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <div className="flex justify-between items-start">
-                <p className="font-bold text-lg text-gray-800">{item.training_type || '알 수 없는 훈련'}</p>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0 text-gray-600 hover:bg-gray-100">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={onEdit}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      <span>수정</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={onDelete} className="text-red-500 focus:text-red-500 focus:bg-red-50">
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      <span>삭제</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-lg text-gray-800 truncate">{item.training_type || '알 수 없는 훈련'}</p>
+                  {item.isAiTraining && (
+                    <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full">AI 추천</span>
+                  )}
+                </div>
+                {!item.isAiTraining && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0 text-gray-600 hover:bg-gray-100">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={onEdit}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        <span>수정</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={onDelete} className="text-red-500 focus:text-red-500 focus:bg-red-50">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        <span>삭제</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </div>
               <div className="flex items-center text-sm text-gray-500 mt-1 space-x-4">
                 <div className="flex items-center">
@@ -93,19 +87,18 @@ const TrainingHistoryCard = ({ item, onEdit, onDelete }: TrainingHistoryCardProp
                   </div>
                 )}
               </div>
-              {item.success_rate !== null && (
-                <div className="mt-3">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm font-medium text-gray-600">성공률</span>
-                    {renderStars(item.success_rate)}
-                  </div>
-                  <Progress value={item.success_rate} className="h-2 bg-gray-200" indicatorClassName="bg-blue-500" />
-                </div>
-              )}
               {item.notes && (
-                <p className="mt-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-200 whitespace-pre-wrap">
+                <p className="mt-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-200 whitespace-pre-wrap break-words">
                   {item.notes}
                 </p>
+              )}
+              {item.training_type && (
+                <div className="mt-4 flex justify-end">
+                  <Button onClick={() => onRetry(item.training_type!)} size="sm" className="bg-blue-500 hover:bg-blue-600">
+                    <Repeat className="mr-2 h-4 w-4" />
+                    다시 훈련하기
+                  </Button>
+                </div>
               )}
             </div>
           </div>

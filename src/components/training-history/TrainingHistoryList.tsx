@@ -13,12 +13,13 @@ import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
 interface TrainingHistoryListProps {
-    trainingHistory: TrainingLog[];
+    trainingHistory: (TrainingLog & { isAiTraining?: boolean })[];
     onEdit: (log: TrainingLog) => void;
     onDelete: (log: TrainingLog) => void;
+    onRetry: (trainingType: string) => void;
 }
 
-const TrainingHistoryList = ({ trainingHistory, onEdit, onDelete }: TrainingHistoryListProps) => {
+const TrainingHistoryList = ({ trainingHistory, onEdit, onDelete, onRetry }: TrainingHistoryListProps) => {
     const groupedByDate = React.useMemo(() => 
         trainingHistory.reduce((acc, log) => {
             const dateKey = format(parseISO(log.session_date), 'yyyy-MM-dd');
@@ -71,6 +72,7 @@ const TrainingHistoryList = ({ trainingHistory, onEdit, onDelete }: TrainingHist
                                                 item={item}
                                                 onEdit={() => onEdit(item)}
                                                 onDelete={() => onDelete(item)}
+                                                onRetry={onRetry}
                                             />
                                         ))}
                                       </AnimatePresence>

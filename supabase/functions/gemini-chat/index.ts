@@ -35,14 +35,15 @@ serve(async (req) => {
         contents: contents,
         systemInstruction: {
           parts: [
-            { text: "You are a friendly and helpful dog training coach. Respond only in natural, conversational Korean. Do not use JSON format under any circumstances." }
+            { text: "You are a helpful dog training recommender. You must respond in JSON format. Do not include any text other than the JSON response." }
           ]
         },
         generationConfig: {
+            responseMimeType: 'application/json',
             temperature: 0.8,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 2048,
+            maxOutputTokens: 16384, // 8192에서 16384로 늘림
         },
         safetySettings: [
             { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE" },
@@ -69,7 +70,7 @@ serve(async (req) => {
     }
 
     return new Response(botMessage, {
-      headers: { ...corsHeaders, 'Content-Type': 'text/plain; charset=utf-8' },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json; charset=utf-8' },
       status: 200,
     })
   } catch (error) {

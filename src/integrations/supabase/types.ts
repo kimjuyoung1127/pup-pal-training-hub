@@ -9,6 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_recommendations: {
+        Row: {
+          id: string
+          dog_id: string
+          user_id: string
+          recommendations: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          dog_id: string
+          user_id: string
+          recommendations: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          dog_id?: string
+          user_id?: string
+          recommendations?: Json
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_recommendations_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: false
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_recommendations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       badges: {
         Row: {
           description: string | null
@@ -532,3 +571,46 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
+
+Tables: {
+  ai_recommendations: {
+    Row: {
+      id: string
+      dog_id: string
+      user_id: string
+      recommendations: Json
+      created_at: string
+    }
+    Insert: {
+      id?: string
+      dog_id: string
+      user_id: string
+      recommendations: Json
+      created_at?: string
+    }
+    Update: {
+      id?: string
+      dog_id?: string
+      user_id?: string
+      recommendations?: Json
+      created_at?: string
+    }
+    Relationships: [
+      {
+        foreignKeyName: "ai_recommendations_dog_id_fkey"
+        columns: ["dog_id"]
+        isOneToOne: false
+        referencedRelation: "dogs"
+        referencedColumns: ["id"]
+      }
+      {
+        foreignKeyName: "ai_recommendations_user_id_fkey"
+        columns: ["user_id"]
+        isOneToOne: false
+        referencedRelation: "users"
+        referencedColumns: ["id"]
+      }
+    ]
+  }
+}

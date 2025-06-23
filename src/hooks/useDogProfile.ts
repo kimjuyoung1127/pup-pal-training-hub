@@ -33,10 +33,13 @@ export interface FullDogExtendedProfile {
 }
 
 const fetchDogProfileData = async () => {
+  console.log('Fetching dog profile data...');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
+    console.log('No user found.');
     return null;
   }
+  console.log('User found:', user.id);
   
   const { data: dogData, error: dogError } = await supabase
     .from('dogs')
@@ -50,16 +53,22 @@ const fetchDogProfileData = async () => {
     if (dogError && dogError.code !== 'PGRST116') {
         console.error('Error fetching dog data:', dogError);
     }
+    console.log('No dog data found or error occurred. Dog data:', dogData);
     return null;
   }
 
-  const { data: extendedProfileData } = await supabase
+  console.log('Dog data found:', dogData);
+
+  const { data: extendedProfileData, error: extendedProfileError } = await supabase
       .from('dog_extended_profile')
       .select('*')
       .eq('dog_id', dogData.id)
       .maybeSingle();
 
-  const { data: healthLinks } = await supabase.from('dog_health_status').select('health_status_option_id').eq('dog_id', dogData.id);
+  const { data: healthLinks, error: healthLinksError } = await supabase.from('dog_health_status').select('health_status_option_id').eq('dog_id', dogData.id);
+  if (healthLinksError) {
+    console.error('Error fetching health links:', healthLinksError);
+  }
   const healthStatusIds = healthLinks?.map(l => l.health_status_option_id) || [];
   const { data: healthStatusData } = healthStatusIds.length > 0 ? await supabase.from('health_status_options').select('name').in('id', healthStatusIds) : { data: [] };
   const fetchedHealthStatusNames = healthStatusData?.map(s => s.name) || [];
