@@ -47,19 +47,21 @@ const GeminiChatPage = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('gemini-chat', {
+      const { data, error } = await supabase.functions.invoke('gemini-plaintext-chat', { // 호출 함수 변경
         body: { history: newMessages },
       });
+
+      console.log('Supabase function response:', data); // 응답 데이터 콘솔에 출력
 
       if (error) {
         throw error;
       }
 
-      // The 'data' object from the function contains a 'response' property.
+      // The 'data' from the function is now plain text.
       const botMessage: Message = { 
         role: 'model', 
-        parts: [{ text: data.response }] 
-      };
+        parts: [{ text: data }] // 'data'를 직접 사용
+      }; 
       setMessages(prev => [...prev, botMessage]);
     } catch (err: any) {
       console.error(err);

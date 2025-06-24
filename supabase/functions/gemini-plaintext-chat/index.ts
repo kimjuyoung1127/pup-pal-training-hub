@@ -1,4 +1,3 @@
-
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
@@ -35,15 +34,15 @@ serve(async (req) => {
         contents: contents,
         systemInstruction: {
           parts: [
-            { text: "You are a dog training recommender. You MUST respond in JSON format. Do not include any text other than the JSON response. The JSON should contain exercise recommendations." } // 시스템 프롬프트 명확화
+            { text: "You are a helpful and friendly dog training coach. Respond in plain text, not JSON." } // 시스템 프롬프트 수정
           ]
         },
         generationConfig: {
-            responseMimeType: 'application/json',
+            responseMimeType: 'text/plain', // 응답 타입을 text/plain으로 변경
             temperature: 0.8,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 16384, // 8192에서 16384로 늘림
+            maxOutputTokens: 2048, // 일반 챗봇이므로 토큰 수 조정
         },
         safetySettings: [
             { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE" },
@@ -60,25 +59,26 @@ serve(async (req) => {
         throw new Error(`Gemini API request failed with status ${response.status}`);
     }
 
-    const data = await response.json()
+    // Gemini API 응답이 JSON 구조이므로 파싱합니다.
+    const responseData = await response.json();
     
-    const botMessage = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    // 응답 구조에서 실제 텍스트를 추출합니다.
+    const botMessage = responseData.candidates?.[0]?.content?.parts?.[0]?.text;
     
     if (!botMessage) {
-      console.error('Unexpected Gemini API response:', data);
+      console.error('Unexpected Gemini API response:', responseData);
       throw new Error('Failed to get a response from the AI.');
     }
 
     return new Response(botMessage, {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json; charset=utf-8' },
+      headers: { ...corsHeaders, 'Content-Type': 'text/plain; charset=utf-8' }, // Content-Type을 text/plain으로 변경
       status: 200,
     })
   } catch (error) {
-    console.error('Error in gemini-chat function:', error)
+    console.error('Error in gemini-plaintext-chat function:', error)
     return new Response(error.message, {
       headers: { ...corsHeaders, 'Content-Type': 'text/plain; charset=utf-8' },
       status: 500,
     })
   }
 })
-
