@@ -33,13 +33,13 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
   } = useDogProfile();
 
   const Header = () => (
-    <div className="bg-white/80 backdrop-blur-sm border-b border-cream-200 px-6 py-4">
+    <div className="bg-background/80 backdrop-blur-sm border-b border-border px-6 py-4 sticky top-0 z-20"> {/* 배경, 테두리, z-index 변경 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="text-xl">🐾</div>
+          <div className="text-xl text-primary">🐾</div> {/* 아이콘 색상 변경 */}
           <div>
-            <h1 className="text-lg font-bold text-cream-800 font-pretendard">우리 아이 프로필</h1>
-            <p className="text-sm text-cream-600 font-pretendard">소중한 가족을 소개합니다</p>
+            <h1 className="text-lg font-bold text-foreground font-pretendard">우리 아이 프로필</h1> {/* 텍스트 색상 변경 */}
+            <p className="text-sm text-muted-foreground font-pretendard">소중한 가족을 소개합니다</p> {/* 텍스트 색상 변경 */}
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -47,7 +47,7 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
             variant="outline"
             size="sm"
             onClick={() => onNavigate('dog-info')}
-            className="text-cream-600 hover:text-cream-800 border-cream-300"
+            className="text-muted-foreground hover:text-pink-500 border-border hover:border-pink-300" /* 버튼 스타일 변경 */
           >
             <Edit className="w-4 h-4 mr-1" />
             편집
@@ -60,23 +60,27 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white p-6 space-y-6">
+      <div className="min-h-screen bg-background p-6 space-y-6"> {/* 배경 변경 */}
         <Header />
-        <Skeleton className="h-32 w-full mt-6" />
-        <Skeleton className="h-24 w-full" />
-        <Skeleton className="h-24 w-full" />
+        {/* Skeleton 기본 색상이 bg-muted를 따르도록 tailwind.config.ts 또는 global css에서 설정되어 있다고 가정 */}
+        <Skeleton className="h-32 w-full mt-6 rounded-lg" /> {/* 라운딩 추가 */}
+        <Skeleton className="h-24 w-full rounded-lg" /> {/* 라운딩 추가 */}
+        <Skeleton className="h-24 w-full rounded-lg" /> {/* 라운딩 추가 */}
       </div>
     );
   }
 
   if (!dogInfo) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6 text-center">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6 text-center"> {/* 배경 변경 */}
         <Header />
         <div className="flex-grow flex flex-col items-center justify-center">
-          <h2 className="text-2xl font-bold text-cream-800 mb-2 font-pretendard">프로필이 없어요!</h2>
-          <p className="text-cream-700 mb-6 font-pretendard">먼저 우리 아이 정보를 등록해주세요.</p>
-          <Button onClick={() => onNavigate('dog-info')}>
+          <h2 className="text-2xl font-bold text-foreground mb-2 font-pretendard">프로필이 없어요!</h2> {/* 텍스트 색상 변경 */}
+          <p className="text-muted-foreground mb-6 font-pretendard">먼저 우리 아이 정보를 등록해주세요.</p> {/* 텍스트 색상 변경 */}
+          <Button
+            onClick={() => onNavigate('dog-info')}
+            className="bg-pink-500 hover:bg-pink-600 text-white shadow-md" /* 버튼 스타일 변경 */
+          >
               강아지 정보 등록하기
           </Button>
         </div>
@@ -85,7 +89,7 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen bg-background pb-24"> {/* 배경 변경 */}
       <Header />
       <div className="p-6 space-y-6">
         <motion.div

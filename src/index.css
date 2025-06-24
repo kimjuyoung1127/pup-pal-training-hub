@@ -63,7 +63,7 @@
     --beige-900: 136 128 110;
     
     /* 시스템 변수는 새로운 팔레트 참조 */
-    --background: var(--cream-50); /* 아주 연한 크림 */
+    --background: 255 252 248; /* #FFFCF8 - 아주 연한 따뜻한 흰색 계열 */
     --foreground: var(--brown-900); /* 진한 브라운 */
     --card: var(--white);
     --card-foreground: var(--brown-900);
@@ -94,7 +94,7 @@
   }
 
   .dark {
-    --background: var(--brown-900); /* 진한 브라운 */
+    --background: 50 45 40; /* #322D28 - 기존보다 약간 더 어둡고 채도가 낮은 브라운 */
     --foreground: var(--cream-100); /* 연한 크림 */
 
     --card: var(--brown-800); /* 중간 브라운 */

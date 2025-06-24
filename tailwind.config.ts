@@ -135,6 +135,25 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground, var(--accent-foreground)))',
 					border: 'hsl(var(--sidebar-border, var(--border)))',
 					ring: 'hsl(var(--sidebar-ring, var(--ring)))'
+				},
+				'ai-chat': { // AI 상담 페이지용 색상
+					DEFAULT: '#258A81', // 청록색 계열 기본
+					light: '#E0F2F1',  // 밝은 청록색 (AI 아이콘 배경 등)
+					text: '#FFFFFF',     // AI 메시지 버블 텍스트
+					'bubble-user': 'hsl(var(--primary))', // 사용자 메시지 버블 배경 (기존 primary)
+					'bubble-user-text': 'hsl(var(--primary-foreground))', // 사용자 메시지 버블 텍스트 (기존 primary-foreground)
+				},
+				'training-yellow': {
+					DEFAULT: '#FFD954',
+					light: '#FFF5D9',
+					dark: '#E6C040',
+					text: 'hsl(var(--brown-900))',
+				},
+				'training-green': {
+					DEFAULT: '#A3D978',
+					light: '#EBF8E3',
+					dark: '#7DB85C',
+					text: 'hsl(var(--brown-900))',
 				}
 			},
 			borderRadius: {

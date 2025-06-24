@@ -190,16 +190,16 @@ const AiTrainingRecommender = ({ onSelectTraining }: AiTrainingRecommenderProps)
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
     >
-      <Card className="card-soft bg-gradient-to-br from-orange-50 to-amber-100 border-orange-200/50">
+      <Card className="card-soft bg-gradient-to-br from-training-yellow-light via-training-yellow/70 to-amber-100 border-training-yellow-dark/30"> {/* 배경 변경 */}
         <CardHeader>
-          <CardTitle className="flex items-center font-bold text-gray-800"><Wand2 className="mr-2 text-orange-500" />AI 맞춤 훈련 추천</CardTitle>
-          <CardDescription className="text-gray-600">우리 강아지의 프로필을 기반으로 AI가 맞춤 훈련을 추천해드려요.</CardDescription>
+          <CardTitle className="flex items-center font-bold text-training-yellow-text"><Wand2 className="mr-2 text-training-yellow-dark" />AI 맞춤 훈련 추천</CardTitle> {/* 색상 변경 */}
+          <CardDescription className="text-muted-foreground">우리 강아지의 프로필을 기반으로 AI가 맞춤 훈련을 추천해드려요.</CardDescription> {/* 색상 변경 */}
         </CardHeader>
         <CardContent className="space-y-4">
           {(recommendTrainingMutation.isPending || isLoadingRecommendations) && (
             <div className="flex justify-center items-center p-4">
-              <Loader2 className="animate-spin w-8 h-8 text-orange-500" />
-              <p className="ml-2 text-gray-600">AI가 열심히 훈련을 추천하고 있어요...</p>
+              <Loader2 className="animate-spin w-8 h-8 text-training-yellow-dark" /> {/* 색상 변경 */}
+              <p className="ml-2 text-muted-foreground">AI가 열심히 훈련을 추천하고 있어요...</p> {/* 색상 변경 */}
             </div>
           )}
 
@@ -214,21 +214,25 @@ const AiTrainingRecommender = ({ onSelectTraining }: AiTrainingRecommenderProps)
                   onClick={() => setHighlightedTitle(rec.title)}
                   className="cursor-pointer h-full"
                 >
-                  <Card className={`bg-white/80 border-gray-200/80 flex flex-col h-full relative ${highlightedTitle === rec.title ? 'border-blue-500 ring-2 ring-blue-500' : ''}`}>
+                  <Card className={`bg-card/80 border-border flex flex-col h-full relative ${highlightedTitle === rec.title ? 'border-training-yellow-dark ring-2 ring-training-yellow-dark' : ''}`}> {/* 카드 스타일 및 선택 시 테두리 변경 */}
                     <CardHeader>
-                      <CardTitle className="text-lg font-semibold text-gray-800 pr-20">{rec.title}</CardTitle>
+                      <CardTitle className="text-lg font-semibold text-foreground pr-20">{rec.title}</CardTitle> {/* 색상 변경 */}
                       <Badge 
                         variant={rec.difficulty === '초급' ? 'default' : rec.difficulty === '중급' ? 'secondary' : 'destructive'} 
-                        className={`w-fit ${rec.difficulty === '중급' ? 'bg-teal-500 text-white' : ''}`}>
+                        className={`w-fit ${
+                          rec.difficulty === '초급' ? 'bg-training-green text-training-green-text' :
+                          rec.difficulty === '중급' ? 'bg-training-yellow text-training-yellow-text' :
+                          'bg-amber-600 text-white' // 고급은 amber 계열로
+                        }`}>
                         {rec.difficulty}
                       </Badge>
                     </CardHeader>
                     <CardContent className="flex-grow">
-                      <p className="text-sm text-gray-600 mb-3">{rec.description}</p>
-                      <div className="text-xs text-gray-500 space-y-1">
-                        <p><Star className="inline-block w-3 h-3 mr-1.5 text-yellow-500" /><strong>효과:</strong> {rec.benefits.join(', ')}</p>
-                        <p><CheckCircle className="inline-block w-3 h-3 mr-1.5 text-green-500" /><strong>준비물:</strong> {rec.equipment.length > 0 ? rec.equipment.join(', ') : '없음'}</p>
-                        <p><AlertTriangle className="inline-block w-3 h-3 mr-1.5 text-red-500" /><strong>주의:</strong> {rec.caution}</p>
+                      <p className="text-sm text-muted-foreground mb-3">{rec.description}</p> {/* 색상 변경 */}
+                      <div className="text-xs text-muted-foreground space-y-1"> {/* 색상 변경 */}
+                        <p><Star className="inline-block w-3 h-3 mr-1.5 text-training-yellow-dark" /><strong>효과:</strong> {rec.benefits.join(', ')}</p> {/* 아이콘 색상 변경 */}
+                        <p><CheckCircle className="inline-block w-3 h-3 mr-1.5 text-training-green-dark" /><strong>준비물:</strong> {rec.equipment.length > 0 ? rec.equipment.join(', ') : '없음'}</p> {/* 아이콘 색상 변경 */}
+                        <p><AlertTriangle className="inline-block w-3 h-3 mr-1.5 text-red" /><strong>주의:</strong> {rec.caution}</p> {/* 아이콘 색상 변경 */}
                       </div>
                     </CardContent>
                     <Button 
@@ -236,7 +240,7 @@ const AiTrainingRecommender = ({ onSelectTraining }: AiTrainingRecommenderProps)
                         e.stopPropagation();
                         handleSelect(rec);
                       }}
-                      className="absolute top-4 right-4 bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1 text-sm h-auto"
+                      className="absolute top-4 right-4 bg-training-yellow hover:bg-training-yellow/90 text-training-yellow-text font-bold px-3 py-1 text-sm h-auto" /* 버튼 색상 변경 */
                     >
                       시작
                     </Button>
@@ -247,15 +251,15 @@ const AiTrainingRecommender = ({ onSelectTraining }: AiTrainingRecommenderProps)
           )}
 
           {aiRecommendations.length === 0 && !recommendTrainingMutation.isPending && !isLoadingRecommendations && (
-            <div className="text-center py-6 bg-orange-50/50 rounded-lg">
-              <p className="text-sm text-gray-500 mt-2">버튼을 눌러 AI에게 훈련을 추천받아보세요!</p>
+            <div className="text-center py-6 bg-training-yellow-light/50 rounded-lg"> {/* 배경 변경 */}
+              <p className="text-sm text-muted-foreground mt-2">버튼을 눌러 AI에게 훈련을 추천받아보세요!</p> {/* 색상 변경 */}
             </div>
           )}
 
           <Button 
             onClick={() => recommendTrainingMutation.mutate()} 
             disabled={recommendTrainingMutation.isPending || isProfileLoading}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold"
+            className="w-full bg-training-yellow hover:bg-training-yellow/90 text-training-yellow-text font-semibold" /* 버튼 색상 변경 */
           >
             {recommendTrainingMutation.isPending ? (
               <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> 추천 생성 중...</>
@@ -265,8 +269,8 @@ const AiTrainingRecommender = ({ onSelectTraining }: AiTrainingRecommenderProps)
           </Button>
 
           {dogInfo && extendedProfile ? null : (
-            <div className="text-center text-sm text-red-500">
-              <p className="text-sm text-gray-500 mt-2">버튼을 눌러 AI에게 훈련을 추천받아보세요!</p>
+            <div className="text-center text-sm text-red-500"> {/* 이 부분은 에러 메시지이므로 red 유지 */}
+              <p className="text-sm text-muted-foreground mt-2">버튼을 눌러 AI에게 훈련을 추천받아보세요!</p>
             </div>
           )}
         </CardContent>

@@ -65,14 +65,14 @@ const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="mx-auto bg-white min-h-screen"
+      className="mx-auto bg-background min-h-screen" // 배경 변경
     >
-      <div className="bg-white/80 backdrop-blur-sm border-b border-cream-200 px-4 py-4 sticky top-0 z-10">
+      <div className="bg-background/80 backdrop-blur-sm border-b border-border px-4 py-4 sticky top-0 z-10"> {/* 헤더 스타일 변경 */}
         <div className="flex items-center">
-          <Button variant="ghost" size="icon" onClick={() => onNavigate('dashboard')}>
-            <ArrowLeft className="h-6 w-6 text-gray-700" />
+          <Button variant="ghost" size="icon" onClick={() => onNavigate('dashboard')} className="hover:bg-muted"> {/* 버튼 호버 색상 변경 */}
+            <ArrowLeft className="h-6 w-6 text-foreground" /> {/* 아이콘 색상 변경 */}
           </Button>
-          <h1 className="text-lg font-bold text-cream-800 ml-2 font-pretendard">훈련 기록</h1>
+          <h1 className="text-lg font-bold text-foreground ml-2 font-pretendard">훈련 기록</h1> {/* 텍스트 색상 변경 */}
         </div>
       </div>
       

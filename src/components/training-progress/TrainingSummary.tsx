@@ -44,31 +44,35 @@ const TrainingSummary = ({ onNavigate, onExit, newlyAwardedBadges = [], isReplay
 
   return (
     <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="p-6 text-center flex flex-col items-center justify-center h-full">
-      <Award className="w-20 h-20 text-yellow-500 mb-4 animate-bounce-gentle" />
-      <h1 className="text-3xl font-bold text-gray-800">훈련 완료!</h1>
-      <p className="text-cream-700 mt-2 mb-6">
+      <Award className="w-20 h-20 text-training-yellow-dark mb-4 animate-bounce-gentle" /> {/* 아이콘 색상 변경 */}
+      <h1 className="text-3xl font-bold text-foreground">훈련 완료!</h1> {/* 타이틀 색상 변경 */}
+      <p className="text-muted-foreground mt-2 mb-6"> {/* 설명 색상 변경 */}
         {newlyAwardedBadges.length === 0 && completionMessage}
       </p>
       
-      <Card className="card-soft p-4 mb-8 w-full">
+      <Card className="card-soft p-4 mb-8 w-full bg-training-yellow-light shadow-md"> {/* 카드 배경 및 섀도우 변경 */}
         {newlyAwardedBadges.length > 0 ? (
           newlyAwardedBadges.map(badge => (
-            <p key={badge.id} className="font-bold text-lg text-orange-600">🏅 '{badge.name}' 뱃지를 획득했어요!</p>
+            <p key={badge.id} className="font-bold text-lg text-training-yellow-dark">🏅 '{badge.name}' 뱃지를 획득했어요!</p> /* 텍스트 색상 변경 */
           ))
         ) : (
-          <p className="font-bold text-lg text-gray-600">새로 획득한 뱃지가 없어요.</p>
+          <p className="font-bold text-lg text-muted-foreground">새로 획득한 뱃지가 없어요.</p> /* 텍스트 색상 변경 */
         )}
       </Card>
 
       <div className="space-y-4 w-full">
         {isReplay ? (
-          <Button onClick={onExit} size="lg" className="w-full btn-primary">
+          <Button
+            onClick={onExit}
+            size="lg"
+            className="w-full bg-training-yellow hover:bg-training-yellow/90 text-training-yellow-text shadow-md" /* 버튼 스타일 변경 */
+          >
             기록 목록으로 돌아가기
           </Button>
         ) : (
           <>
            
-            <Button onClick={onExit} size="lg" variant="ghost" className="w-full text-cream-600">
+            <Button onClick={onExit} size="lg" variant="ghost" className="w-full text-muted-foreground hover:bg-muted hover:text-foreground shadow"> {/* 버튼 스타일 변경 */}
               완료
             </Button>
           </>

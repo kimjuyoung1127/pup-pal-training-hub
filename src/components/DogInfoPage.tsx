@@ -106,22 +106,22 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-cream-50 to-orange-50 p-4">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-beige-100 via-cream-100 to-pink-50 p-4"> {/* 배경 변경 */}
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-2">
-          <div className="text-xl">🐾</div>
-          <h1 className="text-lg font-bold text-cream-800 font-pretendard">멍멍트레이너</h1>
+          <div className="text-xl text-pink-500">🐾</div> {/* 아이콘 색상 변경 */}
+          <h1 className="text-lg font-bold text-foreground font-pretendard">멍멍트레이너</h1> {/* 텍스트 색상 변경 */}
         </div>
-        <div className="text-sm text-cream-600 font-pretendard">
+        <div className="text-sm text-muted-foreground font-pretendard"> {/* 텍스트 색상 변경 */}
           {currentStep + 1} / 3
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="w-full bg-cream-200 rounded-full h-2 mb-8">
+      <div className="w-full bg-pink-100 rounded-full h-2 mb-8"> {/* 프로그레스 바 배경색 변경 */}
         <motion.div 
-          className="bg-orange-500 h-2 rounded-full"
+          className="bg-pink-400 h-2 rounded-full" /* 프로그레스 바 색상 변경 */
           initial={{ width: 0 }}
           animate={{ width: `${((currentStep + 1) / 3) * 100}%` }}
           transition={{ duration: 0.5, ease: "easeOut" }}
@@ -136,10 +136,10 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-2xl font-bold text-cream-800 mb-2 font-pretendard">
+          <h2 className="text-2xl font-bold text-foreground mb-2 font-pretendard"> {/* 텍스트 색상 변경 */}
             {stepTitles[currentStep]}
           </h2>
-          <p className="text-cream-700 font-pretendard">
+          <p className="text-muted-foreground font-pretendard"> {/* 텍스트 색상 변경 */}
             {stepDescriptions[currentStep]}
           </p>
         </motion.div>
@@ -150,7 +150,7 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <Card className="flex-1 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+          <Card className="flex-1 border border-pink-200/50 shadow-lg bg-card/90 backdrop-blur-sm rounded-xl"> {/* 카드 스타일 변경 */}
             <CardContent className="p-6">
               {renderStep()}
             </CardContent>
@@ -170,7 +170,7 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
             variant="outline"
             onClick={prevStep}
             disabled={currentStep === 0}
-            className="flex items-center space-x-2 bg-cream-200 hover:bg-cream-300 text-cream-800 border-2 border-cream-300 font-pretendard"
+            className="flex items-center space-x-2 bg-muted hover:bg-pink-100 text-muted-foreground border-pink-200/70 hover:border-pink-300 font-pretendard shadow" /* 이전 버튼 스타일 변경 */
           >
             <ChevronLeft className="w-4 h-4" />
             <span>이전</span>
@@ -179,7 +179,7 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
           <Button
             onClick={nextStep}
             disabled={!canProceed() || isSaving}
-            className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white font-pretendard"
+            className="flex items-center space-x-2 bg-pink-500 hover:bg-pink-600 text-white font-pretendard shadow-md" /* 다음/완료 버튼 스타일 변경 */
           >
             <span>{currentStep === 2 ? (isSaving ? '저장 중...' : '완료') : '다음'}</span>
             <ChevronRight className="w-4 h-4" />

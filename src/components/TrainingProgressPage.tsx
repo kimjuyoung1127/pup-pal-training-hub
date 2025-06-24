@@ -76,10 +76,10 @@ const TrainingProgressPage = ({ onNavigate, onExit, trainingProgram, dogId }: Tr
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <header className="p-4">
+    <div className="min-h-screen bg-background flex flex-col"> {/* 배경 변경 */}
+      <header className="p-4 sticky top-0 bg-background/80 backdrop-blur-sm z-10 border-b border-border"> {/* 헤더 스타일 및 위치 변경 */}
         <Button variant="ghost" size="icon" onClick={flowStep === 1 ? onExit : () => setFlowStep(prev => prev - 1)}>
-          <ArrowLeft />
+          <ArrowLeft className="text-foreground" /> {/* 아이콘 색상 변경 */}
         </Button>
       </header>
       <main className="flex-grow">

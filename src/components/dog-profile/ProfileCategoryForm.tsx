@@ -96,16 +96,16 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
     const completionPercent = extendedProfile ? Math.round((completionCount / category.missions.length) * 100) : 0;
 
     return (
-        <AccordionItem value={category.key}>
-            <AccordionTrigger>
-                <div className="flex justify-between items-center w-full pr-4">
-                    <span>{category.icon} {category.title}</span>
-                    <span className="text-sm text-orange-500 font-semibold">완성도 {completionPercent}%</span>
+        <AccordionItem value={category.key} className="border-pink-200/70"> {/* 테두리 색상 변경 */}
+            <AccordionTrigger className="hover:bg-pink-50 rounded-md px-4 py-3 group"> {/* 호버 배경 및 패딩, 그룹 클래스 추가 */}
+                <div className="flex justify-between items-center w-full">
+                    <span className="text-foreground group-hover:text-pink-700 transition-colors">{category.icon} {category.title}</span> {/* 기본 및 호버 시 텍스트 색상 변경 */}
+                    <span className="text-sm text-pink-500 font-semibold">완성도 {completionPercent}%</span> {/* 완성도 텍스트 색상 변경 */}
                 </div>
             </AccordionTrigger>
-            <AccordionContent>
+            <AccordionContent className="bg-card/50 p-4 rounded-b-md"> {/* 배경 및 패딩 변경 */}
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-2">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6"> {/* space-y 증가 */}
                         {category.missions.map(mission => (
                             <FormField
                                 key={mission.key}
@@ -113,14 +113,14 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
                                 name={mission.key as keyof FormValues & string}
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>{mission.question}</FormLabel>
+                                        <FormLabel className="text-foreground font-medium">{mission.question}</FormLabel> {/* 라벨 스타일 변경 */}
                                         <FormControl>
                                             {mission.type === 'boolean' ? (
-                                                <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-2">
+                                                <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4 pt-1"> {/* 간격 및 패딩 조정 */}
                                                     {['예', '아니오'].map(option => (
                                                         <FormItem key={option} className="flex items-center space-x-2 space-y-0">
-                                                            <FormControl><RadioGroupItem value={option} className="bg-white" /></FormControl>
-                                                            <FormLabel className="font-normal">{option}</FormLabel>
+                                                            <FormControl><RadioGroupItem value={option} className="border-pink-300 text-pink-600 focus:ring-pink-500" /></FormControl> {/* Radio 스타일 변경 */}
+                                                            <FormLabel className="font-normal text-muted-foreground">{option}</FormLabel>
                                                         </FormItem>
                                                     ))}
                                                 </RadioGroup>
@@ -130,16 +130,20 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
                                                     if (mission.key === 'main_caretaker' && val !== '기타(직접입력)') {
                                                         setOtherCaretaker('');
                                                     }
-                                                }} defaultValue={field.value} className="flex space-x-2">
+                                                }} defaultValue={field.value} className="flex flex-wrap gap-x-4 gap-y-2 pt-1"> {/* flex-wrap 추가 및 간격 조정 */}
                                                     {mission.options.map(option => (
                                                         <FormItem key={option} className="flex items-center space-x-2 space-y-0">
-                                                            <FormControl><RadioGroupItem value={option} className="bg-white" /></FormControl>
-                                                            <FormLabel className="font-normal">{option}</FormLabel>
+                                                            <FormControl><RadioGroupItem value={option} className="border-pink-300 text-pink-600 focus:ring-pink-500" /></FormControl> {/* Radio 스타일 변경 */}
+                                                            <FormLabel className="font-normal text-muted-foreground">{option}</FormLabel>
                                                         </FormItem>
                                                     ))}
                                                 </RadioGroup>
                                             ) : (
-                                                <Textarea placeholder={mission.placeholder} {...field} className="bg-white" />
+                                                <Textarea
+                                                    placeholder={mission.placeholder}
+                                                    {...field}
+                                                    className="bg-background border-pink-200/80 focus:border-pink-400 focus:ring-pink-400 placeholder:text-muted-foreground/70" /* Textarea 스타일 변경 */
+                                                />
                                             )}
                                         </FormControl>
                                         {mission.key === 'main_caretaker' && form.watch('main_caretaker') === '기타(직접입력)' && (
@@ -147,15 +151,19 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
                                                 placeholder="보호자 이름을 입력하세요"
                                                 value={otherCaretaker}
                                                 onChange={(e) => setOtherCaretaker(e.target.value)}
-                                                className="mt-2 bg-white"
+                                                className="mt-2 bg-background border-pink-200/80 focus:border-pink-400 focus:ring-pink-400 placeholder:text-muted-foreground/70" /* Input 스타일 변경 */
                                             />
                                         )}
-                                        <FormMessage />
+                                        <FormMessage className="text-red-400" /> {/* 메시지 색상 변경 */}
                                     </FormItem>
                                 )}
                             />
                         ))}
-                        <Button type="submit" disabled={updateProfileMutation.isPending}>
+                        <Button
+                            type="submit"
+                            disabled={updateProfileMutation.isPending}
+                            className="w-full bg-pink-500 hover:bg-pink-600 text-white shadow-md" /* 버튼 스타일 변경 */
+                        >
                             {updateProfileMutation.isPending ? '저장 중...' : '저장하기'}
                         </Button>
                     </form>

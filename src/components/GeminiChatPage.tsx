@@ -74,19 +74,19 @@ const GeminiChatPage = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-beige-50"> {/* 전체 배경 변경 */}
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 p-4 flex items-center space-x-2 sticky top-0 z-10">
+      <header className="bg-background/80 backdrop-blur-sm border-b border-border p-4 flex items-center space-x-2 sticky top-0 z-10"> {/* 헤더 배경 및 테두리 변경 */}
         <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-5 h-5 text-foreground" /> {/* 아이콘 색상 변경 */}
         </Button>
         <div className="flex items-center space-x-3">
-            <div className="p-2 bg-orange-100 rounded-full">
-                <Dog className="w-6 h-6 text-orange-600" />
+            <div className="p-2 bg-ai-chat-light rounded-full"> {/* AI 코치 아이콘 배경 변경 */}
+                <Dog className="w-6 h-6 text-ai-chat" /> {/* AI 코치 아이콘 색상 변경 */}
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-800">AI 훈련 코치</h1>
-              <p className="text-sm text-gray-600">멍멍코치와 대화하기</p>
+              <h1 className="text-lg font-bold text-foreground">AI 훈련 코치</h1> {/* 헤더 텍스트 색상 변경 */}
+              <p className="text-sm text-muted-foreground">멍멍코치와 대화하기</p> {/* 헤더 텍스트 색상 변경 */}
             </div>
         </div>
       </header>
@@ -104,12 +104,15 @@ const GeminiChatPage = () => {
               className={`flex items-end gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {msg.role === 'model' && (
-                  <div className="w-8 h-8 rounded-full bg-orange-200 flex items-center justify-center text-orange-700 shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-ai-chat flex items-center justify-center text-ai-chat-text shrink-0"> {/* AI 메시지 아이콘 배경/색상 변경 */}
                       <Dog size={20} />
                   </div>
               )}
-              <Card className={`max-w-xs md:max-w-md p-3 rounded-2xl ${msg.role === 'user' ? 'bg-white text-black' : 'bg-white text-black'}`}>
-
+              <Card className={`max-w-xs md:max-w-md p-3 rounded-2xl shadow-md ${ /* 섀도우 추가 */
+                msg.role === 'user'
+                  ? 'bg-ai-chat-bubble-user text-ai-chat-bubble-user-text' /* 사용자 메시지 버블 색상 변경 */
+                  : 'bg-ai-chat text-ai-chat-text' /* AI 메시지 버블 색상 변경 */
+              }`}>
                 <p className="whitespace-pre-wrap">{msg.parts[0].text}</p>
               </Card>
             </motion.div>
@@ -123,14 +126,14 @@ const GeminiChatPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="flex items-end gap-2 justify-start"
           >
-            <div className="w-8 h-8 rounded-full bg-orange-200 flex items-center justify-center text-orange-700 shrink-0">
+            <div className="w-8 h-8 rounded-full bg-ai-chat flex items-center justify-center text-ai-chat-text shrink-0"> {/* 로딩 AI 아이콘 배경/색상 변경 */}
                 <Dog size={20} />
             </div>
-            <Card className="max-w-xs md:max-w-md p-3 rounded-2xl bg-white">
+            <Card className="max-w-xs md:max-w-md p-3 rounded-2xl bg-ai-chat text-ai-chat-text shadow-md"> {/* 로딩 버블 색상 변경 */}
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-0"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-300"></div>
+                <div className="w-2 h-2 bg-ai-chat-text/70 rounded-full animate-pulse delay-0"></div> {/* 로딩 점 색상 변경 */}
+                <div className="w-2 h-2 bg-ai-chat-text/70 rounded-full animate-pulse delay-150"></div> {/* 로딩 점 색상 변경 */}
+                <div className="w-2 h-2 bg-ai-chat-text/70 rounded-full animate-pulse delay-300"></div> {/* 로딩 점 색상 변경 */}
               </div>
             </Card>
           </motion.div>
@@ -139,7 +142,7 @@ const GeminiChatPage = () => {
       </main>
 
       {/* Message input */}
-      <footer className="bg-white border-t border-gray-200 p-4 sticky bottom-0">
+      <footer className="bg-background border-t border-border p-4 sticky bottom-0"> {/* 푸터 배경 및 테두리 변경 */}
         <div className="flex items-center space-x-2">
           <Input
             type="text"
@@ -147,10 +150,10 @@ const GeminiChatPage = () => {
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder="멍멍코치에게 메시지 보내기..."
-            className="flex-1 border-gray-200 focus:border-orange-400 bg-white text-black"
+            className="flex-1 border-border focus:border-ring bg-background text-foreground placeholder:text-muted-foreground" /* 입력창 스타일 변경 */
             disabled={isLoading}
           />
-          <Button onClick={handleSendMessage} disabled={isLoading || input.trim() === ''}>
+          <Button onClick={handleSendMessage} disabled={isLoading || input.trim() === ''} className="bg-primary hover:bg-primary/90 text-primary-foreground"> {/* 버튼 스타일 명시 (기본 primary 따름) */}
             <Send className="w-5 h-5" />
           </Button>
         </div>

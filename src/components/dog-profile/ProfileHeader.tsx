@@ -38,7 +38,7 @@ const getGenderEmoji = (gender: string) => {
 
 const ProfileHeader = ({ dogInfo, onImageUpload, onImageDelete }: ProfileHeaderProps) => {
   return (
-    <Card className="card-soft overflow-hidden bg-gradient-to-br from-orange-300 via-amber-300 to-orange-200"> {/* 그라데이션 색상 변경 */}
+    <Card className="card-soft overflow-hidden bg-gradient-to-br from-orange-300 via-pink-200 to-amber-200 shadow-lg"> {/* 그라데이션 및 섀도우 변경 */}
       <CardContent className="p-6">
         <div className="flex items-center space-x-4">
           <div className="relative">
@@ -46,35 +46,35 @@ const ProfileHeader = ({ dogInfo, onImageUpload, onImageDelete }: ProfileHeaderP
               {dogInfo.image_url ? (
                 <AvatarImage src={dogInfo.image_url} alt={dogInfo.name} className="object-cover" />
               ) : (
-                <AvatarFallback className="bg-orange-200 text-3xl text-orange-600"> {/* Fallback 배경 및 아이콘 색상 변경 */}
+                <AvatarFallback className="bg-pink-100 text-3xl text-pink-500"> {/* Fallback 배경 및 아이콘 색상 변경 */}
                   {getGenderEmoji(dogInfo.gender)}
                 </AvatarFallback>
               )}
             </Avatar>
             <div className="absolute -bottom-1 -right-1 flex items-center">
-              <label htmlFor="dog-image-upload" className="bg-white rounded-full p-1.5 cursor-pointer shadow-md hover:bg-cream-50 transition-colors">
-                <Edit className="w-4 h-4 text-brown-700" /> {/* 아이콘 색상 변경 */}
+              <label htmlFor="dog-image-upload" className="bg-white rounded-full p-1.5 cursor-pointer shadow-md hover:bg-pink-50 transition-colors"> {/* 호버 색상 변경 */}
+                <Edit className="w-4 h-4 text-pink-600" /> {/* 아이콘 색상 변경 */}
                 <input id="dog-image-upload" type="file" className="hidden" accept="image/*" onChange={onImageUpload} />
               </label>
               {dogInfo.image_url && (
-                <Button variant="ghost" size="icon" className="bg-white rounded-full p-1.5 cursor-pointer shadow-md hover:bg-cream-50 transition-colors ml-1 w-7 h-7" onClick={onImageDelete}>
-                  <Trash2 className="w-4 h-4 text-red" /> {/* red-500 대신 red (tailwind.config.ts에 정의된 red 사용) */}
+                <Button variant="ghost" size="icon" className="bg-white rounded-full p-1.5 cursor-pointer shadow-md hover:bg-pink-50 transition-colors ml-1 w-7 h-7" onClick={onImageDelete}> {/* 호버 색상 변경 */}
+                  <Trash2 className="w-4 h-4 text-red" />
                 </Button>
               )}
             </div>
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-brown-800 mb-1 font-pretendard"> {/* 텍스트 색상 변경 */}
+            <h2 className="text-2xl font-bold text-foreground mb-1 font-pretendard"> {/* 텍스트 색상 변경 */}
               {dogInfo.name}
             </h2>
-            <p className="text-brown-700 mb-2 font-pretendard"> {/* 텍스트 색상 변경 */}
+            <p className="text-muted-foreground mb-2 font-pretendard"> {/* 텍스트 색상 변경 */}
               {dogInfo.breed} • {dogInfo.gender === 'male' ? '남아' : '여아'}
             </p>
             <div className="flex space-x-2">
-              <Badge variant="secondary" className="bg-orange-100 text-orange-700 border-orange-200"> {/* Badge 색상 변경 */}
+              <Badge variant="secondary" className="bg-pink-100 text-pink-700 border-pink-200 shadow-sm"> {/* Badge 색상 변경 */}
                 {getAgeLabel(dogInfo.age)}
               </Badge>
-              <Badge variant="secondary" className="bg-orange-100 text-orange-700 border-orange-200"> {/* Badge 색상 변경 */}
+              <Badge variant="secondary" className="bg-pink-100 text-pink-700 border-pink-200 shadow-sm"> {/* Badge 색상 변경 */}
                 {getWeightLabel(dogInfo.weight)}
               </Badge>
             </div>

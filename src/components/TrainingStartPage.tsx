@@ -38,18 +38,18 @@ const TrainingStartPage = ({
     />;
   }
 
-  return <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-100 pb-32">
+  return <div className="min-h-screen bg-gradient-to-br from-beige-50 to-cream-100 pb-32"> {/* 배경 변경 */}
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-4">
+      <div className="bg-background/80 backdrop-blur-sm border-b border-border px-6 py-4 sticky top-0 z-10"> {/* 헤더 스타일 변경 */}
         <div className="flex items-center space-x-3">
-          <Button variant="ghost" size="sm" onClick={() => onNavigate('dashboard')} className="text-gray-600 hover:text-gray-800">
+          <Button variant="ghost" size="sm" onClick={() => onNavigate('dashboard')} className="text-foreground hover:bg-muted"> {/* 버튼 색상 변경 */}
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex items-center space-x-3">
-            <div className="text-xl">🎓</div>
+            <div className="text-2xl text-training-yellow-dark">🎓</div> {/* 아이콘 색상 변경 */}
             <div>
-              <h1 className="text-lg font-bold text-gray-800">오늘의 훈련</h1>
-              <p className="text-sm text-gray-600">함께 성장해봐요!</p>
+              <h1 className="text-lg font-bold text-foreground">오늘의 훈련</h1> {/* 텍스트 색상 변경 */}
+              <p className="text-sm text-muted-foreground">함께 성장해봐요!</p> {/* 텍스트 색상 변경 */}
             </div>
           </div>
         </div>
@@ -62,6 +62,7 @@ const TrainingStartPage = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
+          {/* AiTrainingRecommender 내부에서 training-yellow 계열 사용하도록 수정 필요 */}
           <AiTrainingRecommender 
             onSelectTraining={handleSelectAiTraining} 
             selectedTrainingTitle={selectedAiTraining?.title || null}
@@ -79,10 +80,10 @@ const TrainingStartPage = ({
         duration: 0.5,
         delay: 0.2
       }}>
-          <Card className="card-soft p-6 bg-gradient-to-r from-slate-100 to-gray-100">
+          <Card className="card-soft p-6 bg-training-yellow-light"> {/* 카드 배경 변경 */}
             <div className="flex items-center justify-center space-x-3 mb-4">
-              <div className="text-2xl">💡</div>
-              <h3 className="font-bold text-gray-800">훈련 전 체크리스트</h3>
+              <div className="text-2xl text-training-yellow-dark">💡</div> {/* 아이콘 색상 변경 */}
+              <h3 className="font-bold text-training-yellow-text">훈련 전 체크리스트</h3> {/* 텍스트 색상 변경 */}
             </div>
             <div className="space-y-2">
               {quickTips.map((tip, index) => <motion.div key={index} initial={{
@@ -95,8 +96,8 @@ const TrainingStartPage = ({
               duration: 0.3,
               delay: 0.3 + index * 0.1
             }} className="flex items-center justify-center space-x-2">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                  <p className="text-sm text-gray-700">{tip}</p>
+                  <div className="w-2 h-2 bg-training-yellow rounded-full"></div> {/* 점 색상 변경 */}
+                  <p className="text-sm text-muted-foreground">{tip}</p> {/* 텍스트 색상 변경 */}
                 </motion.div>)}
             </div>
           </Card>

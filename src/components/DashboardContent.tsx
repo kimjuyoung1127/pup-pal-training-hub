@@ -140,14 +140,14 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
     >
       {/* Welcome card */}
       <motion.div variants={itemVariants}>
-        <Card className="card-soft p-6 bg-orange-100">
+        <Card className="card-soft p-6 bg-beige-100 shadow-md"> {/* 배경 및 섀도우 변경 */}
           <div className="flex items-center space-x-4">
             <div className="text-4xl">👋</div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold text-cream-800 mb-1">
+              <h2 className="text-xl font-bold text-foreground mb-1"> {/* 텍스트 색상 변경 */}
                 {randomWelcome}
               </h2>
-              <p className="text-cream-600">
+              <p className="text-muted-foreground"> {/* 텍스트 색상 변경 */}
                 {today.toLocaleDateString('ko-KR')} {weatherIcon}
               </p>
             </div>
@@ -157,12 +157,12 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
 
       {/* Training tip */}
       <motion.div variants={itemVariants}>
-        <Card className="card-soft p-6 bg-gradient-to-r from-orange-100 to-cream-200">
+        <Card className="card-soft p-6 bg-gradient-to-r from-beige-100 to-training-green-light shadow-md"> {/* 배경 및 섀도우 변경 */}
           <div className="flex items-start space-x-3">
-            <div className="text-2xl">💡</div>
+            <div className="text-2xl text-training-green-dark">💡</div> {/* 아이콘 색상 변경 */}
             <div>
-              <h3 className="font-bold text-cream-800 mb-2">오늘의 팁</h3>
-              <p className="text-sm text-cream-700 leading-relaxed">
+              <h3 className="font-bold text-foreground mb-2">오늘의 팁</h3> {/* 텍스트 색상 변경 */}
+              <p className="text-sm text-muted-foreground leading-relaxed"> {/* 텍스트 색상 변경 */}
                 {randomTip}
               </p>
             </div>
@@ -172,21 +172,21 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
 
       {/* Recommended video filter */}
       <motion.div variants={itemVariants} className="space-y-4">
-        <Card className="card-soft p-6 bg-blue-50">
-          <h3 className="font-bold text-black mb-4">추천 영상 필터</h3>
-          <div className="flex flex-col sm:flex-row gap-4 text-black">
+        <Card className="card-soft p-6 bg-beige-100 shadow-md"> {/* 배경 및 섀도우 변경 */}
+          <h3 className="font-bold text-foreground mb-4">추천 영상 필터</h3> {/* 텍스트 색상 변경 */}
+          <div className="flex flex-col sm:flex-row gap-4">
             <Select value={originFilter} onValueChange={setOriginFilter}>
-              <SelectTrigger className="bg-white">
+              <SelectTrigger className="bg-input border-border text-foreground"> {/* Select 스타일 변경 */}
                 <SelectValue placeholder="국가/언어" />
               </SelectTrigger>
-              <SelectContent className="bg-white text-black">
+              <SelectContent className="bg-popover border-border text-popover-foreground"> {/* Select Content 스타일 변경 */}
                 <SelectItem value="all">모든 국가</SelectItem>
                 <SelectItem value="korean">한국어</SelectItem>
                 <SelectItem value="english">영어</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <Button onClick={handleSearchVideos} className="w-full btn-primary mt-4">
+          <Button onClick={handleSearchVideos} className="w-full bg-training-green hover:bg-training-green/90 text-white mt-4 shadow-md"> {/* 버튼 스타일 변경 */}
             훈련 영상 찾아보기
           </Button>
         </Card>
@@ -195,7 +195,7 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
       {/* Recommended video List */}
       {showVideos && filteredVideos.map((video) => (
         <motion.div variants={itemVariants} key={video.youtube_video_id}>
-          <Card className="card-soft overflow-hidden bg-orange-50">
+          <Card className="card-soft overflow-hidden bg-beige-50 shadow-md"> {/* 배경 및 섀도우 변경 */}
             <div className="w-full aspect-video">
               <iframe
                 className="w-full h-full"
@@ -207,8 +207,8 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
               ></iframe>
             </div>
             <CardContent className="p-4">
-              <h3 className="font-bold text-brown-800 mb-2 truncate">{video.title}</h3>
-              <p className="text-sm text-brown-600 line-clamp-2">
+              <h3 className="font-bold text-foreground mb-2 truncate">{video.title}</h3> {/* 텍스트 색상 변경 */}
+              <p className="text-sm text-muted-foreground line-clamp-2"> {/* 텍스트 색상 변경 */}
                 {video.description}
               </p>
             </CardContent>
@@ -219,12 +219,12 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
       {/* Dog reminder */}
       {reminder && (
         <motion.div variants={itemVariants}>
-          <Card className="card-soft p-6 bg-orange-100">
+          <Card className="card-soft p-6 bg-beige-100 shadow-md"> {/* 배경 및 섀도우 변경 */}
             <div className="flex items-start space-x-3">
-              <div className="text-2xl">🐶</div>
+              <div className="text-2xl text-primary">🐶</div> {/* 아이콘 색상 변경 */}
               <div>
-                <h3 className="font-bold text-cream-800 mb-2">{dogName} 리마인드</h3>
-                <p className="text-sm text-cream-700 leading-relaxed">{reminder}</p>
+                <h3 className="font-bold text-foreground mb-2">{dogName} 리마인드</h3> {/* 텍스트 색상 변경 */}
+                <p className="text-sm text-muted-foreground leading-relaxed">{reminder}</p> {/* 텍스트 색상 변경 */}
               </div>
             </div>
           </Card>
@@ -234,17 +234,17 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
       {/* Daily mission */}
       {mission && (
         <motion.div variants={itemVariants}>
-          <Card className="card-soft p-6 bg-orange-100">
+          <Card className="card-soft p-6 bg-training-green-light shadow-md"> {/* 배경 및 섀도우 변경 */}
             <div className="flex items-start space-x-3">
-              <div className="text-2xl">🎯</div>
+              <div className="text-2xl text-training-green-dark">🎯</div> {/* 아이콘 색상 변경 */}
               <div className="flex-1">
-                <h3 className="font-bold text-cream-800 mb-2">오늘의 미션</h3>
-                <p className="text-sm text-cream-700 leading-relaxed">{mission.mission}</p>
+                <h3 className="font-bold text-training-green-text mb-2">오늘의 미션</h3> {/* 텍스트 색상 변경 */}
+                <p className="text-sm text-muted-foreground leading-relaxed">{mission.mission}</p> {/* 텍스트 색상 변경 */}
               </div>
               <Checkbox
                 checked={missionCompleted}
                 onCheckedChange={toggleMissionCompleted}
-                className="w-6 h-6"
+                className="w-6 h-6 border-training-green-dark data-[state=checked]:bg-training-green-dark data-[state=checked]:text-white" /* 체크박스 스타일 변경 */
                 id="daily-mission"
               />
             </div>
@@ -254,7 +254,7 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
 
       {/* Action buttons */}
       <motion.div className="space-y-4" variants={itemVariants}>
-        <Button onClick={() => navigate('/chat')} className="w-full btn-primary justify-between py-6">
+        <Button onClick={() => navigate('/chat')} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground justify-between py-6 shadow-md"> {/* 스타일 유지 또는 약간 조정 */}
           <div className="flex items-center space-x-3">
             <Sparkles className="w-5 h-5" />
             <span className="text-lg">AI 훈련 코치와 대화하기</span>
@@ -262,7 +262,7 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
           <div className="text-2xl">🤖</div>
         </Button>
 
-        <Button onClick={() => onNavigate('dog-info')} className="w-full btn-secondary justify-between py-6">
+        <Button onClick={() => onNavigate('dog-info')} className="w-full bg-beige-200 hover:bg-beige-300 text-brown-700 justify-between py-6 shadow-md"> {/* 버튼 스타일 변경 */}
           <div className="flex items-center space-x-3">
             <BookOpen className="w-5 h-5" />
             <span className="text-lg">강아지 정보 새로 입력하기</span>
@@ -270,7 +270,7 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
           <div className="text-2xl">🐕</div>
         </Button>
 
-        <Button onClick={() => onNavigate('history')} className="w-full btn-secondary justify-between py-6">
+        <Button onClick={() => onNavigate('history')} className="w-full bg-beige-200 hover:bg-beige-300 text-brown-700 justify-between py-6 shadow-md"> {/* 버튼 스타일 변경 */}
           <div className="flex items-center space-x-3">
             <BarChart3 className="w-5 h-5" />
             <span className="text-lg">훈련 기록 보기</span>
