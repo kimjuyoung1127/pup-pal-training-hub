@@ -4,20 +4,23 @@ import { toast } from 'sonner';
 import { checkAndAwardBadges } from '@/lib/badgeManager';
 
 export interface TrainingLog {
-  id: string;
-  session_date: string;
-  duration_minutes: number | null;
-  success_rate: number | null;
-  training_type: string | null;
-  notes?: string | null;
-  is_ai_training?: boolean;
-  ai_training_details?: any;
+  id: string; 
+  created_at: string;
+  user_id: string;
+  dog_id: string;
+  session_date: string; // date type in db
+  duration_minutes: number | null; // int4
+  success_rate: number | null; // numeric
+  training_type: string | null; // text
+  notes: string | null; // text
+  is_ai_training: boolean | null; // bool
+  ai_training_details: Record<string, any> | null; // jsonb
+  training_program_id: string | null; // text
 }
 
-export type TrainingLogUpdate = Partial<Omit<TrainingLog, 'id'>>;
-export type TrainingLogCreate = Omit<TrainingLog, 'id' | 'session_date'> & {
-  is_ai_training?: boolean;
-  ai_training_details?: any;
+export type TrainingLogUpdate = Partial<Omit<TrainingLog, 'id' | 'created_at' | 'user_id' | 'dog_id'>>;
+export type TrainingLogCreate = Omit<TrainingLog, 'id' | 'created_at' | 'user_id' | 'dog_id' | 'session_date'> & {
+  session_date?: string;
 };
 
 const fetchTrainingHistory = async (dogId: string | undefined): Promise<TrainingLog[]> => {
@@ -25,7 +28,20 @@ const fetchTrainingHistory = async (dogId: string | undefined): Promise<Training
 
   const { data, error } = await supabase
     .from('training_history')
-    .select('id, session_date, duration_minutes, success_rate, training_type, notes')
+    .select(`
+      id,
+      created_at,
+      user_id,
+      dog_id,
+      session_date,
+      duration_minutes,
+      success_rate,
+      training_type,
+      notes,
+      is_ai_training,
+      ai_training_details,
+      training_program_id
+    `)
     .eq('dog_id', dogId)
     .order('session_date', { ascending: false })
     .order('created_at', { ascending: false });

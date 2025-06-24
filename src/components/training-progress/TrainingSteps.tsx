@@ -6,13 +6,17 @@ import { Check } from 'lucide-react';
 import { TrainingStep } from '@/lib/trainingData';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { Progress } from "@/components/ui/progress";
+
 interface TrainingStepsProps {
   steps: TrainingStep[];
   onFinishSteps: () => void;
+  isReplay?: boolean;
 }
+
 const TrainingSteps = ({
   steps,
-  onFinishSteps
+  onFinishSteps,
+  isReplay = false
 }: TrainingStepsProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
@@ -51,8 +55,9 @@ const TrainingSteps = ({
       <Progress value={(currentStep + 1) / steps.length * 100} className="w-full my-4" />
       {currentStep === steps.length - 1 && <Button onClick={onFinishSteps} size="lg" className="btn-primary w-full py-4 mt-4">
           <Check className="mr-2" />
-          훈련 완료
+          {isReplay ? '재생 완료' : '훈련 완료'}
         </Button>}
     </motion.div>;
 };
+
 export default TrainingSteps;

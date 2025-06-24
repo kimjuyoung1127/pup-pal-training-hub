@@ -16,7 +16,7 @@ interface TrainingHistoryListProps {
     trainingHistory: (TrainingLog & { isAiTraining?: boolean })[];
     onEdit: (log: TrainingLog) => void;
     onDelete: (log: TrainingLog) => void;
-    onRetry: (trainingType: string) => void;
+    onRetry: (log: TrainingLog) => void;
 }
 
 const TrainingHistoryList = ({ trainingHistory, onEdit, onDelete, onRetry }: TrainingHistoryListProps) => {
@@ -70,8 +70,8 @@ const TrainingHistoryList = ({ trainingHistory, onEdit, onDelete, onRetry }: Tra
                                             <TrainingHistoryCard
                                                 key={item.id}
                                                 item={item}
-                                                onEdit={() => onEdit(item)}
-                                                onDelete={() => onDelete(item)}
+                                                onEdit={onEdit}
+                                                onDelete={onDelete}
                                                 onRetry={onRetry}
                                             />
                                         ))}

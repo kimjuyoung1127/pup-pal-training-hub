@@ -14,6 +14,7 @@ export interface TrainingProgram {
   id: string;
   title: string;
   Icon: LucideIcon;
+  iconName: string; // 아이콘 이름을 저장할 속성 추가
   description: string;
   difficulty: '초급' | '중급' | '고급';
   duration: string;
@@ -27,6 +28,7 @@ export const trainingPrograms: { [key: string]: TrainingProgram } = {
     id: 'basic',
     title: '기본 명령어',
     Icon: Target,
+    iconName: 'Target',
     description: '앉아, 기다려, 이리와 등 기본적인 명령어를 배워요.',
     difficulty: '초급',
     duration: '10-15분',
@@ -63,6 +65,7 @@ export const trainingPrograms: { [key: string]: TrainingProgram } = {
     id: 'toilet',
     title: '배변 훈련',
     Icon: Home,
+    iconName: 'Home',
     description: '올바른 배변 습관을 기르는 훈련이에요.',
     difficulty: '초급',
     duration: '5-10분',
@@ -99,6 +102,7 @@ export const trainingPrograms: { [key: string]: TrainingProgram } = {
     id: 'walk',
     title: '산책 예절',
     Icon: Footprints,
+    iconName: 'Footprints',
     description: '줄 당기지 않기, 다른 강아지와의 만남 등을 배워요.',
     difficulty: '중급',
     duration: '15-20분',
@@ -136,6 +140,7 @@ export const trainingPrograms: { [key: string]: TrainingProgram } = {
     id: 'social',
     title: '사회화 훈련',
     Icon: Users,
+    iconName: 'Users',
     description: '다양한 상황과 사람들에게 익숙해지는 훈련이에요.',
     difficulty: '중급',
     duration: '20-25분',

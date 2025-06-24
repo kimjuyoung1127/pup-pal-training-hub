@@ -47,14 +47,15 @@ const TrainingProgressPage = ({ onNavigate, onExit, trainingProgram, dogId }: Tr
     if (result.success === null || !startTime) return;
 
     const durationMinutes = Math.round((Date.now() - startTime) / (1000 * 60));
-    
+
     const newLog: TrainingLogCreate = {
+      training_program_id: program.isAiTraining ? null : program.id,
       training_type: program.title,
       duration_minutes: durationMinutes,
       success_rate: result.success ? 100 : 50,
       notes: result.notes,
       is_ai_training: program.isAiTraining || false,
-      ai_training_details: program.isAiTraining ? program : null,
+      ai_training_details: program.isAiTraining ? (({ Icon, ...rest }) => rest)(program) : null,
     };
 
     addMutation.mutate(newLog, {

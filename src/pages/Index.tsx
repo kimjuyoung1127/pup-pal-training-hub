@@ -11,14 +11,17 @@ import TrainingHistoryPage from '@/components/TrainingHistoryPage';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
 import TrainingProgressPage from '@/components/TrainingProgressPage'; // TrainingProgressPage 임포트
+import TrainingReplayPage from '@/components/TrainingReplayPage'; // TrainingReplayPage 임포트
 import { TrainingProgram } from '@/lib/trainingData'; // TrainingProgram 임포트
+import { TrainingLog } from '@/hooks/useTrainingHistory'; // TrainingLog 임포트
 
 const Index = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState<'onboarding' | 'login' | 'dashboard' | 'dog-info' | 'dog-profile' | 'training' | 'training-progress' | 'history' | 'settings'>('onboarding');
+  const [currentPage, setCurrentPage] = useState<'onboarding' | 'login' | 'dashboard' | 'dog-info' | 'dog-profile' | 'training' | 'training-progress' | 'training-replay' | 'history' | 'settings'>('onboarding');
   const [dogInfo, setDogInfo] = useState<any>(null);
-  const [trainingParams, setTrainingParams] = useState<{ trainingProgram: TrainingProgram, dogId: string } | null>(null); // trainingParams 상태 추가
+  const [trainingParams, setTrainingParams] = useState<{ trainingProgram: TrainingProgram, dogId: string } | null>(null);
+  const [replayParams, setReplayParams] = useState<{ trainingLog: TrainingLog } | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -61,6 +64,9 @@ const Index = () => {
     if (page === 'training-progress' && params) {
       setTrainingParams(params);
       setCurrentPage('training-progress');
+    } else if (page === 'training-replay' && params) {
+      setReplayParams(params);
+      setCurrentPage('training-replay');
     } else if (page === 'dog-info') {
       setCurrentPage('dog-info');
     } else if (page === 'dog-profile') {
@@ -114,6 +120,14 @@ const Index = () => {
           />;
         }
         // trainingParams가 없으면 대시보드로 리디렉션
+        return <DashboardPage onNavigate={handleNavigate} />;
+      case 'training-replay':
+        if (replayParams) {
+          return <TrainingReplayPage 
+            trainingLog={replayParams.trainingLog}
+            onExit={() => handleNavigate('history')}
+          />;
+        }
         return <DashboardPage onNavigate={handleNavigate} />;
       default:
         return <DashboardPage onNavigate={handleNavigate} />;

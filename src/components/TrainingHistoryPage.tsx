@@ -1,8 +1,7 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from 'lucide-react';
-import { useTrainingHistory, TrainingLog } from '@/hooks/useTrainingHistory';
-import { useAiRecommendations, AiRecommendation } from '@/hooks/useAiRecommendations';
+import { TrainingLog, useTrainingHistory } from '@/hooks/useTrainingHistory';
 import { useDogProfile } from '@/hooks/useDogProfile';
 import { useDogBadges } from '@/hooks/useDogBadges';
 import DogBadges from './DogBadges';
@@ -12,16 +11,7 @@ import TrainingHistorySkeleton from './training-history/TrainingHistorySkeleton'
 import EmptyTrainingHistory from './training-history/EmptyTrainingHistory';
 import TrainingHistoryList from './training-history/TrainingHistoryList';
 import { motion } from 'framer-motion';
-import { trainingPrograms, TrainingProgram, TrainingStep } from '@/lib/trainingData';
-import { Star } from 'lucide-react';
-
-// EnrichedTrainingLog 타입을 명시적으로 정의합니다.
-export interface EnrichedTrainingLog extends TrainingLog {
-  isAiTraining: boolean;
-  steps?: TrainingStep[];
-  difficulty?: '초급' | '중급' | '고급';
-  // 'duration' 필드는 'duration_minutes'와 중복되므로 제거하고 'duration_minutes'를 사용합니다.
-}
+import { useToast } from './ui/use-toast';
 
 interface TrainingHistoryPageProps {
   onNavigate: (page: string, params?: any) => void;
@@ -30,50 +20,18 @@ interface TrainingHistoryPageProps {
 const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
   const { dogInfo, isLoading: isLoadingDogProfile } = useDogProfile();
   const { data: trainingHistory, isLoading: isLoadingHistory, isError: isErrorHistory } = useTrainingHistory(dogInfo?.id);
-  const { data: aiRecommendations, isLoading: isLoadingAi, isError: isErrorAi } = useAiRecommendations(dogInfo?.id);
   const { data: badges, isLoading: isLoadingBadges } = useDogBadges(dogInfo?.id);
   const [logToDelete, setLogToDelete] = useState<TrainingLog | null>(null);
   const [logToEdit, setLogToEdit] = useState<TrainingLog | null>(null);
+  const { toast } = useToast();
 
-  const combinedHistory: EnrichedTrainingLog[] = useMemo(() => {
-    const historyLogs = (trainingHistory || []).map(log => {
-      const details = log.ai_training_details as any;
-      return {
-        ...log,
-        isAiTraining: log.is_ai_training || false,
-        steps: log.is_ai_training ? details?.steps : undefined,
-        difficulty: log.is_ai_training ? details?.difficulty : undefined,
-      };
-    });
-
+  const combinedHistory: TrainingLog[] = useMemo(() => {
+    const historyLogs = (trainingHistory || []).map(log => ({ ...log }));
     return historyLogs.sort((a, b) => new Date(b.session_date).getTime() - new Date(a.session_date).getTime());
   }, [trainingHistory]);
 
-  const handleRetryTraining = (item: EnrichedTrainingLog) => {
-    let programSteps: TrainingStep[] = [];
-    let programTitle = item.training_type || 'Unknown Training';
-
-    if (item.isAiTraining && item.steps) {
-      programSteps = item.steps;
-    } else {
-      const staticProgram = Object.values(trainingPrograms).find(p => p.title === item.training_type);
-      if (staticProgram) {
-        programSteps = staticProgram.steps;
-      }
-    }
-
-    const program: TrainingProgram = {
-      id: item.id,
-      title: programTitle,
-      description: item.notes || '',
-      Icon: Star, // 기본 아이콘
-      color: 'purple', // 기본 색상
-      difficulty: item.difficulty || "중급",
-      duration: item.duration_minutes ? `${item.duration_minutes}분` : '15분',
-      steps: programSteps,
-      isAiTraining: item.isAiTraining, // AI 훈련 여부 전달
-    };
-    onNavigate('training-progress', { trainingProgram: program, dogId: dogInfo?.id });
+  const handleRetryTraining = (log: TrainingLog) => {
+    onNavigate('training-replay', { trainingLog: log });
   };
 
   const renderContent = () => {
@@ -91,10 +49,13 @@ const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
 
     return (
       <TrainingHistoryList
-        trainingHistory={combinedHistory}
-        onEdit={(log) => setLogToEdit(log as TrainingLog)}
-        onDelete={(log) => setLogToDelete(log as TrainingLog)}
-        onRetry={(trainingType: string) => handleRetryTraining(combinedHistory.find(item => item.training_type === trainingType) as EnrichedTrainingLog)}
+        trainingHistory={combinedHistory.map(log => ({
+          ...log,
+          isAiTraining: log.is_ai_training ?? false,
+        }))}
+        onEdit={setLogToEdit}
+        onDelete={setLogToDelete}
+        onRetry={handleRetryTraining}
       />
     );
   };

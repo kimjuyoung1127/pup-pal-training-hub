@@ -16,6 +16,7 @@ interface TrainingSummaryProps {
   onNavigate: (page: string) => void;
   onExit: () => void;
   newlyAwardedBadges?: Badge[];
+  isReplay?: boolean;
 }
 
 const completionMessages = [
@@ -31,7 +32,7 @@ const completionMessages = [
   "참 잘했어요! 다음 훈련도 기대되네요.",
 ];
 
-const TrainingSummary = ({ onNavigate, onExit, newlyAwardedBadges = [] }: TrainingSummaryProps) => {
+const TrainingSummary = ({ onNavigate, onExit, newlyAwardedBadges = [], isReplay = false }: TrainingSummaryProps) => {
   const [completionMessage, setCompletionMessage] = useState('');
 
   useEffect(() => {
@@ -60,12 +61,18 @@ const TrainingSummary = ({ onNavigate, onExit, newlyAwardedBadges = [] }: Traini
       </Card>
 
       <div className="space-y-4 w-full">
-        <Button onClick={() => onNavigate('history')} size="lg" className="w-full btn-secondary">
-          기록 페이지로 이동
-        </Button>
-        <Button onClick={onExit} size="lg" variant="ghost" className="w-full text-cream-600">
-          다시 훈련해보기
-        </Button>
+        {isReplay ? (
+          <Button onClick={onExit} size="lg" className="w-full btn-primary">
+            기록 목록으로 돌아가기
+          </Button>
+        ) : (
+          <>
+           
+            <Button onClick={onExit} size="lg" variant="ghost" className="w-full text-cream-600">
+              완료
+            </Button>
+          </>
+        )}
       </div>
     </motion.div>
   );

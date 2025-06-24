@@ -18,9 +18,9 @@ import { Repeat } from 'lucide-react';
 
 interface TrainingHistoryCardProps {
   item: TrainingLog & { isAiTraining?: boolean };
-  onEdit: () => void;
-  onDelete: () => void;
-  onRetry: (trainingType: string) => void;
+  onEdit: (item: TrainingLog) => void;
+  onDelete: (item: TrainingLog) => void;
+  onRetry: (item: TrainingLog) => void;
 }
 
 const TrainingHistoryCard = ({ item, onEdit, onDelete, onRetry }: TrainingHistoryCardProps) => {
@@ -63,11 +63,11 @@ const TrainingHistoryCard = ({ item, onEdit, onDelete, onRetry }: TrainingHistor
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={onEdit} className="text-blue-600 focus:text-blue-700 focus:bg-blue-50">
+                      <DropdownMenuItem onClick={() => onEdit(item)} className="text-blue-600 focus:text-blue-700 focus:bg-blue-50">
                         <Edit className="mr-2 h-4 w-4" />
                         <span>수정</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={onDelete} className="text-red-500 focus:text-red-600 focus:bg-red-50">
+                      <DropdownMenuItem onClick={() => onDelete(item)} className="text-red-500 focus:text-red-600 focus:bg-red-50">
                         <Trash2 className="mr-2 h-4 w-4" />
                         <span>삭제</span>
                       </DropdownMenuItem>
@@ -94,7 +94,7 @@ const TrainingHistoryCard = ({ item, onEdit, onDelete, onRetry }: TrainingHistor
               )}
               {item.training_type && (
                 <div className="mt-4 flex justify-end">
-                  <Button onClick={() => onRetry(item.training_type!)} size="sm" className="bg-blue-500 hover:bg-blue-600">
+                  <Button onClick={() => onRetry(item)} size="sm" className="bg-blue-500 hover:bg-blue-600">
                     <Repeat className="mr-2 h-4 w-4" />
                     다시 훈련하기
                   </Button>

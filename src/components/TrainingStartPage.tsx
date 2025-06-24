@@ -36,7 +36,7 @@ const TrainingStartPage = ({
 
   if (isTrainingActive && selectedAiTraining && dogInfo?.id) {
     return <TrainingProgressPage 
-      trainingProgram={selectedAiTraining} 
+      trainingProgram={{...selectedAiTraining, isAiTraining: true}} 
       onNavigate={onNavigate} 
       onExit={handleExitTraining} 
       dogId={dogInfo.id} // dogId 전달
