@@ -68,7 +68,7 @@
     --card: var(--white);
     --card-foreground: var(--brown-900);
 
-    --popover: var(--cream-100); /* 연한 크림 */
+    --popover: var(--beige-100); /* 연한 베이지 (기존 cream-100에서 변경) */
     --popover-foreground: var(--brown-900);
 
     --primary: var(--orange-500); /* 메인 오렌지 */

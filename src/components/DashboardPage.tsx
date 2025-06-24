@@ -6,7 +6,7 @@ import DashboardContent from './DashboardContent';
 
 const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-beige-100 via-cream-100 to-training-green-light"> {/* 배경 변경 */}
+    <div className="min-h-screen bg-gradient-to-br from-beige-100 to-training-green-light"> {/* 배경 변경: via-cream-100 제거 */}
       {/* Header */}
       <div className="bg-background/80 backdrop-blur-sm border-b border-border px-6 py-4 sticky top-0 z-10"> {/* 헤더 스타일 변경 */}
         <div className="flex items-center justify-between">

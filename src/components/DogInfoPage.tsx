@@ -106,7 +106,7 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-beige-100 via-cream-100 to-pink-50 p-4"> {/* 배경 변경 */}
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-beige-100 via-pink-100 to-pink-50 p-4"> {/* 배경 변경: via-cream-100을 via-pink-100으로 */}
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-2">
