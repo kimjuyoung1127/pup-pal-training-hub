@@ -19,12 +19,6 @@ const TrainingStartPage = ({
 
   const quickTips = ['간식을 미리 준비해주세요 🦴', '조용한 환경에서 훈련하세요 🤫', '긍정적인 보상을 잊지 마세요 ❤️', '강아지의 컨디션을 확인하세요 😊'];
   
-  const handleStartTraining = () => {
-    if (selectedAiTraining) {
-      setIsTrainingActive(true);
-    }
-  };
-
   const handleExitTraining = () => {
     setIsTrainingActive(false);
     setSelectedAiTraining(null);
@@ -32,6 +26,7 @@ const TrainingStartPage = ({
 
   const handleSelectAiTraining = (training: TrainingProgram) => {
     setSelectedAiTraining(training);
+    setIsTrainingActive(true); // 훈련 선택 시 바로 활성화
   };
 
   if (isTrainingActive && selectedAiTraining && dogInfo?.id) {
@@ -106,16 +101,6 @@ const TrainingStartPage = ({
             </div>
           </Card>
         </motion.div>
-      </div>
-
-      {/* Fixed Bottom Button - positioned above bottom navigation */}
-      <div className="fixed bottom-16 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-200 p-6">
-        <Button onClick={handleStartTraining} disabled={!selectedAiTraining} className={`w-full py-4 text-lg font-bold transition-all duration-200 ${selectedAiTraining ? 'btn-primary' : 'bg-gray-300 text-gray-600 cursor-not-allowed hover:bg-gray-300 hover:scale-100'}`}>
-          <div className="flex items-center justify-center space-x-2">
-            <Play className="w-5 h-5" />
-            <span>훈련 시작하기</span>
-          </div>
-        </Button>
       </div>
     </div>;
 };

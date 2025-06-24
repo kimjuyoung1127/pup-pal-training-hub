@@ -26,12 +26,13 @@ interface AiTrainingProgram {
 
 interface AiTrainingRecommenderProps {
   onSelectTraining: (training: TrainingProgram) => void;
-  selectedTrainingTitle: string | null;
+  selectedTrainingTitle: string | null; // 이 prop은 더 이상 하이라이트에 사용되지 않지만, 호환성을 위해 남겨둡니다.
 }
 
-const AiTrainingRecommender = ({ onSelectTraining, selectedTrainingTitle }: AiTrainingRecommenderProps) => {
+const AiTrainingRecommender = ({ onSelectTraining }: AiTrainingRecommenderProps) => {
   const { dogInfo, extendedProfile, isLoading: isProfileLoading } = useDogProfile();
   const [aiRecommendations, setAiRecommendations] = useState<AiTrainingProgram[]>([]);
+  const [highlightedTitle, setHighlightedTitle] = useState<string | null>(null);
 
   const { data: savedRecommendations, isLoading: isLoadingRecommendations } = useAiRecommendations(dogInfo?.id ? dogInfo.id : null);
   const saveRecommendationsMutation = useSaveAiRecommendations();
@@ -73,8 +74,8 @@ const AiTrainingRecommender = ({ onSelectTraining, selectedTrainingTitle }: AiTr
       // 확장된 프롬프트
       const prompt = `당신은 반려견 행동 수정 전문가입니다.
 
-      다음 강아지 프로필을 기반으로, **전문적이고 창의적인 맞춤형 훈련 초급,중급, 고급 중 2가지**를 추천해주세요. 
-      이전에도 흔히 추천했을 법한 훈련이 아닌, **강아지의 나이, 품종, 건강 상태, 활동 수준, 성격, 약한 부위**를 종합적으로 고려해 주세요.
+      다음 강아지 프로필을 기반으로, **전문적이고 창의적인 맞춤형 훈련 초급,중급,고급 중 2가지**를 추천해주세요. 
+      **강아지의 나이, 품종, 건강 상태, 활동 수준, 성격, 약한 부위**를 종합적으로 고려해 주세요.
       
       📌 주의사항:
       - 사용자의 훈련 목표를 위주로 훈련을 추천해주세요.
@@ -88,7 +89,7 @@ const AiTrainingRecommender = ({ onSelectTraining, selectedTrainingTitle }: AiTr
         "title": "훈련 이름 (예: '짖음 감소를 위한 훈련')",
         "description": "훈련의 목적과 강아지에게 주는 효과를 간결하고 쉽게 설명",
         "difficulty": "초급 | 중급 | 고급",
-        "duration": "예상 소요 시간 (예: '10~15분')",
+        "duration": "예상 소요 시간 (15분 내외로')",
         "benefits": ["훈련을 통해 얻을 수 있는 핵심 효과 3가지", "예: '짖음감소'", "예: '사회성 증가'"],
         "equipment": ["필요한 도구 목록. 없으면 빈 배열 []", "예: '방석', '간식'"],
         "caution": "훈련 중 주의할 점 또는 위험 요소",
@@ -178,6 +179,7 @@ const AiTrainingRecommender = ({ onSelectTraining, selectedTrainingTitle }: AiTr
       id: `ai-${aiTraining.title}`,
       color: 'orange',
       Icon: Star,
+      iconName: 'Star' // iconName을 Star로 명시적으로 지정
     };
     onSelectTraining(trainingProgram);
   };
@@ -197,60 +199,70 @@ const AiTrainingRecommender = ({ onSelectTraining, selectedTrainingTitle }: AiTr
           {(recommendTrainingMutation.isPending || isLoadingRecommendations) && (
             <div className="flex justify-center items-center p-4">
               <Loader2 className="animate-spin w-8 h-8 text-orange-500" />
-              <p className="ml-2 text-gray-700">AI가 열심히 훈련 계획을 짜고 있어요...</p>
+              <p className="ml-2 text-gray-600">AI가 열심히 훈련을 추천하고 있어요...</p>
             </div>
           )}
-          {recommendTrainingMutation.isError && (
-             <p className="text-red-500 text-center">{recommendTrainingMutation.error.message}</p>
-          )}
+
           {aiRecommendations.length > 0 && (
-            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2"> 
-              {aiRecommendations.map((training, index) => (
-                <Card 
-                  key={index} 
-                  onClick={() => handleSelect(training)}
-                  className={`cursor-pointer transition-all bg-white/60 hover:bg-white flex flex-col ${selectedTrainingTitle === training.title ? 'border-orange-500 ring-2 ring-orange-400' : 'border-cream-200 shadow-sm hover:shadow-md'}`}
+            <div className="grid gap-4 md:grid-cols-2">
+              {aiRecommendations.map((rec, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  onClick={() => setHighlightedTitle(rec.title)}
+                  className="cursor-pointer h-full"
                 >
-                  <CardHeader>
-                    <CardTitle className="text-lg font-bold text-slate-800">{training.title}</CardTitle>
-                    <div className="flex items-center space-x-2 text-xs text-slate-600 mt-1">
-                      <Badge variant="outline" className="border-orange-300 text-orange-800">{training.difficulty}</Badge>
-                      <Badge variant="outline" className="border-sky-300 text-sky-800">{training.duration}</Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex-grow flex flex-col justify-between p-6">
-                    <p className="text-sm text-slate-700 mb-6">{training.description}</p>
-                    <div className="space-y-4 text-sm">
-                      <div>
-                        <h4 className="font-semibold flex items-center mb-2 text-slate-700"><CheckCircle className="w-5 h-5 mr-2 text-green-500"/>기대 효과</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {training.benefits.map(b => <Badge key={b} variant="secondary" className="bg-green-100 text-green-800">{b}</Badge>)} 
-                        </div>
+                  <Card className={`bg-white/80 border-gray-200/80 flex flex-col h-full relative ${highlightedTitle === rec.title ? 'border-blue-500 ring-2 ring-blue-500' : ''}`}>
+                    <CardHeader>
+                      <CardTitle className="text-lg font-semibold text-gray-800 pr-20">{rec.title}</CardTitle>
+                      <Badge variant={rec.difficulty === '초급' ? 'default' : rec.difficulty === '중급' ? 'secondary' : 'destructive'} className="w-fit">{rec.difficulty}</Badge>
+                    </CardHeader>
+                    <CardContent className="flex-grow">
+                      <p className="text-sm text-gray-600 mb-3">{rec.description}</p>
+                      <div className="text-xs text-gray-500 space-y-1">
+                        <p><Star className="inline-block w-3 h-3 mr-1.5 text-yellow-500" /><strong>효과:</strong> {rec.benefits.join(', ')}</p>
+                        <p><CheckCircle className="inline-block w-3 h-3 mr-1.5 text-green-500" /><strong>준비물:</strong> {rec.equipment.length > 0 ? rec.equipment.join(', ') : '없음'}</p>
+                        <p><AlertTriangle className="inline-block w-3 h-3 mr-1.5 text-red-500" /><strong>주의:</strong> {rec.caution}</p>
                       </div>
-                      <div>
-                        <h4 className="font-semibold flex items-center mb-2 text-slate-700"><List className="w-5 h-5 mr-2 text-blue-500"/>필요 도구</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {training.equipment.length > 0 ? training.equipment.map(e => <Badge key={e} variant="secondary" className="bg-blue-100 text-blue-800">{e}</Badge>) : <Badge variant="secondary" className="bg-gray-100 text-gray-800">특별한 도구 필요 없음</Badge>}
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold flex items-center mb-2 text-slate-700"><AlertTriangle className="w-5 h-5 mr-2 text-red-500"/>주의사항</h4>
-                        <p className="text-slate-600 bg-red-50/50 p-3 rounded-lg">{training.caution}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                    <Button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelect(rec);
+                      }}
+                      className="absolute top-4 right-4 bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1 text-sm h-auto"
+                    >
+                      시작
+                    </Button>
+                  </Card>
+                </motion.div>
               ))}
             </div>
           )}
 
           {aiRecommendations.length === 0 && !recommendTrainingMutation.isPending && !isLoadingRecommendations && (
-            <div className="text-center p-4">
-              <p className="text-gray-600 mb-4">아직 생성된 AI 추천이 없어요. 버튼을 눌러 우리 강아지를 위한 맞춤 훈련을 받아보세요!</p>
-              <Button onClick={() => recommendTrainingMutation.mutate()} disabled={isProfileLoading || recommendTrainingMutation.isPending}>
-                {isProfileLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />} 
-                AI 추천 받기
-              </Button>
+            <div className="text-center py-6 bg-orange-50/50 rounded-lg">
+              <p className="text-sm text-gray-500 mt-2">버튼을 눌러 AI에게 훈련을 추천받아보세요!</p>
+            </div>
+          )}
+
+          <Button 
+            onClick={() => recommendTrainingMutation.mutate()} 
+            disabled={recommendTrainingMutation.isPending || isProfileLoading}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold"
+          >
+            {recommendTrainingMutation.isPending ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> 추천 생성 중...</>
+            ) : (
+              <><Wand2 className="mr-2 h-4 w-4" /> AI 추천 다시 받기</>
+            )}
+          </Button>
+
+          {dogInfo && extendedProfile ? null : (
+            <div className="text-center text-sm text-red-500">
+              <p className="text-sm text-gray-500 mt-2">버튼을 눌러 AI에게 훈련을 추천받아보세요!</p>
             </div>
           )}
         </CardContent>
