@@ -63,11 +63,11 @@ const TrainingHistoryCard = ({ item, onEdit, onDelete, onRetry }: TrainingHistor
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={onEdit}>
+                      <DropdownMenuItem onClick={onEdit} className="text-blue-600 focus:text-blue-700 focus:bg-blue-50">
                         <Edit className="mr-2 h-4 w-4" />
                         <span>수정</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={onDelete} className="text-red-500 focus:text-red-500 focus:bg-red-50">
+                      <DropdownMenuItem onClick={onDelete} className="text-red-500 focus:text-red-600 focus:bg-red-50">
                         <Trash2 className="mr-2 h-4 w-4" />
                         <span>삭제</span>
                       </DropdownMenuItem>

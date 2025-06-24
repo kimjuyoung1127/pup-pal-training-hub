@@ -10,10 +10,15 @@ export interface TrainingLog {
   success_rate: number | null;
   training_type: string | null;
   notes?: string | null;
+  is_ai_training?: boolean;
+  ai_training_details?: any;
 }
 
 export type TrainingLogUpdate = Partial<Omit<TrainingLog, 'id'>>;
-export type TrainingLogCreate = Omit<TrainingLog, 'id' | 'session_date'>;
+export type TrainingLogCreate = Omit<TrainingLog, 'id' | 'session_date'> & {
+  is_ai_training?: boolean;
+  ai_training_details?: any;
+};
 
 const fetchTrainingHistory = async (dogId: string | undefined): Promise<TrainingLog[]> => {
   if (!dogId) return [];

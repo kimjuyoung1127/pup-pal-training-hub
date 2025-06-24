@@ -1,28 +1,29 @@
 
 import React, { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
+import TrainingIntro from './training-progress/TrainingIntro';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { trainingPrograms, TrainingProgram } from '@/lib/trainingData';
 import { useTrainingHistory, TrainingLogCreate } from '@/hooks/useTrainingHistory';
-import TrainingIntro from './training-progress/TrainingIntro';
+import { useDogProfile } from '@/hooks/useDogProfile';
 import TrainingSteps from './training-progress/TrainingSteps';
 import TrainingLog from './training-progress/TrainingLog';
 import TrainingSummary from './training-progress/TrainingSummary';
 
 interface TrainingProgressPageProps {
-  trainingId?: string;
-  trainingProgram?: TrainingProgram;
+  trainingProgram: TrainingProgram & { isAiTraining?: boolean };
   onNavigate: (page: string) => void;
   onExit: () => void;
+  dogId: string; // dogId prop 추가
 }
 
-const TrainingProgressPage = ({ trainingId, onNavigate, onExit, trainingProgram }: TrainingProgressPageProps) => {
+const TrainingProgressPage = ({ onNavigate, onExit, trainingProgram, dogId }: TrainingProgressPageProps) => {
   const [flowStep, setFlowStep] = useState(1); // 1: intro, 2: steps, 3: log, 4: summary
   const [startTime, setStartTime] = useState<number | null>(null);
-  const { addMutation } = useTrainingHistory();
+  const { addMutation } = useTrainingHistory(dogId); // dogId를 useTrainingHistory에 전달
   
-  const program = trainingProgram || (trainingId ? trainingPrograms[trainingId] : null);
+  const program = trainingProgram;
 
   if (!program) {
     return (
@@ -46,12 +47,16 @@ const TrainingProgressPage = ({ trainingId, onNavigate, onExit, trainingProgram 
     if (result.success === null || !startTime) return;
 
     const durationMinutes = Math.round((Date.now() - startTime) / (1000 * 60));
+    
     const newLog: TrainingLogCreate = {
       training_type: program.title,
       duration_minutes: durationMinutes,
       success_rate: result.success ? 100 : 50,
       notes: result.notes,
+      is_ai_training: program.isAiTraining || false,
+      ai_training_details: program.isAiTraining ? program : null,
     };
+
     addMutation.mutate(newLog, {
       onSuccess: () => {
         setFlowStep(4);

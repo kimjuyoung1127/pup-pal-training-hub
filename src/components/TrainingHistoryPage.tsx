@@ -12,6 +12,16 @@ import TrainingHistorySkeleton from './training-history/TrainingHistorySkeleton'
 import EmptyTrainingHistory from './training-history/EmptyTrainingHistory';
 import TrainingHistoryList from './training-history/TrainingHistoryList';
 import { motion } from 'framer-motion';
+import { trainingPrograms, TrainingProgram, TrainingStep } from '@/lib/trainingData';
+import { Star } from 'lucide-react';
+
+// EnrichedTrainingLog 타입을 명시적으로 정의합니다.
+export interface EnrichedTrainingLog extends TrainingLog {
+  isAiTraining: boolean;
+  steps?: TrainingStep[];
+  difficulty?: '초급' | '중급' | '고급';
+  // 'duration' 필드는 'duration_minutes'와 중복되므로 제거하고 'duration_minutes'를 사용합니다.
+}
 
 interface TrainingHistoryPageProps {
   onNavigate: (page: string, params?: any) => void;
@@ -25,59 +35,66 @@ const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
   const [logToDelete, setLogToDelete] = useState<TrainingLog | null>(null);
   const [logToEdit, setLogToEdit] = useState<TrainingLog | null>(null);
 
-  useEffect(() => {
-    console.log('🐶 Dog Profile:', dogInfo);
-    console.log('📜 Training History:', trainingHistory);
-    console.log('🤖 AI Recommendations:', aiRecommendations);
-  }, [dogInfo, trainingHistory, aiRecommendations]);
+  const combinedHistory: EnrichedTrainingLog[] = useMemo(() => {
+    const historyLogs = (trainingHistory || []).map(log => {
+      const details = log.ai_training_details as any;
+      return {
+        ...log,
+        isAiTraining: log.is_ai_training || false,
+        steps: log.is_ai_training ? details?.steps : undefined,
+        difficulty: log.is_ai_training ? details?.difficulty : undefined,
+      };
+    });
 
-  const combinedHistory = useMemo(() => {
-    console.log('🔄 Combining history and recommendations...');
-    const processedAiRecs = (aiRecommendations || []).flatMap(rec => 
-      (rec.recommendations as any[])
-        .map((r: any, index: number) => ({
-          id: `ai-${rec.id}-${index}`,
-          session_date: rec.created_at,
-          training_type: r.program,
-          notes: r.description,
-          isAiTraining: true,
-          duration_minutes: null,
-          success_rate: null,
-        } as TrainingLog & { isAiTraining: boolean }))
-        .filter(item => item.training_type) // training_type이 있는 항목만 필터링
-    );
-    const combined = [...processedAiRecs, ...(trainingHistory || [])];
-    console.log('✅ Combined Data:', combined);
-    return combined;
-  }, [aiRecommendations, trainingHistory]);
+    return historyLogs.sort((a, b) => new Date(b.session_date).getTime() - new Date(a.session_date).getTime());
+  }, [trainingHistory]);
 
-  const handleRetryTraining = (trainingType: string) => {
-    onNavigate('training', { trainingType });
+  const handleRetryTraining = (item: EnrichedTrainingLog) => {
+    let programSteps: TrainingStep[] = [];
+    let programTitle = item.training_type || 'Unknown Training';
+
+    if (item.isAiTraining && item.steps) {
+      programSteps = item.steps;
+    } else {
+      const staticProgram = Object.values(trainingPrograms).find(p => p.title === item.training_type);
+      if (staticProgram) {
+        programSteps = staticProgram.steps;
+      }
+    }
+
+    const program: TrainingProgram = {
+      id: item.id,
+      title: programTitle,
+      description: item.notes || '',
+      Icon: Star, // 기본 아이콘
+      color: 'purple', // 기본 색상
+      difficulty: item.difficulty || "중급",
+      duration: item.duration_minutes ? `${item.duration_minutes}분` : '15분',
+      steps: programSteps,
+      isAiTraining: item.isAiTraining, // AI 훈련 여부 전달
+    };
+    onNavigate('training-progress', { trainingProgram: program, dogId: dogInfo?.id });
   };
 
   const renderContent = () => {
-    if (isLoadingHistory || isLoadingAi || isLoadingDogProfile) {
-      console.log('⏳ Loading data...');
+    if (isLoadingHistory || isLoadingDogProfile) {
       return <TrainingHistorySkeleton />;
     }
 
-    if (isErrorHistory || isErrorAi) {
-      console.error('❌ Error loading data. History Error:', isErrorHistory, 'AI Recs Error:', isErrorAi);
+    if (isErrorHistory) {
       return <div className="text-center text-red-500 p-8">훈련 기록을 불러오는 데 실패했습니다.</div>;
     }
 
     if (!combinedHistory || combinedHistory.length === 0) {
-      console.log('텅 비었음! Empty data, showing empty component.');
       return <EmptyTrainingHistory onNavigate={() => onNavigate('dashboard')} />;
     }
 
-    console.log('렌더링될 데이터:', combinedHistory);
     return (
       <TrainingHistoryList
         trainingHistory={combinedHistory}
-        onEdit={setLogToEdit}
-        onDelete={setLogToDelete}
-        onRetry={handleRetryTraining}
+        onEdit={(log) => setLogToEdit(log as TrainingLog)}
+        onDelete={(log) => setLogToDelete(log as TrainingLog)}
+        onRetry={(trainingType: string) => handleRetryTraining(combinedHistory.find(item => item.training_type === trainingType) as EnrichedTrainingLog)}
       />
     );
   };
@@ -104,14 +121,20 @@ const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
         {renderContent()}
       </div>
 
-      <DeleteTrainingLogDialog 
-        log={logToDelete}
-        onOpenChange={(open) => !open && setLogToDelete(null)}
-      />
-      <EditTrainingLogDialog
-        log={logToEdit}
-        onOpenChange={(open) => !open && setLogToEdit(null)}
-      />
+      {dogInfo?.id && (
+        <>
+          <DeleteTrainingLogDialog 
+            log={logToDelete}
+            dogId={dogInfo.id}
+            onOpenChange={(open) => !open && setLogToDelete(null)}
+          />
+          <EditTrainingLogDialog
+            log={logToEdit}
+            dogId={dogInfo.id}
+            onOpenChange={(open) => !open && setLogToEdit(null)}
+          />
+        </>
+      )}
     </motion.div>
   );
 };

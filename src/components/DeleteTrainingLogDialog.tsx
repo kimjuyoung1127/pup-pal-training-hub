@@ -10,16 +10,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useTrainingHistory } from '@/hooks/useTrainingHistory';
-import { TrainingLog } from '@/hooks/useTrainingHistory';
+import { useTrainingHistory, TrainingLog } from '@/hooks/useTrainingHistory';
 
 interface DeleteTrainingLogDialogProps {
   log: TrainingLog | null;
+  dogId: string | undefined;
   onOpenChange: (open: boolean) => void;
 }
 
-const DeleteTrainingLogDialog = ({ log, onOpenChange }: DeleteTrainingLogDialogProps) => {
-  const { deleteMutation } = useTrainingHistory();
+const DeleteTrainingLogDialog = ({ log, dogId, onOpenChange }: DeleteTrainingLogDialogProps) => {
+  const { deleteMutation } = useTrainingHistory(dogId);
 
   const handleDelete = () => {
     if (log) {
@@ -29,16 +29,16 @@ const DeleteTrainingLogDialog = ({ log, onOpenChange }: DeleteTrainingLogDialogP
 
   return (
     <AlertDialog open={!!log} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent className="bg-white">
         <AlertDialogHeader>
-          <AlertDialogTitle>정말 삭제하시겠습니까?</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle className="text-black">정말 삭제하시겠습니까?</AlertDialogTitle>
+          <AlertDialogDescription className="text-gray-800">
             이 작업은 되돌릴 수 없습니다. 훈련 기록이 영구적으로 삭제됩니다.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>취소</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={deleteMutation.isPending} className="bg-red-600 hover:bg-red-700">
+          <AlertDialogCancel className="bg-pink-200 hover:bg-pink-300 text-gray-800">취소</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDelete} disabled={deleteMutation.isPending} className="bg-pink-500 hover:bg-pink-600 text-gray-800">
             {deleteMutation.isPending ? '삭제 중...' : '삭제'}
           </AlertDialogAction>
         </AlertDialogFooter>

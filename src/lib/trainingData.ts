@@ -19,6 +19,7 @@ export interface TrainingProgram {
   duration: string;
   steps: TrainingStep[];
   color: string;
+  isAiTraining?: boolean; // AI 훈련 여부를 나타내는 속성 추가
 }
 
 export const trainingPrograms: { [key: string]: TrainingProgram } = {

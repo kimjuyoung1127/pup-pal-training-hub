@@ -10,12 +10,15 @@ import BottomNavigation from '@/components/BottomNavigation';
 import TrainingHistoryPage from '@/components/TrainingHistoryPage';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
+import TrainingProgressPage from '@/components/TrainingProgressPage'; // TrainingProgressPage 임포트
+import { TrainingProgram } from '@/lib/trainingData'; // TrainingProgram 임포트
 
 const Index = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState<'onboarding' | 'login' | 'dashboard' | 'dog-info' | 'dog-profile' | 'training' | 'training-progress' | 'history' | 'settings'>('onboarding');
   const [dogInfo, setDogInfo] = useState<any>(null);
+  const [trainingParams, setTrainingParams] = useState<{ trainingProgram: TrainingProgram, dogId: string } | null>(null); // trainingParams 상태 추가
 
   useEffect(() => {
     setLoading(true);
@@ -53,9 +56,12 @@ const Index = () => {
     setCurrentPage('dashboard');
   };
 
-  const handleNavigate = (page: string) => {
-    console.log(`Navigating to: ${page}`);
-    if (page === 'dog-info') {
+  const handleNavigate = (page: string, params?: any) => {
+    console.log(`Navigating to: ${page}`, params);
+    if (page === 'training-progress' && params) {
+      setTrainingParams(params);
+      setCurrentPage('training-progress');
+    } else if (page === 'dog-info') {
       setCurrentPage('dog-info');
     } else if (page === 'dog-profile') {
       setCurrentPage('dog-profile');
@@ -78,7 +84,7 @@ const Index = () => {
   };
 
   // 하단 네비게이션을 보여줄 페이지들
-  const showBottomNav = ['dashboard', 'dog-info', 'dog-profile', 'training', 'settings', 'history'].includes(currentPage);
+  const showBottomNav = ['dashboard', 'dog-info', 'dog-profile', 'training', 'settings', 'history', 'training-progress'].includes(currentPage);
 
   const renderPage = () => {
     switch (currentPage) {
@@ -98,6 +104,17 @@ const Index = () => {
         return <SettingsPage />;
       case 'history':
         return <TrainingHistoryPage onNavigate={handleNavigate} />;
+      case 'training-progress':
+        if (trainingParams) {
+          return <TrainingProgressPage 
+            trainingProgram={trainingParams.trainingProgram} 
+            dogId={trainingParams.dogId} 
+            onNavigate={handleNavigate} 
+            onExit={() => handleNavigate('dashboard')} 
+          />;
+        }
+        // trainingParams가 없으면 대시보드로 리디렉션
+        return <DashboardPage onNavigate={handleNavigate} />;
       default:
         return <DashboardPage onNavigate={handleNavigate} />;
     }

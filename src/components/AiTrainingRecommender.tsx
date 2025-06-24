@@ -47,7 +47,14 @@ const AiTrainingRecommender = ({ onSelectTraining, selectedTrainingTitle }: AiTr
           return unknownRecs as AiTrainingProgram[];
         }
       );
-      setAiRecommendations(allParsedRecommendations);
+
+      // title을 기준으로 중복 제거
+      const uniqueRecommendations = allParsedRecommendations.filter(
+        (rec, index, self) =>
+          index === self.findIndex((r) => r.title === rec.title)
+      );
+
+      setAiRecommendations(uniqueRecommendations);
     } else {
       setAiRecommendations([]);
     }

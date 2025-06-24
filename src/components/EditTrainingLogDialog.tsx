@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -33,11 +33,14 @@ const formSchema = z.object({
 
 interface EditTrainingLogDialogProps {
   log: TrainingLog | null;
+  dogId: string | undefined;
   onOpenChange: (open: boolean) => void;
 }
 
-const EditTrainingLogDialog = ({ log, onOpenChange }: EditTrainingLogDialogProps) => {
-  const { updateMutation } = useTrainingHistory();
+const EditTrainingLogDialog = ({ log, dogId, onOpenChange }: EditTrainingLogDialogProps) => {
+  console.log('EditTrainingLogDialog rendered. Props:', { log, dogId });
+  const { updateMutation } = useTrainingHistory(dogId);
+  const [notes, setNotes] = useState('');
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,6 +53,7 @@ const EditTrainingLogDialog = ({ log, onOpenChange }: EditTrainingLogDialogProps
   });
 
   useEffect(() => {
+    console.log('useEffect triggered. Log:', log);
     if (log) {
       form.reset({
         training_type: log.training_type || '',
@@ -58,10 +62,12 @@ const EditTrainingLogDialog = ({ log, onOpenChange }: EditTrainingLogDialogProps
         success_rate: log.success_rate ?? 0,
         notes: log.notes ?? '',
       });
+      console.log('Form reset with log data.');
     }
   }, [log, form]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log('Submitting form with values:', values);
     if (log) {
       const updateData: TrainingLogUpdate = {
         ...values,
@@ -69,7 +75,11 @@ const EditTrainingLogDialog = ({ log, onOpenChange }: EditTrainingLogDialogProps
       };
       updateMutation.mutate({ id: log.id, ...updateData }, {
         onSuccess: () => {
+          console.log('Update successful');
           onOpenChange(false);
+        },
+        onError: (error) => {
+          console.error('Update failed:', error);
         }
       });
     }
@@ -77,10 +87,10 @@ const EditTrainingLogDialog = ({ log, onOpenChange }: EditTrainingLogDialogProps
 
   return (
     <Dialog open={!!log} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="bg-white sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>훈련 기록 수정</DialogTitle>
-          <DialogDescription>훈련 기록의 세부 정보를 수정합니다.</DialogDescription>
+          <DialogTitle className="text-gray-800">훈련 기록 수정</DialogTitle>
+          <DialogDescription className="text-gray-800">훈련 기록의 세부 정보를 수정합니다.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
@@ -89,9 +99,9 @@ const EditTrainingLogDialog = ({ log, onOpenChange }: EditTrainingLogDialogProps
               name="training_type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>훈련 종류</FormLabel>
+                  <FormLabel className="text-gray-800">훈련 종류</FormLabel>
                   <FormControl>
-                    <Input placeholder="예: 앉아" {...field} />
+                    <Input placeholder="예: 앉아" {...field} className="bg-gray-50 border-gray-300" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -102,9 +112,9 @@ const EditTrainingLogDialog = ({ log, onOpenChange }: EditTrainingLogDialogProps
               name="session_date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>날짜</FormLabel>
+                  <FormLabel className="text-gray-800">날짜</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input type="date" {...field} className="bg-gray-50 border-gray-300" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -115,9 +125,9 @@ const EditTrainingLogDialog = ({ log, onOpenChange }: EditTrainingLogDialogProps
               name="duration_minutes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>훈련 시간 (분)</FormLabel>
+                  <FormLabel className="text-gray-800">훈련 시간 (분)</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} value={field.value ?? ""} onChange={e => field.onChange(e.target.value === '' ? null : +e.target.value)} />
+                    <Input type="number" {...field} value={field.value ?? ""} onChange={e => field.onChange(e.target.value === '' ? null : +e.target.value)} className="bg-gray-50 border-gray-300" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -128,9 +138,9 @@ const EditTrainingLogDialog = ({ log, onOpenChange }: EditTrainingLogDialogProps
               name="success_rate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>성공률 (%)</FormLabel>
+                  <FormLabel className="text-gray-800">성공률 (%)</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} value={field.value ?? ""} onChange={e => field.onChange(e.target.value === '' ? null : +e.target.value)} />
+                    <Input type="number" {...field} value={field.value ?? ""} onChange={e => field.onChange(e.target.value === '' ? null : +e.target.value)} className="bg-gray-50 border-gray-300" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -141,11 +151,11 @@ const EditTrainingLogDialog = ({ log, onOpenChange }: EditTrainingLogDialogProps
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>메모</FormLabel>
+                  <FormLabel className="text-gray-800">메모</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="훈련에 대한 메모를 남겨주세요."
-                      className="resize-none"
+                      className="resize-none bg-gray-50 border-gray-300"
                       {...field}
                       value={field.value ?? ""}
                     />
@@ -155,8 +165,8 @@ const EditTrainingLogDialog = ({ log, onOpenChange }: EditTrainingLogDialogProps
               )}
             />
             <DialogFooter>
-              <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>취소</Button>
-              <Button type="submit" disabled={updateMutation.isPending}>
+              <Button type="button" onClick={() => onOpenChange(false)} className="bg-pink-200 hover:bg-pink-300 text-gray-800">취소</Button>
+              <Button type="submit" disabled={updateMutation.isPending} className="bg-pink-500 hover:bg-pink-600 text-gray-800">
                 {updateMutation.isPending ? '저장 중...' : '변경사항 저장'}
               </Button>
             </DialogFooter>

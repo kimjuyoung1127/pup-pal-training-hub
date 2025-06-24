@@ -6,6 +6,7 @@ import { ArrowLeft, Play } from 'lucide-react';
 import TrainingProgressPage from './TrainingProgressPage';
 import AiTrainingRecommender from './AiTrainingRecommender';
 import { TrainingProgram } from '@/lib/trainingData';
+import { useDogProfile } from '@/hooks/useDogProfile'; // useDogProfile 훅 임포트
 
 const TrainingStartPage = ({
   onNavigate
@@ -14,6 +15,7 @@ const TrainingStartPage = ({
 }) => {
   const [selectedAiTraining, setSelectedAiTraining] = useState<TrainingProgram | null>(null);
   const [isTrainingActive, setIsTrainingActive] = useState(false);
+  const { dogInfo } = useDogProfile(); // useDogProfile 훅 사용
 
   const quickTips = ['간식을 미리 준비해주세요 🦴', '조용한 환경에서 훈련하세요 🤫', '긍정적인 보상을 잊지 마세요 ❤️', '강아지의 컨디션을 확인하세요 😊'];
   
@@ -32,8 +34,13 @@ const TrainingStartPage = ({
     setSelectedAiTraining(training);
   };
 
-  if (isTrainingActive && selectedAiTraining) {
-    return <TrainingProgressPage trainingProgram={selectedAiTraining} onNavigate={onNavigate} onExit={handleExitTraining} />;
+  if (isTrainingActive && selectedAiTraining && dogInfo?.id) {
+    return <TrainingProgressPage 
+      trainingProgram={selectedAiTraining} 
+      onNavigate={onNavigate} 
+      onExit={handleExitTraining} 
+      dogId={dogInfo.id} // dogId 전달
+    />;
   }
 
   return <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-100 pb-32">
