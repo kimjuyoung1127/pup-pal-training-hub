@@ -217,7 +217,11 @@ const AiTrainingRecommender = ({ onSelectTraining }: AiTrainingRecommenderProps)
                   <Card className={`bg-white/80 border-gray-200/80 flex flex-col h-full relative ${highlightedTitle === rec.title ? 'border-blue-500 ring-2 ring-blue-500' : ''}`}>
                     <CardHeader>
                       <CardTitle className="text-lg font-semibold text-gray-800 pr-20">{rec.title}</CardTitle>
-                      <Badge variant={rec.difficulty === '초급' ? 'default' : rec.difficulty === '중급' ? 'secondary' : 'destructive'} className="w-fit">{rec.difficulty}</Badge>
+                      <Badge 
+                        variant={rec.difficulty === '초급' ? 'default' : rec.difficulty === '중급' ? 'secondary' : 'destructive'} 
+                        className={`w-fit ${rec.difficulty === '중급' ? 'bg-teal-500 text-white' : ''}`}>
+                        {rec.difficulty}
+                      </Badge>
                     </CardHeader>
                     <CardContent className="flex-grow">
                       <p className="text-sm text-gray-600 mb-3">{rec.description}</p>
