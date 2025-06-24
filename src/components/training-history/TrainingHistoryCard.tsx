@@ -55,25 +55,16 @@ const TrainingHistoryCard = ({ item, onEdit, onDelete, onRetry }: TrainingHistor
                     <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full">AI 추천</span>
                   )}
                 </div>
-                {!item.isAiTraining && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0 text-gray-600 hover:bg-gray-100">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => onEdit(item)} className="text-blue-600 focus:text-blue-700 focus:bg-blue-50">
-                        <Edit className="mr-2 h-4 w-4" />
-                        <span>수정</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onDelete(item)} className="text-red-500 focus:text-red-600 focus:bg-red-50">
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        <span>삭제</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
+                <div className="flex items-center space-x-2">
+                  <Button variant="outline" size="sm" onClick={() => onEdit(item)} className="bg-pink-500 hover:bg-pink-600 text-white border-pink-500">
+                    <Edit className="mr-1 h-3 w-3" />
+                    수정
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => onDelete(item)} className="bg-pink-500 hover:bg-pink-600 text-white border-pink-500">
+                    <Trash2 className="mr-1 h-3 w-3" />
+                    삭제
+                  </Button>
+                </div>
               </div>
               <div className="flex items-center text-sm text-gray-500 mt-1 space-x-4">
                 <div className="flex items-center">

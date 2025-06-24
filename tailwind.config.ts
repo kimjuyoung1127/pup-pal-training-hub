@@ -86,6 +86,19 @@ export default {
 					900: '#99650D',
 				},
 
+				pink: {
+					50: '#FFF0F5',
+					100: '#FFE4EE',
+					200: '#FFCBE0',
+					300: '#FFAFD1',
+					400: '#FF94C3',
+					500: '#FF79B4',
+					600: '#E66DA3',
+					700: '#CC6092',
+					800: '#B35481',
+					900: '#994870',
+				},
+
 				
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
