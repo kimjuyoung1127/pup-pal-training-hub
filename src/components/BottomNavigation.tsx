@@ -43,7 +43,7 @@ const BottomNavigation = ({ currentPage, onNavigate }: BottomNavigationProps) =>
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-cream-200 px-4 py-2 z-50">
+    <div className="fixed bottom-0 left-0 right-0 bg-cream-50/95 backdrop-blur-sm border-t border-cream-200 px-4 py-2 z-50"> {/* 배경색 변경 */}
       <div className="flex justify-around items-center max-w-md mx-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -55,10 +55,10 @@ const BottomNavigation = ({ currentPage, onNavigate }: BottomNavigationProps) =>
               variant="ghost"
               size="sm"
               onClick={() => onNavigate(item.page)}
-              className={`flex flex-col items-center space-y-1 px-3 py-2 h-auto ${
+              className={`flex flex-col items-center space-y-1 px-3 py-2 h-auto rounded-md ${ // rounded-md 추가
                 isActive 
-                  ? 'text-sky-600 bg-sky-50' 
-                  : 'text-cream-600 hover:text-sky-600 hover:bg-sky-50'
+                  ? 'text-orange-600 bg-orange-100' // 활성 시 색상 변경
+                  : 'text-brown-700 hover:text-orange-600 hover:bg-orange-50' // 기본 및 호버 시 색상 변경
               }`}
             >
               <Icon className="w-5 h-5" />

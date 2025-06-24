@@ -5,87 +5,131 @@
 
 @layer base {
   :root {
-    /* 기본 색상 팔레트 정의 */
+    /* 새로운 색상 팔레트 정의 */
     --white: 255 255 255;
-    --cream-100: 255 246 238; /* 연한 크림색 */
-    --cream-200: 255 235 216;
-    --cream-300: 255 224 194;
-    --cream-400: 255 213 172;
-    --cream-700: 204 159 116;
-    --cream-800: 179 134 99;
-    --cream-900: 120 90 60; /* 더 진한 갈색 */
-    --orange-500: 255 169 77;
-    --gray-200: 229 231 235;
-    --gray-800: 55 65 81; /* 진한 회색 */
+    --cream-50: 255 254 250;
+    --cream-100: 255 248 240;
+    --cream-200: 255 240 224;
+    --cream-300: 255 232 208;
+    --cream-400: 255 223 192;
+    --cream-500: 255 214 176; /* 기본 크림 */
+    --cream-600: 230 192 158;
+    --cream-700: 204 170 140;
+    --cream-800: 179 150 123;
+    --cream-900: 153 129 106; /* 진한 크림 */
+
+    --orange-50: 255 249 242;
+    --orange-100: 255 242 229;
+    --orange-200: 255 229 204;
+    --orange-300: 255 216 178;
+    --orange-400: 255 202 153;
+    --orange-500: 255 188 127; /* 메인 오렌지 */
+    --orange-600: 230 169 114;
+    --orange-700: 204 150 101;
+    --orange-800: 179 131 89;
+    --orange-900: 153 112 76;
+
+    --pink-50: 255 245 247;
+    --pink-100: 255 234 240;
+    --pink-200: 255 217 229;
+    --pink-300: 255 200 218;
+    --pink-400: 255 183 207;
+    --pink-500: 255 166 196; /* 메인 핑크 */
+    --pink-600: 230 150 176;
+    --pink-700: 204 133 157;
+    --pink-800: 179 116 137;
+    --pink-900: 153 100 118;
+
+    --brown-50: 253 248 245;
+    --brown-100: 251 240 234;
+    --brown-200: 246 226 213;
+    --brown-300: 240 211 193;
+    --brown-400: 235 197 172;
+    --brown-500: 229 183 152; /* 메인 브라운 */
+    --brown-600: 206 165 137;
+    --brown-700: 183 146 122;
+    --brown-800: 160 128 106;
+    --brown-900: 138 110 91;
+
+    --beige-50: 252 251 248;
+    --beige-100: 249 246 240;
+    --beige-200: 243 237 226;
+    --beige-300: 237 229 211;
+    --beige-400: 232 221 197;
+    --beige-500: 226 212 182; /* 메인 베이지 */
+    --beige-600: 203 191 164;
+    --beige-700: 181 170 146;
+    --beige-800: 158 148 128;
+    --beige-900: 136 128 110;
     
-    /* 시스템 변수는 팔레트 참조 */
-    --background: 255 255 255; /* white */
-    --foreground: 120 90 60; /* cream-900 */
-    --card: 255 255 255; /* white */
-    --card-foreground: 120 90 60; /* cream-900 */
+    /* 시스템 변수는 새로운 팔레트 참조 */
+    --background: var(--cream-50); /* 아주 연한 크림 */
+    --foreground: var(--brown-900); /* 진한 브라운 */
+    --card: var(--white);
+    --card-foreground: var(--brown-900);
 
-    --popover: 255 246 238; /* cream-100 */
-    --popover-foreground: 120 90 60; /* cream-900 */
+    --popover: var(--cream-100); /* 연한 크림 */
+    --popover-foreground: var(--brown-900);
 
-    --primary: 255 169 77; /* orange-500 */
-    --primary-foreground: 255 255 255; /* white */
+    --primary: var(--orange-500); /* 메인 오렌지 */
+    --primary-foreground: var(--white);
 
-    --secondary: 255 235 216; /* cream-200 */
-    --secondary-foreground: 179 134 99; /* cream-800 */
+    --secondary: var(--cream-200); /* 부드러운 크림 */
+    --secondary-foreground: var(--brown-800); /* 중간 브라운 */
 
-    --muted: 255 235 216; /* cream-200 */
-    --muted-foreground: 204 159 116; /* cream-700 */
+    --muted: var(--beige-200); /* 부드러운 베이지 */
+    --muted-foreground: var(--brown-700); /* 약간 연한 브라운 */
 
-    --accent: 255 255 255; /* white */
-    --accent-foreground: 120 90 60; /* cream-900 */
+    --accent: var(--pink-400); /* 핑크 포인트 */
+    --accent-foreground: var(--white);
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 219 69 51; /* #D86A51 - Red 톤 다운 */
+    --destructive-foreground: var(--white);
 
-    --border: 255 224 194; /* cream-300 */
-    --input: 255 224 194; /* cream-300 */
-    --ring: 255 169 77; /* orange-500 */
+    --border: var(--cream-300);
+    --input: var(--cream-300);
+    --ring: var(--orange-500);
 
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 55 65 81; /* dark gray */
-    --foreground: 255 255 255; /* white */
+    --background: var(--brown-900); /* 진한 브라운 */
+    --foreground: var(--cream-100); /* 연한 크림 */
 
-    --card: 120 90 60; /* cream-900 */
-    --card-foreground: 255 255 255; /* white */
+    --card: var(--brown-800); /* 중간 브라운 */
+    --card-foreground: var(--cream-100);
 
-    --popover: 120 90 60; /* cream-900 */
-    --popover-foreground: 255 255 255; /* white */
+    --popover: var(--brown-800);
+    --popover-foreground: var(--cream-100);
 
-    --primary: 255 169 77; /* orange-500 */
-    --primary-foreground: 120 90 60; /* cream-900 */
+    --primary: var(--orange-400); /* 다크모드용 오렌지 (약간 밝게) */
+    --primary-foreground: var(--brown-900);
 
-    --secondary: 204 159 116; /* cream-700 */
-    --secondary-foreground: 255 255 255; /* white */
+    --secondary: var(--brown-700); /* 약간 연한 브라운 */
+    --secondary-foreground: var(--cream-200); /* 부드러운 크림 */
 
-    --muted: 204 159 116; /* cream-700 */
-    --muted-foreground: 255 224 194; /* cream-300 */
+    --muted: var(--brown-600);
+    --muted-foreground: var(--cream-300);
 
-    --accent: 204 159 116; /* cream-700 */
-    --accent-foreground: 255 255 255; /* white */
+    --accent: var(--pink-500); /* 다크모드용 핑크 (약간 밝게) */
+    --accent-foreground: var(--brown-900);
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 216 106 81; /* #D86A51 의 밝은 버전 */
+    --destructive-foreground: var(--cream-100);
 
-    --border: 204 159 116; /* cream-700 */
-    --input: 229 231 235; /* gray-200 */
-    --ring: 255 169 77; /* orange-500 */
+    --border: var(--brown-700);
+    --input: var(--brown-600);
+    --ring: var(--orange-400);
   }
 
   * {
-    border-color: var(--border);
+    border-color: hsl(var(--border));
   }
 
   body {
-    background-color: rgb(var(--background));
-    color: rgb(var(--foreground));
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-family: 'Pretendard', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
@@ -96,62 +140,90 @@
   }
   
   ::-webkit-scrollbar-track {
-    background-color: rgba(243, 244, 246, 0.5);
+    background-color: hsla(var(--cream-200) / 0.5); /* 반투명 크림 */
   }
   
   ::-webkit-scrollbar-thumb {
-    background-color: #d1d5db; /* gray-300 */
+    background-color: hsl(var(--cream-400)); /* 크림 */
     border-radius: 9999px; /* rounded-full */
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: rgb(251 146 60); /* bg-orange-400 */
+    background-color: hsl(var(--orange-400)); /* 오렌지 */
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    background-color: hsla(var(--brown-700) / 0.5); /* 반투명 브라운 */
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--brown-600)); /* 브라운 */
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--orange-500)); /* 오렌지 */
   }
 }
 
 @layer components {
   /* 공통 버튼 스타일 */
   .btn-primary {
-    background-color: rgb(255, 169, 77);
-    color: white;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
     font-weight: 500;
     padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
+    border-radius: var(--radius);
     transition: all 200ms;
     transform: scale(1);
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    box-shadow: 0 10px 15px -3px hsla(var(--primary) / 0.2), 0 4px 6px -4px hsla(var(--primary) / 0.1);
+  }
+  .btn-primary:hover {
+    filter: brightness(1.1);
+  }
+  .btn-primary:active {
+    transform: scale(0.98);
+    filter: brightness(0.9);
   }
 
+
   .btn-secondary {
-    background-color: rgb(var(--cream-200));
-    color: rgb(var(--cream-800));
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
     font-weight: 500;
     padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
+    border-radius: var(--radius);
     transition: all 200ms;
     transform: scale(1);
+  }
+  .btn-secondary:hover {
+    filter: brightness(1.05);
+  }
+   .btn-secondary:active {
+    transform: scale(0.98);
+    filter: brightness(0.95);
   }
 
   /* 카드 스타일 */
   .card-soft {
-    background-color: white;
-    border: 1px solid rgb(var(--cream-200));
-    border-radius: 1rem;
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: calc(var(--radius) + 4px); /* 좀 더 부드러운 느낌 */
+    box-shadow: 0 1px 2px 0 hsla(var(--foreground) / 0.05);
     transition: all 200ms;
   }
 
   /* 입력 필드 스타일 */
   .input-soft {
-    background-color: white;
-    border: 2px solid rgb(var(--cream-200));
-    border-radius: 0.75rem;
+    background-color: hsl(var(--background)); /* 배경색과 동일하게 하여 일체감 */
+    border: 2px solid hsl(var(--border));
+    border-radius: var(--radius);
     padding: 0.75rem 1rem;
     transition: all 200ms;
+    color: hsl(var(--foreground));
   }
 
   .input-soft:focus {
-    border-color: rgb(255, 169, 77);
-    box-shadow: 0 0 0 2px rgba(255, 169, 77, 0.2);
+    border-color: hsl(var(--ring));
+    box-shadow: 0 0 0 2px hsla(var(--ring) / 0.2);
   }
 }
