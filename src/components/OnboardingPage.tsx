@@ -1,28 +1,41 @@
 
 import React, { useState } from 'react';
-import { ChevronRight, Heart, BookOpen, TrendingUp } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
+  const { t, i18n } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
 
   const slides = [
     {
       icon: '🐕',
-      title: '안녕하세요!\n멍멍트레이너입니다',
-      description: '반려견과 함께하는 특별한 훈련 여정을\n시작해보세요',
+      title: t('onboarding.slide1.title'),
+      description: t('onboarding.slide1.description'),
       bgGradient: 'from-orange-200 to-cream-200'
     },
     {
       icon: '🤖',
-      title: 'AI 맞춤 훈련\n추천받기',
-      description: '우리 강아지만을 위한\n특별한 훈련 계획을 만들어드려요',
+      title: t('onboarding.slide2.title'),
+      description: t('onboarding.slide2.description'),
       bgGradient: 'from-cream-200 to-orange-200'
     },
     {
       icon: '📊',
-      title: '성장하는 모습을\n기록하기',
-      description: '매일매일 발전하는 우리 강아지의\n성장 과정을 함께 추적해요',
+      title: t('onboarding.slide3.title'),
+      description: t('onboarding.slide3.description'),
       bgGradient: 'from-orange-100 to-cream-300'
     }
   ];
@@ -43,12 +56,21 @@ const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-cream-50 to-orange-50">
-      {/* Header with logo */}
-      <div className="flex items-center justify-center pt-12 pb-8">
+      {/* Header with logo and language selector */}
+      <div className="flex items-center justify-between pt-12 pb-8 px-8">
         <div className="flex items-center space-x-2">
           <div className="text-2xl">🐾</div>
-          <h1 className="text-xl font-bold text-cream-800">멍멍트레이너</h1>
+          <h1 className="text-xl font-bold text-cream-800">{t('appName')}</h1>
         </div>
+        <Select onValueChange={changeLanguage} defaultValue={i18n.language}>
+          <SelectTrigger className="w-[120px]">
+            <SelectValue placeholder={t('onboarding.selectLanguage')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="en">English</SelectItem>
+            <SelectItem value="ko">한국어</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Slides container */}
@@ -84,7 +106,7 @@ const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
           disabled={currentSlide === 0}
           className="text-cream-600 hover:text-cream-800 disabled:opacity-30"
         >
-          이전
+          {t('onboarding.prevButton')}
         </Button>
 
         {/* Page indicators */}
@@ -106,7 +128,7 @@ const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
           onClick={nextSlide}
           className="btn-primary flex items-center space-x-2"
         >
-          <span>{currentSlide === slides.length - 1 ? '시작하기' : '다음'}</span>
+          <span>{currentSlide === slides.length - 1 ? t('onboarding.getStarted') : t('onboarding.nextButton')}</span>
           <ChevronRight className="w-4 h-4" />
         </Button>
       </div>

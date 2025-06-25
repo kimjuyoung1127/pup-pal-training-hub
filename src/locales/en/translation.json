@@ -1,0 +1,22 @@
+{
+  "appName": "Doggy Trainer",
+  "onboarding": {
+    "welcome": "Welcome to Our App!",
+    "selectLanguage": "Select Language",
+    "getStarted": "Get Started",
+    "nextButton": "Next",
+    "prevButton": "Previous",
+    "slide1": {
+      "title": "Hello!\nI'm Doggy Trainer",
+      "description": "Start a special training journey\nwith your furry friend."
+    },
+    "slide2": {
+      "title": "Get AI-Powered\nTraining Recommendations",
+      "description": "We create a special training plan\njust for your dog."
+    },
+    "slide3": {
+      "title": "Track Your Dog's\nGrowth",
+      "description": "Let's track your dog's progress\ntogether, day by day."
+    }
+  }
+}

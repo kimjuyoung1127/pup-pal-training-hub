@@ -1,0 +1,22 @@
+{
+  "appName": "멍멍 트레이너",
+  "onboarding": {
+    "welcome": "앱에 오신 것을 환영합니다!",
+    "selectLanguage": "언어 선택",
+    "getStarted": "시작하기",
+    "nextButton": "다음",
+    "prevButton": "이전",
+    "slide1": {
+      "title": "안녕하세요!\n멍멍트레이너입니다",
+      "description": "반려견과 함께하는 특별한 훈련 여정을\n시작해보세요"
+    },
+    "slide2": {
+      "title": "AI 맞춤 훈련\n추천받기",
+      "description": "우리 강아지만을 위한\n특별한 훈련 계획을 만들어드려요"
+    },
+    "slide3": {
+      "title": "성장하는 모습을\n기록하기",
+      "description": "매일매일 발전하는 우리 강아지의\n성장 과정을 함께 추적해요"
+    }
+  }
+}
