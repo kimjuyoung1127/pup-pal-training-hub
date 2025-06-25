@@ -27,7 +27,10 @@ const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
 
   const combinedHistory: TrainingLog[] = useMemo(() => {
     const historyLogs = (trainingHistory || []).map(log => ({ ...log }));
-    return historyLogs.sort((a, b) => new Date(b.session_date).getTime() - new Date(a.session_date).getTime());
+    // Sort and slice to get the latest 2 logs
+    return historyLogs
+      .sort((a, b) => new Date(b.session_date).getTime() - new Date(a.session_date).getTime())
+      .slice(0, 2);
   }, [trainingHistory]);
 
   const handleRetryTraining = (log: TrainingLog) => {

@@ -39,23 +39,10 @@ const AiTrainingRecommender = ({ onSelectTraining }: AiTrainingRecommenderProps)
 
   useEffect(() => {
     if (savedRecommendations && savedRecommendations.length > 0) {
-      // 여러 추천 기록의 recommendations 필드를 모두 합쳐서 하나의 배열로 만듭니다.
-      const allParsedRecommendations = savedRecommendations.flatMap(
-        (rec: AiRecommendation) => {
-          // First cast to unknown to avoid direct type assertion
-          const unknownRecs = rec.recommendations as unknown;
-          // Then safely cast to AiTrainingProgram[]
-          return unknownRecs as AiTrainingProgram[];
-        }
-      );
-
-      // title을 기준으로 중복 제거
-      const uniqueRecommendations = allParsedRecommendations.filter(
-        (rec, index, self) =>
-          index === self.findIndex((r) => r.title === rec.title)
-      );
-
-      setAiRecommendations(uniqueRecommendations);
+      // 가장 최근의 추천 기록만 사용합니다.
+      const latestRecommendation = savedRecommendations[0];
+      const parsedRecommendations = latestRecommendation.recommendations as unknown as AiTrainingProgram[];
+      setAiRecommendations(parsedRecommendations || []);
     } else {
       setAiRecommendations([]);
     }
@@ -162,8 +149,8 @@ const AiTrainingRecommender = ({ onSelectTraining }: AiTrainingRecommenderProps)
     },
     onSuccess: (data) => {
       toast.success('AI 훈련 추천을 생성했습니다!');
-      // 새로 생성된 추천(data)을 기존 목록(aiRecommendations)의 맨 앞에 추가합니다.
-      setAiRecommendations(prev => [...data, ...prev]);
+      // 새로 생성된 추천으로 상태를 완전히 교체합니다.
+      setAiRecommendations(data);
       if (dogInfo?.id) {
         saveRecommendationsMutation.mutate({ dogId: dogInfo.id, recommendations: data });
       }
