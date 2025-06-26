@@ -140,14 +140,14 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
     >
       {/* Welcome card */}
       <motion.div variants={itemVariants}>
-        <Card className="card-soft p-6 bg-orange-100">
+        <Card className="card-soft p-6 bg-sky-100">
           <div className="flex items-center space-x-4">
             <div className="text-4xl">👋</div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold text-cream-800 mb-1">
+              <h2 className="text-xl font-bold text-sky-900 mb-1">
                 {randomWelcome}
               </h2>
-              <p className="text-cream-600">
+              <p className="text-sky-700">
                 {today.toLocaleDateString('ko-KR')} {weatherIcon}
               </p>
             </div>
@@ -157,12 +157,12 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
 
       {/* Training tip */}
       <motion.div variants={itemVariants}>
-        <Card className="card-soft p-6 bg-gradient-to-r from-orange-100 to-cream-200">
+        <Card className="card-soft p-6 bg-gradient-to-r from-sky-100 to-blue-200">
           <div className="flex items-start space-x-3">
             <div className="text-2xl">💡</div>
             <div>
-              <h3 className="font-bold text-cream-800 mb-2">오늘의 팁</h3>
-              <p className="text-sm text-cream-700 leading-relaxed">
+              <h3 className="font-bold text-sky-900 mb-2">오늘의 팁</h3>
+              <p className="text-sm text-sky-800 leading-relaxed">
                 {randomTip}
               </p>
             </div>
@@ -172,21 +172,21 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
 
       {/* Recommended video filter */}
       <motion.div variants={itemVariants} className="space-y-4">
-        <Card className="card-soft p-6 bg-blue-50">
-          <h3 className="font-bold text-black mb-4">추천 영상 필터</h3>
-          <div className="flex flex-col sm:flex-row gap-4 text-black">
+        <Card className="card-soft p-6 bg-sky-50">
+          <h3 className="font-bold text-sky-900 mb-4">추천 영상 필터</h3>
+          <div className="flex flex-col sm:flex-row gap-4 text-sky-900">
             <Select value={originFilter} onValueChange={setOriginFilter}>
-              <SelectTrigger className="bg-white">
+              <SelectTrigger className="bg-white text-sky-900 border-sky-300">
                 <SelectValue placeholder="국가/언어" />
               </SelectTrigger>
-              <SelectContent className="bg-white text-black">
+              <SelectContent className="bg-white text-sky-900">
                 <SelectItem value="all">모든 국가</SelectItem>
                 <SelectItem value="korean">한국어</SelectItem>
                 <SelectItem value="english">영어</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <Button onClick={handleSearchVideos} className="w-full btn-primary mt-4">
+          <Button onClick={handleSearchVideos} className="w-full btn-primary mt-4 bg-sky-600 hover:bg-sky-700 text-white">
             훈련 영상 찾아보기
           </Button>
         </Card>
@@ -195,7 +195,7 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
       {/* Recommended video List */}
       {showVideos && filteredVideos.map((video) => (
         <motion.div variants={itemVariants} key={video.youtube_video_id}>
-          <Card className="card-soft overflow-hidden bg-orange-50">
+          <Card className="card-soft overflow-hidden bg-sky-50">
             <div className="w-full aspect-video">
               <iframe
                 className="w-full h-full"
@@ -207,8 +207,8 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
               ></iframe>
             </div>
             <CardContent className="p-4">
-              <h3 className="font-bold text-brown-800 mb-2 truncate">{video.title}</h3>
-              <p className="text-sm text-brown-600 line-clamp-2">
+              <h3 className="font-bold text-sky-900 mb-2 truncate">{video.title}</h3>
+              <p className="text-sm text-sky-700 line-clamp-2">
                 {video.description}
               </p>
             </CardContent>
@@ -219,12 +219,12 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
       {/* Dog reminder */}
       {reminder && (
         <motion.div variants={itemVariants}>
-          <Card className="card-soft p-6 bg-orange-100">
+          <Card className="card-soft p-6 bg-blue-100">
             <div className="flex items-start space-x-3">
               <div className="text-2xl">🐶</div>
               <div>
-                <h3 className="font-bold text-cream-800 mb-2">{dogName} 리마인드</h3>
-                <p className="text-sm text-cream-700 leading-relaxed">{reminder}</p>
+                <h3 className="font-bold text-sky-900 mb-2">{dogName} 리마인드</h3>
+                <p className="text-sm text-sky-800 leading-relaxed">{reminder}</p>
               </div>
             </div>
           </Card>
@@ -234,17 +234,17 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
       {/* Daily mission */}
       {mission && (
         <motion.div variants={itemVariants}>
-          <Card className="card-soft p-6 bg-orange-100">
+          <Card className="card-soft p-6 bg-blue-100">
             <div className="flex items-start space-x-3">
               <div className="text-2xl">🎯</div>
               <div className="flex-1">
-                <h3 className="font-bold text-cream-800 mb-2">오늘의 미션</h3>
-                <p className="text-sm text-cream-700 leading-relaxed">{mission.mission}</p>
+                <h3 className="font-bold text-sky-900 mb-2">오늘의 미션</h3>
+                <p className="text-sm text-sky-800 leading-relaxed">{mission.mission}</p>
               </div>
               <Checkbox
                 checked={missionCompleted}
                 onCheckedChange={toggleMissionCompleted}
-                className="w-6 h-6"
+                className="w-6 h-6 border-sky-400 data-[state=checked]:bg-sky-600"
                 id="daily-mission"
               />
             </div>

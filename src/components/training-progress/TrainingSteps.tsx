@@ -39,21 +39,21 @@ const TrainingSteps = ({
         <Carousel setApi={setApi} className="w-full max-w-md">
           <CarouselContent>
             {steps.map((step, index) => <CarouselItem key={index}>
-                <Card className="card-soft">
-                  <CardContent className="flex flex-col items-center justify-center p-6 text-center aspect-square bg-sky-200">
-                    <h3 className="text-xl font-bold text-gray-800 mb-4">{step.title}</h3>
-                    <p className="text-lg text-cream-800 mb-6">{step.instruction}</p>
-                    {step.tip && <p className="text-sm text-orange-600 bg-orange-50 p-2 rounded-lg">💡 {step.tip}</p>}
+                <Card className="border-sky-200 bg-sky-50">
+                  <CardContent className="flex flex-col items-center justify-center p-6 text-center aspect-square">
+                    <h3 className="text-2xl font-bold text-sky-800 mb-4">{step.title}</h3>
+                    <p className="text-lg text-gray-700 mb-6">{step.instruction}</p>
+                    {step.tip && <p className="text-sm text-sky-700 bg-sky-100 p-3 rounded-lg">💡 {step.tip}</p>}
                   </CardContent>
                 </Card>
               </CarouselItem>)}
           </CarouselContent>
-          <CarouselPrevious className="left-[-50px]" />
-          <CarouselNext className="right-[-50px]" />
+          <CarouselPrevious className="left-[-50px] bg-sky-100 hover:bg-sky-200 text-sky-700 border-sky-200" />
+          <CarouselNext className="right-[-50px] bg-sky-100 hover:bg-sky-200 text-sky-700 border-sky-200" />
         </Carousel>
       </div>
-      <Progress value={(currentStep + 1) / steps.length * 100} className="w-full my-4" />
-      {currentStep === steps.length - 1 && <Button onClick={onFinishSteps} size="lg" className="btn-primary w-full py-4 mt-4">
+      <Progress value={(currentStep + 1) / steps.length * 100} className="w-full my-4 [&>div]:bg-sky-500" />
+      {currentStep === steps.length - 1 && <Button onClick={onFinishSteps} size="lg" className="bg-sky-600 hover:bg-sky-700 text-white w-full py-4 mt-4">
           <Check className="mr-2" />
           {isReplay ? '재생 완료' : '훈련 완료'}
         </Button>}

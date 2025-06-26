@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Award } from 'lucide-react';
+import { TrainingLog } from '@/hooks/useTrainingHistory';
 
 interface Badge {
   id: number;
@@ -13,10 +14,11 @@ interface Badge {
 }
 
 interface TrainingSummaryProps {
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, params?: any) => void;
   onExit: () => void;
   newlyAwardedBadges?: Badge[];
   isReplay?: boolean;
+  trainingLog?: TrainingLog | null;
 }
 
 const completionMessages = [
@@ -32,7 +34,7 @@ const completionMessages = [
   "참 잘했어요! 다음 훈련도 기대되네요.",
 ];
 
-const TrainingSummary = ({ onNavigate, onExit, newlyAwardedBadges = [], isReplay = false }: TrainingSummaryProps) => {
+const TrainingSummary = ({ onNavigate, onExit, newlyAwardedBadges = [], isReplay = false, trainingLog = null }: TrainingSummaryProps) => {
   const [completionMessage, setCompletionMessage] = useState('');
 
   useEffect(() => {
@@ -44,16 +46,16 @@ const TrainingSummary = ({ onNavigate, onExit, newlyAwardedBadges = [], isReplay
 
   return (
     <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="p-6 text-center flex flex-col items-center justify-center h-full">
-      <Award className="w-20 h-20 text-yellow-500 mb-4 animate-bounce-gentle" />
-      <h1 className="text-3xl font-bold text-gray-800">훈련 완료!</h1>
-      <p className="text-cream-700 mt-2 mb-6">
+      <Award className="w-20 h-20 text-sky-500 mb-4 animate-bounce-gentle" />
+      <h1 className="text-3xl font-bold text-sky-800">훈련 완료!</h1>
+      <p className="text-gray-600 mt-2 mb-6">
         {newlyAwardedBadges.length === 0 && completionMessage}
       </p>
       
-      <Card className="card-soft p-4 mb-8 w-full">
+      <Card className="bg-sky-50 border-sky-200 p-4 mb-8 w-full">
         {newlyAwardedBadges.length > 0 ? (
           newlyAwardedBadges.map(badge => (
-            <p key={badge.id} className="font-bold text-lg text-orange-600">🏅 '{badge.name}' 뱃지를 획득했어요!</p>
+            <p key={badge.id} className="font-bold text-lg text-sky-700">🏅 '{badge.name}' 뱃지를 획득했어요!</p>
           ))
         ) : (
           <p className="font-bold text-lg text-gray-600">새로 획득한 뱃지가 없어요.</p>
@@ -62,15 +64,16 @@ const TrainingSummary = ({ onNavigate, onExit, newlyAwardedBadges = [], isReplay
 
       <div className="space-y-4 w-full">
         {isReplay ? (
-          <Button onClick={onExit} size="lg" className="w-full btn-primary">
+          <Button onClick={onExit} size="lg" className="w-full bg-sky-600 hover:bg-sky-700 text-white">
             기록 목록으로 돌아가기
           </Button>
         ) : (
           <>
-           
-            <Button onClick={onExit} size="lg" variant="ghost" className="w-full text-cream-600">
-              완료
-            </Button>
+            <div className="space-y-4 w-full">
+              <Button onClick={onExit} size="lg" className="w-full bg-sky-600 hover:bg-sky-700 text-white">
+                돌아가기
+              </Button>
+            </div>
           </>
         )}
       </div>

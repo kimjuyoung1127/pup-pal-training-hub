@@ -99,8 +99,8 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
         <AccordionItem value={category.key}>
             <AccordionTrigger>
                 <div className="flex justify-between items-center w-full pr-4">
-                    <span>{category.icon} {category.title}</span>
-                    <span className="text-sm text-orange-500 font-semibold">완성도 {completionPercent}%</span>
+                    <span className="text-sky-800 font-semibold">{category.icon} {category.title}</span>
+                    <span className="text-sm text-gray-800 font-bold">완성도 {completionPercent}%</span>
                 </div>
             </AccordionTrigger>
             <AccordionContent>
@@ -113,14 +113,14 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
                                 name={mission.key as keyof FormValues & string}
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>{mission.question}</FormLabel>
+                                        <FormLabel className="text-gray-800">{mission.question}</FormLabel>
                                         <FormControl>
                                             {mission.type === 'boolean' ? (
                                                 <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-2">
                                                     {['예', '아니오'].map(option => (
                                                         <FormItem key={option} className="flex items-center space-x-2 space-y-0">
                                                             <FormControl><RadioGroupItem value={option} className="bg-white" /></FormControl>
-                                                            <FormLabel className="font-normal">{option}</FormLabel>
+                                                            <FormLabel className="font-normal text-gray-700">{option}</FormLabel>
                                                         </FormItem>
                                                     ))}
                                                 </RadioGroup>
@@ -134,7 +134,7 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
                                                     {mission.options.map(option => (
                                                         <FormItem key={option} className="flex items-center space-x-2 space-y-0">
                                                             <FormControl><RadioGroupItem value={option} className="bg-white" /></FormControl>
-                                                            <FormLabel className="font-normal">{option}</FormLabel>
+                                                            <FormLabel className="font-normal text-gray-700">{option}</FormLabel>
                                                         </FormItem>
                                                     ))}
                                                 </RadioGroup>

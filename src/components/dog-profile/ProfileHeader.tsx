@@ -38,7 +38,7 @@ const getGenderEmoji = (gender: string) => {
 
 const ProfileHeader = ({ dogInfo, onImageUpload, onImageDelete }: ProfileHeaderProps) => {
   return (
-    <Card className="card-soft overflow-hidden bg-gradient-to-r from-green-50 to-emerald-50">
+    <Card className="card-soft overflow-hidden bg-gradient-to-r from-sky-50 to-blue-50">
       <CardContent className="p-6">
         <div className="flex items-center space-x-4">
           <div className="relative">
@@ -46,14 +46,14 @@ const ProfileHeader = ({ dogInfo, onImageUpload, onImageDelete }: ProfileHeaderP
               {dogInfo.image_url ? (
                 <AvatarImage src={dogInfo.image_url} alt={dogInfo.name} className="object-cover" />
               ) : (
-                <AvatarFallback className="bg-green-200 text-2xl">
+                <AvatarFallback className="bg-sky-200 text-2xl">
                   {getGenderEmoji(dogInfo.gender)}
                 </AvatarFallback>
               )}
             </Avatar>
             <div className="absolute -bottom-1 -right-1 flex items-center">
               <label htmlFor="dog-image-upload" className="bg-white rounded-full p-1.5 cursor-pointer shadow-md hover:bg-gray-100 transition-colors">
-                <Edit className="w-4 h-4 text-cream-800" />
+                <Edit className="w-4 h-4 text-sky-800" />
                 <input id="dog-image-upload" type="file" className="hidden" accept="image/*" onChange={onImageUpload} />
               </label>
               {dogInfo.image_url && (
@@ -64,17 +64,17 @@ const ProfileHeader = ({ dogInfo, onImageUpload, onImageDelete }: ProfileHeaderP
             </div>
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-cream-800 mb-1 font-pretendard">
+            <h2 className="text-2xl font-bold text-sky-900 mb-1 font-pretendard">
               {dogInfo.name}
             </h2>
-            <p className="text-cream-700 mb-2 font-pretendard">
+            <p className="text-sky-800 mb-2 font-pretendard">
               {dogInfo.breed} • {dogInfo.gender === 'male' ? '남아' : '여아'}
             </p>
             <div className="flex space-x-2">
-              <Badge variant="secondary" className="bg-cream-200 text-cream-800">
+              <Badge variant="secondary" className="bg-sky-100 text-sky-900">
                 {getAgeLabel(dogInfo.age)}
               </Badge>
-              <Badge variant="secondary" className="bg-cream-200 text-cream-800">
+              <Badge variant="secondary" className="bg-sky-100 text-sky-900">
                 {getWeightLabel(dogInfo.weight)}
               </Badge>
             </div>

@@ -137,7 +137,7 @@ const Index = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-2xl font-bold text-cream-800">로딩 중...</div>
+        <div className="text-2xl font-bold text-sky-800">로딩 중...</div>
       </div>
     );
   }

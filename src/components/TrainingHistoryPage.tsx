@@ -17,7 +17,7 @@ interface TrainingHistoryPageProps {
   onNavigate: (page: string, params?: any) => void;
 }
 
-const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
+const TrainingHistoryPage: React.FC<TrainingHistoryPageProps> = ({ onNavigate }) => {
   const { dogInfo, isLoading: isLoadingDogProfile } = useDogProfile();
   const { data: trainingHistory, isLoading: isLoadingHistory, isError: isErrorHistory } = useTrainingHistory(dogInfo?.id);
   const { data: badges, isLoading: isLoadingBadges } = useDogBadges(dogInfo?.id);
@@ -34,6 +34,7 @@ const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
   }, [trainingHistory]);
 
   const handleRetryTraining = (log: TrainingLog) => {
+    console.log("Retrying training with log:", log);
     onNavigate('training-replay', { trainingLog: log });
   };
 
@@ -47,7 +48,7 @@ const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
     }
 
     if (!combinedHistory || combinedHistory.length === 0) {
-      return <EmptyTrainingHistory onNavigate={() => onNavigate('dashboard')} />;
+      return <EmptyTrainingHistory onNavigate={() => onNavigate('/')} />;
     }
 
     return (
@@ -72,7 +73,7 @@ const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
     >
       <div className="bg-white/80 backdrop-blur-sm border-b border-cream-200 px-4 py-4 sticky top-0 z-10">
         <div className="flex items-center">
-          <Button variant="ghost" size="icon" onClick={() => onNavigate('dashboard')}>
+          <Button variant="ghost" size="icon" onClick={() => onNavigate('/')}>
             <ArrowLeft className="h-6 w-6 text-gray-700" />
           </Button>
           <h1 className="text-lg font-bold text-cream-800 ml-2 font-pretendard">훈련 기록</h1>
@@ -97,7 +98,7 @@ const TrainingHistoryPage = ({ onNavigate }: TrainingHistoryPageProps) => {
             dogId={dogInfo.id}
             onOpenChange={(open) => !open && setLogToEdit(null)}
           />
-        </>
+        </> 
       )}
     </motion.div>
   );

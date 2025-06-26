@@ -33,13 +33,13 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
   } = useDogProfile();
 
   const Header = () => (
-    <div className="bg-white/80 backdrop-blur-sm border-b border-cream-200 px-6 py-4">
+    <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="text-xl">🐾</div>
           <div>
-            <h1 className="text-lg font-bold text-cream-800 font-pretendard">우리 아이 프로필</h1>
-            <p className="text-sm text-cream-600 font-pretendard">소중한 가족을 소개합니다</p>
+            <h1 className="text-lg font-bold text-sky-800 font-pretendard">우리 아이 프로필</h1>
+            <p className="text-sm text-sky-600 font-pretendard">소중한 가족을 소개합니다</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -47,7 +47,7 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
             variant="outline"
             size="sm"
             onClick={() => onNavigate('dog-info')}
-            className="text-cream-600 hover:text-cream-800 border-cream-300"
+            className="bg-white text-sky-600 hover:bg-sky-100 hover:text-sky-800 border-sky-300"
           >
             <Edit className="w-4 h-4 mr-1" />
             편집
@@ -74,8 +74,8 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
       <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6 text-center">
         <Header />
         <div className="flex-grow flex flex-col items-center justify-center">
-          <h2 className="text-2xl font-bold text-cream-800 mb-2 font-pretendard">프로필이 없어요!</h2>
-          <p className="text-cream-700 mb-6 font-pretendard">먼저 우리 아이 정보를 등록해주세요.</p>
+          <h2 className="text-2xl font-bold text-sky-800 mb-2 font-pretendard">프로필이 없어요!</h2>
+          <p className="text-sky-700 mb-6 font-pretendard">먼저 우리 아이 정보를 등록해주세요.</p>
           <Button onClick={() => onNavigate('dog-info')}>
               강아지 정보 등록하기
           </Button>

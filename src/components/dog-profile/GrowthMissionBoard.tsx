@@ -28,19 +28,19 @@ const GrowthMissionBoard = ({ extendedProfile, dogId, onUpdate }: GrowthMissionB
 
     return (
         <>
-            <Card className="card-soft bg-green-50">
+            <Card className="card-soft bg-sky-50">
                 <CardHeader>
-                    <CardTitle className="text-cream-800 font-pretendard">🌱 강아지 성장 미션 보드</CardTitle>
-                    <p className="text-sm text-cream-600 font-pretendard">"프로필을 완성하고 더 정확한 훈련법을 추천받으세요!"</p>
-                    <div className="w-full bg-cream-200 rounded-full h-2.5 mt-2">
+                    <CardTitle className="text-sky-900 font-pretendard">🌱 강아지 성장 미션 보드</CardTitle>
+                    <p className="text-sm text-sky-700 font-pretendard">"프로필을 완성하고 더 정확한 훈련법을 추천받으세요!"</p>
+                    <div className="w-full bg-sky-200 rounded-full h-2.5 mt-2">
                         <motion.div
-                            className="bg-green-500 h-2.5 rounded-full"
+                            className="bg-sky-500 h-2.5 rounded-full"
                             initial={{ width: 0 }}
                             animate={{ width: `${completionPercent}%` }}
                             transition={{ duration: 0.8 }}
                         />
                     </div>
-                    <p className="text-right text-sm font-semibold text-green-600 font-pretendard mt-1">프로필 완성도 {completionPercent}%</p>
+                    <p className="text-right text-sm font-semibold text-sky-800 font-pretendard mt-1">프로필 완성도 {completionPercent}%</p>
                 </CardHeader>
                 <CardContent>
                     <Accordion type="single" collapsible className="w-full">

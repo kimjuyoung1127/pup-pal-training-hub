@@ -177,16 +177,16 @@ const AiTrainingRecommender = ({ onSelectTraining }: AiTrainingRecommenderProps)
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
     >
-      <Card className="card-soft bg-gradient-to-br from-orange-50 to-amber-100 border-orange-200/50">
+      <Card className="bg-gradient-to-br from-sky-50 to-sky-100 border-sky-200/50">
         <CardHeader>
-          <CardTitle className="flex items-center font-bold text-gray-800"><Wand2 className="mr-2 text-orange-500" />AI 맞춤 훈련 추천</CardTitle>
-          <CardDescription className="text-gray-600">우리 강아지의 프로필을 기반으로 AI가 맞춤 훈련을 추천해드려요.</CardDescription>
+          <CardTitle className="flex items-center font-bold text-sky-900 text-xl"><Wand2 className="mr-2 text-sky-500" />AI 맞춤 훈련 추천</CardTitle>
+          <CardDescription className="text-sky-700">우리 강아지의 프로필을 기반으로 AI가 맞춤 훈련을 추천해드려요.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {(recommendTrainingMutation.isPending || isLoadingRecommendations) && (
             <div className="flex justify-center items-center p-4">
-              <Loader2 className="animate-spin w-8 h-8 text-orange-500" />
-              <p className="ml-2 text-gray-600">AI가 열심히 훈련을 추천하고 있어요...</p>
+              <Loader2 className="animate-spin w-8 h-8 text-sky-500" />
+              <p className="ml-2 text-sky-700">AI가 열심히 훈련을 추천하고 있어요...</p>
             </div>
           )}
 

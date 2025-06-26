@@ -10,10 +10,10 @@ interface HealthStatusCardProps {
 
 const HealthStatusCard = ({ healthStatusNames }: HealthStatusCardProps) => {
   return (
-    <Card className="card-soft bg-green-50">
+    <Card className="card-soft bg-sky-50">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center space-x-2 text-cream-800 font-pretendard">
-          <Heart className="w-5 h-5 text-green-500" />
+        <CardTitle className="flex items-center space-x-2 text-sky-800 font-pretendard">
+          <Heart className="w-5 h-5 text-sky-500" />
           <span>건강 상태</span>
         </CardTitle>
       </CardHeader>
@@ -24,13 +24,13 @@ const HealthStatusCard = ({ healthStatusNames }: HealthStatusCardProps) => {
               <Badge 
                 key={index} 
                 variant="outline" 
-                className="bg-green-50 border-green-200 text-green-700"
+                className="bg-sky-50 border-sky-200 text-sky-800"
               >
                 {status}
               </Badge>
             ))
           ) : (
-            <p className="text-sm text-cream-600 font-pretendard">등록된 건강 정보가 없습니다.</p>
+            <p className="text-sm text-gray-700 font-pretendard">등록된 건강 정보가 없습니다.</p>
           )}
         </div>
       </CardContent>

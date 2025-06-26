@@ -27,6 +27,7 @@ const DeleteProfileDialog = ({ isDeleting, onDelete }: DeleteProfileDialogProps)
           variant="destructive"
           size="sm"
           disabled={isDeleting}
+          className="bg-sky-700 hover:bg-sky-800"
         >
           <Trash2 className="w-4 h-4 mr-1" />
           삭제
@@ -40,8 +41,8 @@ const DeleteProfileDialog = ({ isDeleting, onDelete }: DeleteProfileDialogProps)
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>취소</AlertDialogCancel>
-          <AlertDialogAction onClick={onDelete} disabled={isDeleting} className="bg-red-600 hover:bg-red-700">
+          <AlertDialogCancel disabled={isDeleting} className="text-sky-900">취소</AlertDialogCancel>
+          <AlertDialogAction onClick={onDelete} disabled={isDeleting} className="bg-sky-700 hover:bg-sky-800 text-white">
             {isDeleting ? '삭제 중...' : '삭제'}
           </AlertDialogAction>
         </AlertDialogFooter>

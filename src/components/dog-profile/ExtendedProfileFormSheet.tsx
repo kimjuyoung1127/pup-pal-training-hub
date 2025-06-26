@@ -81,6 +81,7 @@ const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedPro
         onSuccess: () => {
             toast.success('🎉 멋져요! 딩딩이의 정보를 업데이트했어요.', {
                 description: '다음 추천 훈련이 더 정확해질 거예요!',
+                className: 'bg-sky-50 text-sky-900 border-sky-200'
             });
             onUpdate();
             onClose();
@@ -127,8 +128,10 @@ const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedPro
                             >
                                 {items.map(item => (
                                     <FormItem key={item} className="flex items-center space-x-3 space-y-0">
-                                        <FormControl><RadioGroupItem value={item} /></FormControl>
-                                        <FormLabel className="font-normal">{item}</FormLabel>
+                                        <FormControl>
+                                            <RadioGroupItem value={item} className="text-sky-700 border-sky-600" />
+                                        </FormControl>
+                                        <FormLabel className="font-normal text-sky-900">{item}</FormLabel>
                                     </FormItem>
                                 ))}
                             </RadioGroup>

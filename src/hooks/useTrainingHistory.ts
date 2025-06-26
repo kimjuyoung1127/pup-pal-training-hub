@@ -101,7 +101,9 @@ export const useTrainingHistory = (dogId: string | undefined) => {
             return data;
         },
         onSuccess: (newLog: any) => {
-            toast.success('훈련 기록이 저장되었습니다.');
+            toast.success('훈련이 완료되었습니다! 기록 페이지에서 확인해보세요.', {
+                duration: 5000,
+            });
             
             if (newLog && newLog.dog_id) {
                 checkAndAwardBadges(newLog.dog_id).finally(() => {

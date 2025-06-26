@@ -5,7 +5,7 @@ import TrainingIntro from './training-progress/TrainingIntro';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { trainingPrograms, TrainingProgram } from '@/lib/trainingData';
-import { useTrainingHistory, TrainingLogCreate } from '@/hooks/useTrainingHistory';
+import { useTrainingHistory, TrainingLogCreate, TrainingLog as TrainingLogType } from '@/hooks/useTrainingHistory';
 import { useDogProfile } from '@/hooks/useDogProfile';
 import TrainingSteps from './training-progress/TrainingSteps';
 import TrainingLog from './training-progress/TrainingLog';
@@ -13,7 +13,7 @@ import TrainingSummary from './training-progress/TrainingSummary';
 
 interface TrainingProgressPageProps {
   trainingProgram: TrainingProgram & { isAiTraining?: boolean };
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, params?: any) => void;
   onExit: () => void;
   dogId: string; // dogId prop 추가
 }
@@ -21,6 +21,7 @@ interface TrainingProgressPageProps {
 const TrainingProgressPage = ({ onNavigate, onExit, trainingProgram, dogId }: TrainingProgressPageProps) => {
   const [flowStep, setFlowStep] = useState(1); // 1: intro, 2: steps, 3: log, 4: summary
   const [startTime, setStartTime] = useState<number | null>(null);
+  const [completedLog, setCompletedLog] = useState<TrainingLogType | null>(null);
   const { addMutation } = useTrainingHistory(dogId); // dogId를 useTrainingHistory에 전달
   
   const program = trainingProgram;
@@ -59,7 +60,8 @@ const TrainingProgressPage = ({ onNavigate, onExit, trainingProgram, dogId }: Tr
     };
 
     addMutation.mutate(newLog, {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        setCompletedLog(data);
         setFlowStep(4);
       }
     });
@@ -70,7 +72,7 @@ const TrainingProgressPage = ({ onNavigate, onExit, trainingProgram, dogId }: Tr
       case 1: return <TrainingIntro program={program} onStart={handleStart} />;
       case 2: return <TrainingSteps steps={program.steps} onFinishSteps={handleFinishSteps} />;
       case 3: return <TrainingLog onSave={handleSave} isSaving={addMutation.isPending} />;
-      case 4: return <TrainingSummary onNavigate={onNavigate} onExit={onExit} />;
+      case 4: return <TrainingSummary onNavigate={onNavigate} onExit={onExit} trainingLog={completedLog} />;
       default: return <TrainingIntro program={program} onStart={handleStart} />;
     }
   };
