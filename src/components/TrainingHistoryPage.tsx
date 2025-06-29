@@ -48,7 +48,7 @@ const TrainingHistoryPage: React.FC<TrainingHistoryPageProps> = ({ onNavigate })
     }
 
     if (!combinedHistory || combinedHistory.length === 0) {
-      return <EmptyTrainingHistory onNavigate={() => onNavigate('/')} />;
+      return <EmptyTrainingHistory onNavigate={() => onNavigate('training')} />;
     }
 
     return (

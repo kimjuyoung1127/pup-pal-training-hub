@@ -64,9 +64,9 @@ const SettingsActions = () => {
 
 // 헤더 컴포넌트 추가
 const Header = () => (
-  <div className="bg-white/80 backdrop-blur-sm border-b border-cream-200 px-6 py-4 sticky top-0 z-10">
+  <div className="bg-gray-50/80 backdrop-blur-sm border-b border-gray-200 px-6 py-4 sticky top-0 z-10">
     <div className="flex items-center justify-between">
-      <h1 className="text-lg font-bold text-cream-800 font-pretendard">설정</h1>
+      <h1 className="text-lg font-bold text-gray-800 font-pretendard">설정</h1>
     </div>
   </div>
 );
@@ -91,7 +91,7 @@ const SettingsPage = () => {
   }
 
   return (
-    <div className="bg-white text-foreground min-h-screen">
+    <div className="bg-gray-50 text-gray-900 min-h-screen">
       <Header />
       <div className="p-6 space-y-6">
         <UserProfile user={user} />

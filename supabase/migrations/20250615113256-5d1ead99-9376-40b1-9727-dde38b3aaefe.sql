@@ -11,7 +11,6 @@ ALTER TABLE public.dog_extended_profile
   ADD COLUMN IF NOT EXISTS past_experience TEXT,
   ADD COLUMN IF NOT EXISTS sensitive_items TEXT[],
   ADD COLUMN IF NOT EXISTS family_kids BOOLEAN,
-  ADD COLUMN IF NOT EXISTS family_elderly BOOLEAN,
   ADD COLUMN IF NOT EXISTS preferred_play TEXT[];
 
 COMMENT ON COLUMN public.dog_extended_profile.known_behaviors IS '이미 잘하는 행동';
@@ -25,5 +24,4 @@ COMMENT ON COLUMN public.dog_extended_profile.activity_level IS '하루 활동�
 COMMENT ON COLUMN public.dog_extended_profile.past_experience IS '과거 경험 (입양/유기 등)';
 COMMENT ON COLUMN public.dog_extended_profile.sensitive_items IS '민감한 자극 요소';
 COMMENT ON COLUMN public.dog_extended_profile.family_kids IS '가족 구성에 아이가 있는지 여부';
-COMMENT ON COLUMN public.dog_extended_profile.family_elderly IS '가족 구성에 노인이 있는지 여부';
 COMMENT ON COLUMN public.dog_extended_profile.preferred_play IS '좋아하는 활동';

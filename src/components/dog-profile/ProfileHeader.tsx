@@ -13,14 +13,30 @@ interface ProfileHeaderProps {
   onImageDelete: () => void;
 }
 
-const getAgeLabel = (age: string) => {
-  switch (age) {
-    case 'puppy': return '강아지 (6개월 미만)';
-    case 'young': return '어린 개 (6개월 ~ 2년)';
-    case 'adult': return '성견 (2년 ~ 7년)';
-    case 'senior': return '노견 (7년 이상)';
-    default: return age;
+const formatAge = (age: { years: number | null; months: number | null; }) => {
+  if (typeof age !== 'object' || age === null) {
+    // Handle old string-based age for backward compatibility if needed
+    if (typeof age === 'string') {
+        switch (age) {
+            case 'puppy': return '강아지 (6개월 미만)';
+            case 'young': return '어린 개 (6개월 ~ 2년)';
+            case 'adult': return '성견 (2년 ~ 7년)';
+            case 'senior': return '노견 (7년 이상)';
+            default: return age;
+        }
+    }
+    return '나이 정보 없음';
   }
+
+  const { years, months } = age;
+  let ageString = '';
+  if (years !== null && years > 0) {
+    ageString += `${years}년 `;
+  }
+  if (months !== null && months > 0) {
+    ageString += `${months}개월`;
+  }
+  return ageString.trim() || '나이 정보 없음';
 };
 
 const getWeightLabel = (weight: string) => {
@@ -72,7 +88,7 @@ const ProfileHeader = ({ dogInfo, onImageUpload, onImageDelete }: ProfileHeaderP
             </p>
             <div className="flex space-x-2">
               <Badge variant="secondary" className="bg-sky-100 text-sky-900">
-                {getAgeLabel(dogInfo.age)}
+                {formatAge(dogInfo.age as any)}
               </Badge>
               <Badge variant="secondary" className="bg-sky-100 text-sky-900">
                 {getWeightLabel(dogInfo.weight)}

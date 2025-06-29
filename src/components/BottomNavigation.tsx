@@ -57,8 +57,8 @@ const BottomNavigation = ({ currentPage, onNavigate }: BottomNavigationProps) =>
               onClick={() => onNavigate(item.page)}
               className={`flex flex-col items-center space-y-1 px-3 py-2 h-auto ${
                 isActive 
-                  ? 'text-sky-600 bg-white' 
-                  : 'text-gray-500 hover:text-sky-600 hover:bg-sky-100'
+                  ? 'text-sky-600 bg-gray-100' 
+                  : 'text-gray-500 hover:text-sky-600 hover:bg-gray-100'
               }`}
             >
               <Icon className="w-5 h-5" />

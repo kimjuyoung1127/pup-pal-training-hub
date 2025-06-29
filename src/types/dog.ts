@@ -1,7 +1,10 @@
 
 export interface DogInfo {
   name: string;
-  age: string;
+  age: {
+    years: number | null;
+    months: number | null;
+  };
   gender: string;
   breed: string;
   weight: string;

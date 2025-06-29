@@ -58,6 +58,7 @@ export default {
 				amber: '#FAA935',
 				red: '#C45132',
 				rust: '#8A2504',
+        'dark-grey': '#333333', // 진한 회색 추가
 
 				// 강아지 앱 전용 컬러 팔레트
 				cream: {

@@ -100,7 +100,7 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
             <AccordionTrigger>
                 <div className="flex justify-between items-center w-full pr-4">
                     <span className="text-sky-800 font-semibold">{category.icon} {category.title}</span>
-                    <span className="text-sm text-gray-800 font-bold">완성도 {completionPercent}%</span>
+                    <span className="text-sm text-sky-800 font-semibold">완성도 {completionPercent}%</span>
                 </div>
             </AccordionTrigger>
             <AccordionContent>

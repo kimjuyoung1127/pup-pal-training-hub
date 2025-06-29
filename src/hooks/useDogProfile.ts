@@ -136,10 +136,11 @@ const fetchDogProfileData = async () => {
   const fullDogInfo: FullDogInfo = {
     id: dogData.id,
     name: dogData.name || '',
-    age: dogData.age || '',
+    age: dogData.age ? JSON.parse(dogData.age) : { years: null, months: null },
     gender: dogData.gender || '',
     breed: dogData.breed || '',
-    weight: dogData.weight || '',
+    weight: dogData.weight || null,
+ 
     healthStatus: healthStatusIds,
     trainingGoals: behaviorIds,
     image_url: dogData.image_url

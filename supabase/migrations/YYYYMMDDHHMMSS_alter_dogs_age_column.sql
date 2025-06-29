@@ -1,0 +1,2 @@
+ALTER TABLE public.dogs
+ALTER COLUMN age TYPE TEXT;
