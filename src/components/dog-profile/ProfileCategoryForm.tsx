@@ -48,10 +48,6 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
         }, {} as { [key: string]: any }),
     });
 
-    const [otherCaretaker, setOtherCaretaker] = useState(
-        form.getValues().main_caretaker !== '본인' ? form.getValues().main_caretaker : ''
-    );
-
     const updateProfileMutation = useMutation({
         mutationFn: async (updates: Partial<FullDogExtendedProfile>) => {
             const { data: existing } = await supabase.from('dog_extended_profile').select('id').eq('dog_id', dogId).maybeSingle();
@@ -69,6 +65,7 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
     });
 
     const onSubmit = (values: FormValues) => {
+        console.log("Raw form values:", values);
         const processedValues: Partial<FullDogExtendedProfile> = {};
         Object.keys(values).forEach(key => {
             const mission = category.missions.find(m => m.key === key);
@@ -77,12 +74,11 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
                 processedValues[key] = value.split(',').map((s: string) => s.trim()).filter(Boolean);
             } else if (mission?.type === 'boolean') {
                 processedValues[key] = value === '예';
-            } else if (key === 'main_caretaker' && value === '기타(직접입력)') {
-                processedValues[key] = otherCaretaker;
             } else {
                 processedValues[key] = value;
             }
         });
+        console.log("Processed values to be sent:", processedValues);
         updateProfileMutation.mutate(processedValues);
     };
 
@@ -125,12 +121,7 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
                                                     ))}
                                                 </RadioGroup>
                                             ) : mission.options ? (
-                                                <RadioGroup onValueChange={(val) => {
-                                                    field.onChange(val);
-                                                    if (mission.key === 'main_caretaker' && val !== '기타(직접입력)') {
-                                                        setOtherCaretaker('');
-                                                    }
-                                                }} defaultValue={field.value} className="flex flex-wrap gap-x-4 gap-y-2">
+                                                <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex flex-wrap gap-x-4 gap-y-2">
                                                     {mission.options.map(option => (
                                                         <FormItem key={option} className="flex items-center space-x-3 space-y-0">
                                                           <FormControl>
@@ -144,14 +135,6 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
                                                 <Textarea placeholder={mission.placeholder} {...field} className="bg-white" style={{ color: '#111827' }} />
                                             )}
                                         </FormControl>
-                                        {mission.key === 'main_caretaker' && form.watch('main_caretaker') === '기타(직접입력)' && (
-                                            <Input
-                                                placeholder="보호자 이름을 입력하세요"
-                                                value={otherCaretaker}
-                                                onChange={(e) => setOtherCaretaker(e.target.value)}
-                                                className="mt-2 bg-white" style={{ color: '#111827' }}
-                                            />
-                                        )}
                                         <FormMessage />
                                     </FormItem>
                                 )}

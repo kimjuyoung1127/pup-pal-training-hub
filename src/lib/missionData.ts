@@ -24,10 +24,9 @@ export const missionCategories: MissionCategory[] = [
         title: '기본 정보',
         icon: '🏠',
         missions: [
-            { key: 'living_environment', title: '생활 환경', question: '딩딩이는 어디에서 살고 있나요?', type: 'radio', options: ['아파트', '단독주택', '농가주택'] },
+            { key: 'living_environment', title: '생활 환경', question: '아이는 어디에서 살고 있나요?', type: 'radio', options: ['아파트', '단독주택', '농가주택'] },
             { key: 'family_composition', title: '함께사는 가족 구성원', question: '함께 사는 가족은 몇 명인가요?', type: 'radio', options: ['1인', '2인', '3인', '4인', '5인 이상'] },
             { key: 'family_kids', title: '아이 동거 여부', question: '가족 중에 아이가 함께 사나요?', type: 'boolean' },
-            { key: 'main_caretaker', title: '주 보호자', question: '주 보호자는 누구인가요?', type: 'radio', options: ['본인', '기타(직접입력)'] },
         ],
     },
     {
