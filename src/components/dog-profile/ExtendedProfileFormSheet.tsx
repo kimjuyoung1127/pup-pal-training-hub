@@ -129,9 +129,9 @@ const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedPro
                                 {items.map(item => (
                                     <FormItem key={item} className="flex items-center space-x-3 space-y-0">
                                         <FormControl>
-                                            <RadioGroupItem value={item} className="text-sky-700 border-sky-600" />
+                                            <RadioGroupItem value={item} className="bg-white border-sky-600 text-sky-700" />
                                         </FormControl>
-                                        <FormLabel className="font-normal text-sky-900">{item}</FormLabel>
+                                        <FormLabel className="font-normal" style={{ color: '#111827' }}>{item}</FormLabel>
                                     </FormItem>
                                 ))}
                             </RadioGroup>
@@ -148,9 +148,9 @@ const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedPro
                 name="value"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>{mission.question}</FormLabel>
+                        <FormLabel style={{ color: '#1f2937' }}>{mission.question}</FormLabel>
                         <FormControl>
-                            <Textarea placeholder={placeholder} {...field} className="min-h-[100px]" />
+                            <Textarea placeholder={placeholder} {...field} style={{ color: '#111827' }} className="min-h-[100px] bg-white" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -190,9 +190,9 @@ const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedPro
                         name="value"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>{mission.question}</FormLabel>
+                                <FormLabel style={{ color: '#1f2937' }}>{mission.question}</FormLabel>
                                 <FormControl>
-                                    <Textarea placeholder="자세하게 알려주세요." {...field} className="min-h-[100px]" />
+                                    <Textarea placeholder="자세하게 알려주세요." {...field} style={{ color: '#111827' }} className="min-h-[100px] bg-white" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -203,11 +203,13 @@ const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedPro
     };
 
     return (
-        <Sheet open={isOpen} onOpenChange={(open) => { if (!open) { onClose(); }}}>
+        <Sheet open={isOpen} onOpenChange={onClose}>
             <SheetContent className="bg-white">
                 <SheetHeader>
-                    <SheetTitle className="font-pretendard text-cream-800">{mission?.title}</SheetTitle>
-                    <SheetDescription className="font-pretendard text-cream-600">{mission?.question}</SheetDescription>
+                    <SheetTitle style={{ color: '#111827' }}>{mission?.title}</SheetTitle>
+                    <SheetDescription style={{ color: '#4b5563' }}>
+                        {mission?.question}
+                    </SheetDescription>
                 </SheetHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 py-8">

@@ -119,8 +119,8 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
                                                 <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-2">
                                                     {['예', '아니오'].map(option => (
                                                         <FormItem key={option} className="flex items-center space-x-2 space-y-0">
-                                                            <FormControl><RadioGroupItem value={option} className="bg-white" /></FormControl>
-                                                            <FormLabel className="font-normal text-gray-700">{option}</FormLabel>
+                                                            <FormControl><RadioGroupItem value={option} className="bg-white border-gray-300" /></FormControl>
+                                                            <FormLabel className="font-normal" style={{ color: '#111827' }}>{option}</FormLabel>
                                                         </FormItem>
                                                     ))}
                                                 </RadioGroup>
@@ -130,16 +130,18 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
                                                     if (mission.key === 'main_caretaker' && val !== '기타(직접입력)') {
                                                         setOtherCaretaker('');
                                                     }
-                                                }} defaultValue={field.value} className="flex space-x-2">
+                                                }} defaultValue={field.value} className="flex flex-wrap gap-x-4 gap-y-2">
                                                     {mission.options.map(option => (
-                                                        <FormItem key={option} className="flex items-center space-x-2 space-y-0">
-                                                            <FormControl><RadioGroupItem value={option} className="bg-white" /></FormControl>
-                                                            <FormLabel className="font-normal text-gray-700">{option}</FormLabel>
+                                                        <FormItem key={option} className="flex items-center space-x-3 space-y-0">
+                                                          <FormControl>
+                                                            <RadioGroupItem value={option} className="bg-white border-gray-300" />
+                                                          </FormControl>
+                                                          <FormLabel className="font-normal" style={{ color: '#111827' }}>{option}</FormLabel>
                                                         </FormItem>
-                                                    ))}
+                                                      ))}
                                                 </RadioGroup>
                                             ) : (
-                                                <Textarea placeholder={mission.placeholder} {...field} className="bg-white" />
+                                                <Textarea placeholder={mission.placeholder} {...field} className="bg-white" style={{ color: '#111827' }} />
                                             )}
                                         </FormControl>
                                         {mission.key === 'main_caretaker' && form.watch('main_caretaker') === '기타(직접입력)' && (
@@ -147,7 +149,7 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
                                                 placeholder="보호자 이름을 입력하세요"
                                                 value={otherCaretaker}
                                                 onChange={(e) => setOtherCaretaker(e.target.value)}
-                                                className="mt-2 bg-white"
+                                                className="mt-2 bg-white" style={{ color: '#111827' }}
                                             />
                                         )}
                                         <FormMessage />
