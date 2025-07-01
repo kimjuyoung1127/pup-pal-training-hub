@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { FullDogExtendedProfile } from '@/hooks/useDogProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export type MissionKey = keyof Omit<FullDogExtendedProfile, 'id' | 'dog_id' | 'created_at' | 'updated_at' | 'favorite_snacks' | 'sensitive_factors' | 'past_history'>;
 
@@ -29,6 +29,7 @@ const formSchema = z.object({
 });
 
 const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedProfile, onUpdate }: ExtendedProfileFormSheetProps) => {
+    const queryClient = useQueryClient();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: { value: '' },
@@ -59,6 +60,8 @@ const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedPro
             
             if (fetchError) throw fetchError;
 
+            let awardedNewBadge = false;
+
             if (existing) {
                  const { data, error } = await supabase
                     .from('dog_extended_profile')
@@ -67,7 +70,17 @@ const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedPro
                     .select()
                     .single();
                  if (error) throw error;
-                 return data;
+                 
+                 // 뱃지 획득 로직 추가
+                 const { data: updatedProfile } = await supabase.from('dog_extended_profile').select('*').eq('dog_id', dogId).single();
+                 if (updatedProfile) {
+                    const completionStatus = checkProfileCompletion(updatedProfile);
+                    if (completionStatus.allComplete) {
+                        awardedNewBadge = await awardCompletionistBadge(dogId);
+                    }
+                 }
+
+                 return { data, awardedNewBadge };
             } else {
                  const { data, error } = await supabase
                     .from('dog_extended_profile')
@@ -75,14 +88,22 @@ const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedPro
                     .select()
                     .single();
                  if (error) throw error;
-                 return data;
+                 return { data, awardedNewBadge: false }; // 첫 생성 시에는 뱃지 체크 안함
             }
         },
-        onSuccess: () => {
-            toast.success('🎉 멋져요! 딩딩이의 정보를 업데이트했어요.', {
-                description: '다음 추천 훈련이 더 정확해질 거예요!',
-                className: 'bg-sky-50 text-sky-900 border-sky-200'
-            });
+        onSuccess: (result) => {
+            if (result.awardedNewBadge) {
+                toast.success('🎉 꼼꼼한 보호자 뱃지를 획득했어요!', {
+                    description: '강아지의 모든 정보를 입력해주셨네요. 정말 대단해요!',
+                    className: 'bg-yellow-50 text-yellow-900 border-yellow-200'
+                });
+            } else {
+                toast.success('🎉 멋져요! 딩딩이의 정보를 업데이트했어요.', {
+                    description: '다음 추천 훈련이 더 정확해질 거예요!',
+                    className: 'bg-sky-50 text-sky-900 border-sky-200'
+                });
+            }
+            queryClient.invalidateQueries({ queryKey: ['dogBadges', dogId] });
             onUpdate();
             onClose();
         },
@@ -224,6 +245,42 @@ const ExtendedProfileFormSheet = ({ isOpen, onClose, mission, dogId, extendedPro
             </SheetContent>
         </Sheet>
     );
+};
+
+const checkProfileCompletion = (profile: FullDogExtendedProfile) => {
+    const fieldsToIgnore = ['id', 'dog_id', 'created_at', 'updated_at'];
+    const allKeys = Object.keys(profile).filter(k => !fieldsToIgnore.includes(k));
+    const completedKeys = allKeys.filter(key => {
+        const value = profile[key as keyof FullDogExtendedProfile];
+        if (Array.isArray(value)) return value.length > 0;
+        return value !== null && value !== '';
+    });
+    return {
+        allComplete: allKeys.length === completedKeys.length,
+        completionRate: completedKeys.length / allKeys.length
+    };
+};
+
+const awardCompletionistBadge = async (dogId: string): Promise<boolean> => {
+    // '꼼꼼한 보호자' 뱃지 ID가 5라고 가정합니다. 실제 ID에 맞게 수정해야 합니다.
+    const badgeId = 5; 
+
+    const { data: existingBadge, error: fetchError } = await supabase
+        .from('dog_badges')
+        .select('id')
+        .eq('dog_id', dogId)
+        .eq('badge_id', badgeId)
+        .maybeSingle();
+
+    if (fetchError || existingBadge) {
+        return false; // 이미 뱃지가 있거나 에러 발생 시
+    }
+
+    const { error: insertError } = await supabase
+        .from('dog_badges')
+        .insert({ dog_id: dogId, badge_id: badgeId });
+
+    return !insertError;
 };
 
 export default ExtendedProfileFormSheet;

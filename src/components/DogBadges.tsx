@@ -7,6 +7,7 @@ import { Badge as UiBadge } from "@/components/ui/badge";
 import { Award } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 import { motion } from 'framer-motion';
+import { useToast } from '@/hooks/use-toast';
 
 interface DogBadgesProps {
   badges: DogBadge[];
@@ -14,6 +15,8 @@ interface DogBadgesProps {
 }
 
 const DogBadges = ({ badges, isLoading }: DogBadgesProps) => {
+  const { toast } = useToast();
+
   if (isLoading) {
     return <Card className="mb-6 bg-white">
         <CardHeader>
@@ -61,6 +64,12 @@ const DogBadges = ({ badges, isLoading }: DogBadgesProps) => {
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
+                      onClick={() => {
+                        toast({
+                          title: badge.name,
+                          description: badge.description,
+                        });
+                      }}
                     >
                       <span className={`text-4xl filter transition-all duration-300 ${badge.achieved ? 'grayscale-0' : 'grayscale hover:grayscale-0'}`}>
                         {badge.icon || '🏅'}
