@@ -34,7 +34,7 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
 
   const Header = () => (
     <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center space-x-3">
           <div className="text-xl">🐾</div>
           <div>
@@ -42,18 +42,18 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
             <p className="text-sm text-sky-600 font-pretendard">소중한 가족을 소개합니다</p>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onNavigate('dog-info')}
-            className="bg-white text-sky-600 hover:bg-sky-100 hover:text-sky-800 border border-sky-300 focus:ring-0 focus:ring-offset-0"
-          >
-            <Edit className="w-4 h-4 mr-1" />
-            편집
-          </Button>
-          <DeleteProfileDialog isDeleting={isDeleting} onDelete={handleDeleteDogProfile} />
-        </div>
+      </div>
+      <div className="flex items-center space-x-2 justify-end">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onNavigate('dog-info')}
+          className="bg-white text-sky-600 hover:bg-sky-100 hover:text-sky-800 border border-sky-300 focus:ring-0 focus:ring-offset-0"
+        >
+          <Edit className="w-4 h-4 mr-1" />
+          편집
+        </Button>
+        <DeleteProfileDialog isDeleting={isDeleting} onDelete={handleDeleteDogProfile} />
       </div>
     </div>
   );
@@ -74,11 +74,11 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
       <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6 text-center">
         <Header />
         <div className="flex-grow flex flex-col items-center justify-center">
-          <h2 className="text-2xl font-bold text-sky-800 mb-2 font-pretendard">프로필이 없어요!</h2>
-          <p className="text-sky-700 mb-6 font-pretendard">먼저 우리 아이 정보를 등록해주세요.</p>
+          <h2 className="text-3xl font-bold text-sky-800 mb-4 font-pretendard">프로필이 없어요!</h2>
+          <p className="text-lg text-sky-700 mb-8 font-pretendard">먼저 우리 아이 정보를 등록해주세요.</p>
           <Button 
             onClick={() => onNavigate('dog-info')}
-            className="focus:ring-0 focus:ring-offset-0 bg-sky-600 text-white hover:bg-sky-700"
+            className="focus:ring-0 focus:ring-offset-0 bg-sky-600 text-white hover:bg-sky-700 px-8 py-4 text-lg"
           >
               강아지 정보 등록하기
           </Button>
