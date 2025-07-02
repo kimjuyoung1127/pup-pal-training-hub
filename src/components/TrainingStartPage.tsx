@@ -42,7 +42,7 @@ const TrainingStartPage = ({
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-4">
         <div className="flex items-center space-x-3">
-          <Button variant="ghost" size="sm" onClick={() => onNavigate('dashboard')} className="text-gray-600 hover:text-gray-800">
+          <Button size="sm" onClick={() => onNavigate('dashboard')} className="bg-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-100 focus:ring-0 focus:ring-offset-0">
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex items-center space-x-3">

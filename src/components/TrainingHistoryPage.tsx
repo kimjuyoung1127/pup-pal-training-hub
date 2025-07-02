@@ -73,7 +73,7 @@ const TrainingHistoryPage: React.FC<TrainingHistoryPageProps> = ({ onNavigate })
     >
       <div className="bg-white/80 backdrop-blur-sm border-b border-cream-200 px-4 py-4 sticky top-0 z-10">
         <div className="flex items-center">
-          <Button variant="ghost" size="icon" onClick={() => onNavigate('/')}>
+          <Button size="icon" onClick={() => onNavigate('/')} className="bg-transparent hover:bg-gray-100 focus:ring-0 focus:ring-offset-0">
             <ArrowLeft className="h-6 w-6 text-gray-700" />
           </Button>
           <h1 className="text-lg font-bold text-cream-800 ml-2 font-pretendard">훈련 기록</h1>

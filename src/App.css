@@ -38,3 +38,25 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Menubar style overrides */
+/*
+[data-radix-menubar-trigger][data-state='open'],
+[data-radix-menubar-trigger]:focus,
+[data-radix-menubar-submenu-trigger][data-state='open'],
+[data-radix-menubar-submenu-trigger]:focus {
+  background-color: #f1f5f9; 
+  color: #0f172a; 
+}
+
+[role^="menuitem"]:focus {
+    background-color: #f1f5f9; 
+    color: #0f172a; 
+}
+
+[data-radix-menubar-content],
+[data-radix-menubar-submenu-content] {
+    background-color: #ffffff; 
+    color: #0f172a; 
+}
+*/

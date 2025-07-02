@@ -47,7 +47,7 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
             variant="outline"
             size="sm"
             onClick={() => onNavigate('dog-info')}
-            className="bg-white text-sky-600 hover:bg-sky-100 hover:text-sky-800 border-sky-300"
+            className="bg-white text-sky-600 hover:bg-sky-100 hover:text-sky-800 border border-sky-300 focus:ring-0 focus:ring-offset-0"
           >
             <Edit className="w-4 h-4 mr-1" />
             편집
@@ -76,7 +76,10 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
         <div className="flex-grow flex flex-col items-center justify-center">
           <h2 className="text-2xl font-bold text-sky-800 mb-2 font-pretendard">프로필이 없어요!</h2>
           <p className="text-sky-700 mb-6 font-pretendard">먼저 우리 아이 정보를 등록해주세요.</p>
-          <Button onClick={() => onNavigate('dog-info')}>
+          <Button 
+            onClick={() => onNavigate('dog-info')}
+            className="focus:ring-0 focus:ring-offset-0 bg-sky-600 text-white hover:bg-sky-700"
+          >
               강아지 정보 등록하기
           </Button>
         </div>

@@ -52,13 +52,12 @@ const BottomNavigation = ({ currentPage, onNavigate }: BottomNavigationProps) =>
           return (
             <Button
               key={item.id}
-              variant="ghost"
               size="sm"
               onClick={() => onNavigate(item.page)}
-              className={`flex flex-col items-center space-y-1 px-3 py-2 h-auto ${
-                isActive 
-                  ? 'text-sky-600 bg-gray-100' 
-                  : 'text-gray-500 hover:text-sky-600 hover:bg-gray-100'
+              className={`flex flex-col items-center space-y-1 px-3 py-2 h-auto transition-none bg-transparent hover:bg-transparent focus:ring-0 focus:ring-offset-0 ${ // variant 제거 및 스타일 직접 제어
+                isActive
+                  ? 'text-sky-600 font-bold' // 활성: 텍스트 색상과 굵기 변경
+                  : 'text-gray-500 hover:text-sky-600' // 비활성 및 호버
               }`}
             >
               <Icon className="w-5 h-5" />

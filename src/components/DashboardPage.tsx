@@ -14,14 +14,13 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
             <div className="text-xl">🐾</div>
             <div>
               <h1 className="text-lg font-bold text-sky-900">멍멍트레이너</h1>
-              <p className="text-sm text-sky-700">댕댕이와 함께 성장해요</p>
+              <p className="text-sm text-sky-700">반려견과 함께 성장해요</p>
             </div>
           </div>
           <Button
-            variant="ghost"
             size="sm"
             onClick={() => onNavigate('settings')}
-            className="text-sky-600 hover:text-sky-800"
+            className="text-sky-600 hover:text-sky-800 bg-transparent hover:bg-sky-100 focus:ring-0"
           >
             <Settings className="w-5 h-5" />
           </Button>
