@@ -85,7 +85,7 @@ const LoginPage = ({ onLogin }: { onLogin: () => void }) => {
               className="w-full bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-medium py-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md flex items-center justify-center space-x-3"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400 shadow-md">
-                <img src="/login/kakao.png" alt="카카오 로그인" className="h-10 w-10" />
+                <img src="/login/2.png" alt="카카오 로그인" className="h-10 w-10" />
               </div>
               <span>카카오로 시작하기</span>
             </Button>
