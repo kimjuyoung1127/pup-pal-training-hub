@@ -75,8 +75,8 @@ const LoginPage = ({ onLogin }: { onLogin: () => void }) => {
               onClick={handleGoogleLogin}
               className="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 font-medium py-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md flex items-center justify-center space-x-3"
             >
-              <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">G</span>
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-md">
+                <img src="/login/1.png" alt="Google 로그인" className="h-10 w-10" />
               </div>
               <span>구글로 시작하기</span>
             </Button>
@@ -85,8 +85,8 @@ const LoginPage = ({ onLogin }: { onLogin: () => void }) => {
               onClick={handleKakaoLogin}
               className="w-full bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-medium py-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md flex items-center justify-center space-x-3"
             >
-              <div className="w-5 h-5 bg-yellow-900 rounded-full flex items-center justify-center">
-                <span className="text-yellow-400 text-xs font-bold">K</span>
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400 shadow-md">
+                <img src="/login/2.png" alt="카카오 로그인" className="h-10 w-10" />
               </div>
               <span>카카오로 시작하기</span>
             </Button>
@@ -100,13 +100,6 @@ const LoginPage = ({ onLogin }: { onLogin: () => void }) => {
             </p>
           </div>
         </div>
-      </div>
-
-      {/* Footer */}
-      <div className="p-8 text-center">
-        <p className="text-sm text-cream-600">
-          멍멍트레이너와 함께 행복한 반려생활을 🐾
-        </p>
       </div>
     </div>
   );
