@@ -4,9 +4,10 @@ import { type User as SupabaseUser } from '@supabase/supabase-js';
 import { Card, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { LogOut, Loader2 } from 'lucide-react';
+import { LogOut, Loader2, FileText, Info, Shield } from 'lucide-react';
 import { MediaGallery } from './settings/MediaGallery';
 import { DarkModeToggle } from './settings/DarkModeToggle';
+import { Link } from 'react-router-dom';
 
 // 로딩 상태를 표시하는 스피너 컴포넌트
 const LoadingSpinner = () => (
@@ -48,16 +49,41 @@ const SettingsActions = () => {
   };
 
   return (
-    <div className="mt-8">
+    <div className="mt-8 space-y-4">
       <DarkModeToggle />
-      <Button
-        variant="ghost"
-        className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 p-4 mt-4"
-        onClick={handleLogout}
-      >
-        <LogOut className="w-5 h-5 mr-3" />
-        로그아웃
-      </Button>
+
+      <div className="space-y-2 pt-4 border-t border-gray-200">
+        <h3 className="px-4 text-sm font-semibold text-gray-500">정보</h3>
+        <Link to="/AboutUsPage">
+          <Button variant="ghost" className="w-full justify-start p-4">
+            <Info className="w-5 h-5 mr-3" />
+            서비스 소개
+          </Button>
+        </Link>
+        <Link to="/TermsOfServicePage">
+          <Button variant="ghost" className="w-full justify-start p-4">
+            <FileText className="w-5 h-5 mr-3" />
+            서비스 이용약관
+          </Button>
+        </Link>
+        <Link to="/PrivacyPolicyPage">
+          <Button variant="ghost" className="w-full justify-start p-4">
+            <Shield className="w-5 h-5 mr-3" />
+            개인정보처리방침
+          </Button>
+        </Link>
+      </div>
+
+      <div className="pt-4 border-t border-gray-200">
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 p-4"
+          onClick={handleLogout}
+        >
+          <LogOut className="w-5 h-5 mr-3" />
+          로그아웃
+        </Button>
+      </div>
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { DogInfo } from '@/types/dog';
 import { toast } from 'sonner';
+import { useEffect } from 'react';
 
 export type FullDogInfo = DogInfo & { id: string; image_url: string | null; };
 
@@ -64,6 +65,11 @@ const fetchDogProfileData = async () => {
       .select('*')
       .eq('dog_id', dogData.id)
       .maybeSingle();
+
+  if (extendedProfileError) {
+    console.error('Error fetching extended profile:', extendedProfileError);
+  }
+  console.log('Extended profile data:', extendedProfileData);
 
   const { data: healthLinks, error: healthLinksError } = await supabase.from('dog_health_status').select('health_status_option_id').eq('dog_id', dogData.id);
   if (healthLinksError) {
@@ -151,18 +157,24 @@ const fetchDogProfileData = async () => {
     healthStatusNames: fetchedHealthStatusNames,
     trainingGoalNames: fetchedTrainingGoalNames,
     trainingStats,
-    extendedProfile: extendedProfileData
+    extendedProfile: extendedProfileData || null // null일 경우를 명시적으로 처리
   };
 };
 
 export const useDogProfile = () => {
   const queryClient = useQueryClient();
 
-  const { data: profileData, isLoading } = useQuery({
+  const { data: profileData, isLoading, error } = useQuery({
     queryKey: ['dogProfile'],
     queryFn: fetchDogProfileData,
     staleTime: 1000 * 60 * 5, // 5분 동안 fresh 상태 유지
   });
+
+  useEffect(() => {
+    if (error) {
+      console.error("Error in useDogProfile query:", error);
+    }
+  }, [error]);
 
   const uploadImageMutation = useMutation({
     mutationFn: async (event: React.ChangeEvent<HTMLInputElement>) => {

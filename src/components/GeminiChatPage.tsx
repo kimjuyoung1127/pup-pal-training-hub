@@ -8,33 +8,52 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { ArrowLeft, Send, Dog } from 'lucide-react';
 import { toast } from 'sonner';
+import { useDogProfile, FullDogInfo, FullDogExtendedProfile } from '@/hooks/useDogProfile';
 
 interface Message {
   role: 'user' | 'model';
   parts: { text: string }[];
 }
 
+// 강아지 프로필과 확장 프로필을 결합하고, 불필요한 속성을 제거한 타입을 정의합니다.
+type ChatDogProfile = Omit<FullDogInfo & FullDogExtendedProfile, 'id' | 'dog_id' | 'created_at' | 'updated_at'>;
+
 const GeminiChatPage = () => {
   const navigate = useNavigate();
+  const { dogInfo, extendedProfile } = useDogProfile();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (dogInfo && extendedProfile) {
+      const fullProfile = { ...dogInfo, ...extendedProfile };
+      // 민감하거나 불필요한 정보 제거
+      delete (fullProfile as any).id;
+      delete (fullProfile as any).dog_id;
+      delete (fullProfile as any).created_at;
+      delete (fullProfile as any).updated_at;
 
-  useEffect(() => {
-    // Initial greeting from the bot
-    setMessages([
-        { role: 'model', parts: [{ text: '안녕하세요! 저는 강아지 훈련 전문가, 멍멍코치입니다. 무엇을 도와드릴까요?' }] }
-    ]);
-  }, []);
+      const systemMessage: Message = {
+        role: 'user', // 시스템 메시지를 user 역할로 보내 AI가 인식하도록 함
+        parts: [{
+          text: `[SYSTEM] 다음은 사용자의 강아지 프로필입니다. 이 정보를 바탕으로 모든 답변을 제공해주세요: ${JSON.stringify(fullProfile, null, 2)}`
+        }]
+      };
+
+      const initialBotMessage: Message = {
+        role: 'model',
+        parts: [{
+          text: `안녕하세요! 저는 강아지 훈련 전문가, 멍멍코치입니다. ${dogInfo.name}와(과) 관련된 모든 훈련과 행동 문제에 대해 상담해드릴 수 있어요. 무엇을 도와드릴까요?`
+        }]
+      };
+
+      // 시스템 메시지를 가장 먼저, 그 다음 봇의 인사 메시지를 설정합니다.
+      // 시스템 메시지는 UI에 렌더링하지 않을 것입니다.
+      setMessages([systemMessage, initialBotMessage]);
+    }
+  }, [dogInfo, extendedProfile]);
 
   const handleSendMessage = async () => {
     if (input.trim() === '' || isLoading) return;
@@ -47,8 +66,21 @@ const GeminiChatPage = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('gemini-plaintext-chat', { // 호출 함수 변경
-        body: { history: newMessages },
+      let fullProfile: Partial<ChatDogProfile> = {}; // fullProfile에 대한 명시적 타입 정의
+      if (dogInfo && extendedProfile) {
+        const combinedProfile = { ...dogInfo, ...extendedProfile };
+        
+        // delete 연산자는 'any' 타입 또는 선택적 속성에만 사용할 수 있으므로, 타입 단언을 사용합니다.
+        delete (combinedProfile as any).id;
+        delete (combinedProfile as any).dog_id;
+        delete (combinedProfile as any).created_at;
+        delete (combinedProfile as any).updated_at;
+
+        fullProfile = combinedProfile;
+      }
+
+      const { data, error } = await supabase.functions.invoke('gemini-plaintext-chat', { 
+        body: { history: newMessages, dogProfile: fullProfile }, // fullProfile을 백엔드로 전달
       });
 
       console.log('Supabase function response:', data); // 응답 데이터 콘솔에 출력
@@ -94,7 +126,7 @@ const GeminiChatPage = () => {
       {/* Chat messages */}
       <main className="flex-1 overflow-y-auto p-4 space-y-4">
         <AnimatePresence>
-          {messages.map((msg, index) => (
+          {messages.filter(msg => !(msg.parts[0].text.startsWith('[SYSTEM]'))).map((msg, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}

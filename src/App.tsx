@@ -7,6 +7,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import GeminiChatPage from "./components/GeminiChatPage";
+import TrainingHistoryPage from './components/TrainingHistoryPage';
+import TrainingProgressPage from './components/TrainingProgressPage';
+import SettingsPage from './components/SettingsPage';
+import DogBadges from './components/DogBadges'; // DogBadgesPage 대신 DogBadges를 임포트합니다.
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/TermsOfServicePage';
+import AboutUsPage from './pages/AboutUsPage';
 
 const queryClient = new QueryClient();
 
@@ -19,7 +26,22 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/chat" element={<GeminiChatPage />} />
+          <Route path="/PrivacyPolicyPage" element={<PrivacyPolicyPage />} />
+          <Route path="/TermsOfServicePage" element={<TermsOfServicePage />} />
+          <Route path="/AboutUsPage" element={<AboutUsPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/training-history" element={<TrainingHistoryPage onNavigate={function (page: string, params?: any): void {
+            throw new Error("Function not implemented.");
+          } } />} />
+            throw new Error("Function not implemented.");
+          <Route path="/training-progress/:programId" element={<TrainingProgressPage trainingProgram={undefined} onNavigate={function (page: string): void {
+            throw new Error("Function not implemented.");
+          } } onExit={function (): void {
+            throw new Error("Function not implemented.");
+          } } dogId={""} />} />
+    
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/dog-badges" element={<DogBadges badges={[]} isLoading={false} />} /> {/* DogBadges 컴포넌트를 사용하고 필요한 props를 전달합니다. */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
