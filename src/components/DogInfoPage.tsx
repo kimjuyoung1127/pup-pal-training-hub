@@ -111,9 +111,9 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-2">
           <div className="text-xl">🐾</div>
-          <h1 className="text-lg font-bold text-cream-800 font-pretendard">멍멍트레이너</h1>
+          <h1 className="text-lg font-bold text-gray-800 font-pretendard">멍멍트레이너</h1>
         </div>
-        <div className="text-sm text-cream-600 font-pretendard">
+        <div className="text-sm text-gray-600 font-pretendard">
           {currentStep + 1} / 3
         </div>
       </div>
@@ -136,10 +136,10 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-2xl font-bold text-cream-800 mb-2 font-pretendard">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2 font-pretendard">
             {stepTitles[currentStep]}
           </h2>
-          <p className="text-cream-700 font-pretendard">
+          <p className="text-gray-700 font-pretendard">
             {stepDescriptions[currentStep]}
           </p>
         </motion.div>
@@ -170,7 +170,7 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
             variant="outline"
             onClick={prevStep}
             disabled={currentStep === 0}
-            className="flex items-center space-x-2 bg-cream-200 hover:bg-cream-300 text-cream-800 border-2 border-cream-300 font-pretendard"
+            className="flex items-center space-x-2 bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 font-pretendard focus:ring-0 focus:ring-offset-0"
           >
             <ChevronLeft className="w-4 h-4" />
             <span>이전</span>
@@ -179,7 +179,7 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
           <Button
             onClick={nextStep}
             disabled={!canProceed() || isSaving}
-            className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white font-pretendard"
+            className="flex items-center space-x-2 bg-sky-600 hover:bg-sky-700 text-white font-pretendard focus:ring-0 focus:ring-offset-0"
           >
             <span>{currentStep === 2 ? (isSaving ? '저장 중...' : '완료') : '다음'}</span>
             <ChevronRight className="w-4 h-4" />

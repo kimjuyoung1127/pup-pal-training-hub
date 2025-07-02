@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input'; // Input 추가
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Check, ChevronsUpDown } from 'lucide-react';
@@ -25,14 +25,14 @@ const Step2_DogFeatures: React.FC<Props> = ({ dogInfo, setDogInfo, breedOpen, se
 
       <div className="space-y-4">
         <div>
-          <Label className="text-cream-800 font-medium">견종</Label>
+          <Label className="text-gray-800 font-medium">견종</Label>
           <Popover open={breedOpen} onOpenChange={setBreedOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 role="combobox"
                 aria-expanded={breedOpen}
-                className="w-full justify-between mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl text-cream-800 hover:bg-cream-50"
+                className="w-full justify-between mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl text-gray-900 hover:bg-cream-50"
               >
                 {dogInfo.breed
                   ? dogBreeds.find((breed) => breed === dogInfo.breed)
@@ -44,10 +44,10 @@ const Step2_DogFeatures: React.FC<Props> = ({ dogInfo, setDogInfo, breedOpen, se
               <Command className="bg-white">
                 <CommandInput 
                   placeholder="견종을 검색해보세요..." 
-                  className="h-9 text-cream-800"
+                  className="h-9 text-gray-900"
                 />
                 <CommandList className="max-h-60 overflow-y-auto">
-                  <CommandEmpty className="text-cream-600 py-6 text-center text-sm">
+                  <CommandEmpty className="text-gray-600 py-6 text-center text-sm">
                     검색 결과가 없습니다.
                   </CommandEmpty>
                   <CommandGroup>
@@ -59,7 +59,7 @@ const Step2_DogFeatures: React.FC<Props> = ({ dogInfo, setDogInfo, breedOpen, se
                           setDogInfo(prev => ({ ...prev, breed: currentValue === dogInfo.breed ? "" : currentValue }));
                           setBreedOpen(false);
                         }}
-                        className="text-cream-800 hover:bg-orange-100 cursor-pointer data-[selected=true]:bg-orange-100"
+                        className="text-gray-800 hover:bg-sky-100 cursor-pointer data-[selected=true]:bg-sky-100"
                       >
                         <Check
                           className={cn(
@@ -78,17 +78,19 @@ const Step2_DogFeatures: React.FC<Props> = ({ dogInfo, setDogInfo, breedOpen, se
         </div>
 
         <div>
-          <Label htmlFor="weight" className="text-cream-800 font-medium">체중</Label>
-          <Select onValueChange={(value) => setDogInfo(prev => ({ ...prev, weight: value }))} value={dogInfo.weight || undefined}>
-            <SelectTrigger className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl text-cream-800">
-              <SelectValue placeholder="체중을 선택해주세요" className="text-cream-500" />
-            </SelectTrigger>
-            <SelectContent className="bg-white border-cream-200 z-50">
-              <SelectItem value="small" className="text-cream-800 hover:bg-orange-100 focus:bg-orange-100">소형견 (7kg 미만)</SelectItem>
-              <SelectItem value="medium" className="text-cream-800 hover:bg-orange-100 focus:bg-orange-100">중형견 (7kg ~ 25kg)</SelectItem>
-              <SelectItem value="large" className="text-cream-800 hover:bg-orange-100 focus:bg-orange-100">대형견 (25kg 이상)</SelectItem>
-            </SelectContent>
-          </Select>
+          <Label htmlFor="weight" className="text-gray-800 font-medium">체중 (kg)</Label>
+          <Input
+            id="weight"
+            type="number"
+            step="0.1"
+            value={dogInfo.weight ?? ''}
+            onChange={(e) => {
+              const value = e.target.value;
+              setDogInfo(prev => ({ ...prev, weight: value === '' ? null : parseFloat(value) }));
+            }}
+            placeholder="예: 5.2"
+            className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl text-gray-900"
+          />
         </div>
       </div>
     </div>

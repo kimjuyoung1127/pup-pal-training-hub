@@ -55,9 +55,9 @@ const Step3_TrainingGoals: React.FC<Props> = ({
           <CardContent className="p-6">
             <div className="flex items-center mb-4">
               <Heart className="w-6 h-6 text-orange-500 mr-2" />
-              <Label className="text-cream-800 font-semibold text-lg font-pretendard">건강 상태</Label>
+              <Label className="text-gray-800 font-semibold text-lg font-pretendard">건강 상태</Label>
             </div>
-            <p className="text-sm text-cream-600 mb-4 font-pretendard">우리 아이의 현재 건강 상태를 알려주세요 (복수 선택 가능)</p>
+            <p className="text-sm text-gray-600 mb-4 font-pretendard">우리 아이의 현재 건강 상태를 알려주세요 (복수 선택 가능)</p>
             
             {isLoading ? (
               renderSkeletons(4, "grid grid-cols-2 gap-3")
@@ -72,7 +72,7 @@ const Step3_TrainingGoals: React.FC<Props> = ({
                   <ToggleGroupItem
                     key={option.id}
                     value={String(option.id)}
-                    className="flex items-center justify-start text-left space-x-3 p-3 h-auto rounded-xl border-2 transition-all duration-200 data-[state=on]:bg-orange-100 data-[state=on]:border-orange-300 data-[state=on]:shadow-md bg-white border-cream-200 hover:border-orange-200 hover:bg-orange-50 data-[state=on]:text-cream-700 text-cream-700"
+                    className="flex items-center justify-start text-left space-x-3 p-3 h-auto rounded-xl border-2 transition-all duration-200 data-[state=on]:bg-sky-100 data-[state=on]:border-sky-400 data-[state=on]:shadow-md bg-white border-cream-200 hover:border-sky-300 hover:bg-sky-50 data-[state=on]:text-sky-900 text-gray-800"
                   >
                     <span className="text-lg">{option.icon}</span>
                     <span className="text-sm font-pretendard flex-1">
@@ -82,7 +82,7 @@ const Step3_TrainingGoals: React.FC<Props> = ({
                 ))}
               </ToggleGroup>
             ) : (
-              <p className="text-center text-cream-600 font-pretendard py-4">
+              <p className="text-center text-gray-600 font-pretendard py-4">
                 건강 상태 옵션을 불러오지 못했습니다.
               </p>
             )}
@@ -100,9 +100,9 @@ const Step3_TrainingGoals: React.FC<Props> = ({
           <CardContent className="p-6">
             <div className="flex items-center mb-4">
               <Target className="w-6 h-6 text-orange-500 mr-2" />
-              <Label className="text-cream-800 font-semibold text-lg font-pretendard">훈련 목표</Label>
+              <Label className="text-gray-800 font-semibold text-lg font-pretendard">훈련 목표</Label>
             </div>
-            <p className="text-sm text-cream-600 mb-4 font-pretendard">어떤 훈련을 원하시나요? (복수 선택 가능)</p>
+            <p className="text-sm text-gray-600 mb-4 font-pretendard">어떤 훈련을 원하시나요? (복수 선택 가능)</p>
             
             {isLoading ? (
               renderSkeletons(6, "grid grid-cols-1 gap-3")
@@ -117,7 +117,7 @@ const Step3_TrainingGoals: React.FC<Props> = ({
                   <ToggleGroupItem
                     key={option.id}
                     value={String(option.id)}
-                    className="flex items-center justify-start text-left space-x-3 p-3 h-auto rounded-xl border-2 transition-all duration-200 data-[state=on]:bg-orange-100 data-[state=on]:border-orange-300 data-[state=on]:shadow-md bg-white border-cream-200 hover:border-orange-200 hover:bg-orange-50 data-[state=on]:text-cream-700 text-cream-700"
+                    className="flex items-center justify-start text-left space-x-3 p-3 h-auto rounded-xl border-2 transition-all duration-200 data-[state=on]:bg-sky-100 data-[state=on]:border-sky-400 data-[state=on]:shadow-md bg-white border-cream-200 hover:border-sky-300 hover:bg-sky-50 data-[state=on]:text-sky-900 text-gray-800"
                   >
                     <span className="text-lg">{option.icon}</span>
                     <span className="text-sm font-pretendard flex-1">
@@ -127,7 +127,7 @@ const Step3_TrainingGoals: React.FC<Props> = ({
                 ))}
               </ToggleGroup>
             ) : (
-              <p className="text-center text-cream-600 font-pretendard py-4">
+              <p className="text-center text-gray-600 font-pretendard py-4">
                 훈련 목표 옵션을 불러오지 못했습니다.
               </p>
             )}
