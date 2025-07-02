@@ -45,35 +45,35 @@ const TrainingHistoryCard = ({ item, onEdit, onDelete, onRetry }: TrainingHistor
     >
       <Card className="shadow-none border border-gray-200 bg-white hover:bg-gray-50 transition-colors w-full">
         <CardContent className="p-4">
-          <div className="flex items-start space-x-4">
-            <div className="text-3xl p-3 bg-gray-100 rounded-xl border border-gray-200">{icon}</div>
+          <div className="flex items-start space-x-3 sm:space-x-4">
+            <div className="text-2xl sm:text-3xl p-2 sm:p-3 bg-gray-100 rounded-lg sm:rounded-xl border border-gray-200">{icon}</div>
             <div className="flex-1 min-w-0">
-              <div className="flex justify-between items-start">
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-lg text-gray-800 truncate">{item.training_type || '알 수 없는 훈련'}</p>
+              <div className="flex flex-col sm:flex-row justify-between sm:items-start">
+                <div className="flex-1 min-w-0 mb-2 sm:mb-0">
+                  <p className="font-bold text-base sm:text-lg text-gray-800 truncate">{item.training_type || '알 수 없는 훈련'}</p>
                   {item.isAiTraining && (
-                    <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full">AI 추천</span>
+                    <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full inline-block mt-1">AI 추천</span>
                   )}
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="sm" onClick={() => onEdit(item)} className="bg-pink-500 hover:bg-pink-600 text-white border-pink-500">
+                <div className="flex items-center space-x-2 flex-shrink-0">
+                  <Button variant="outline" size="xs" onClick={() => onEdit(item)} className="bg-pink-500 hover:bg-pink-600 text-white border-pink-500">
                     <Edit className="mr-1 h-3 w-3" />
                     수정
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => onDelete(item)} className="bg-pink-500 hover:bg-pink-600 text-white border-pink-500">
+                  <Button variant="outline" size="xs" onClick={() => onDelete(item)} className="bg-pink-500 hover:bg-pink-600 text-white border-pink-500">
                     <Trash2 className="mr-1 h-3 w-3" />
                     삭제
                   </Button>
                 </div>
               </div>
-              <div className="flex items-center text-sm text-gray-500 mt-1 space-x-4">
+              <div className="flex flex-wrap items-center text-xs sm:text-sm text-gray-500 mt-2 space-x-3">
                 <div className="flex items-center">
-                  <Calendar className="w-4 h-4 mr-1.5" />
-                  <span>{format(new Date(item.session_date), 'yyyy년 M월 d일', { locale: ko })}</span>
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                  <span>{format(new Date(item.session_date), 'yyyy.MM.dd', { locale: ko })}</span>
                 </div>
                 {item.duration_minutes !== null && (
                   <div className="flex items-center">
-                    <Clock className="w-4 h-4 mr-1.5" />
+                    <Clock className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                     <span>{item.duration_minutes}분</span>
                   </div>
                 )}
@@ -85,7 +85,7 @@ const TrainingHistoryCard = ({ item, onEdit, onDelete, onRetry }: TrainingHistor
               )}
               {item.training_type && (
                 <div className="mt-4 flex justify-end">
-                  <Button onClick={() => onRetry(item)} size="sm" className="bg-blue-500 hover:bg-blue-600">
+                  <Button onClick={() => onRetry(item)} size="sm" className="bg-blue-500 hover:bg-blue-600 w-full sm:w-auto">
                     <Repeat className="mr-2 h-4 w-4" />
                     다시 훈련하기
                   </Button>
