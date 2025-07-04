@@ -97,14 +97,10 @@ const fetchDogProfileData = async () => {
 
   let trainingStats = {
       consecutiveDays: 0,
-      averageSuccessRate: 0,
       badgesCount: badgesCount || 0,
   };
 
   if (trainingHistoryData && trainingHistoryData.length > 0) {
-    const totalSuccessRate = trainingHistoryData.reduce((acc, record) => acc + (Number(record.success_rate) || 0), 0);
-    const averageSuccessRate = Math.round(totalSuccessRate / trainingHistoryData.length);
-
     const trainingDates = [...new Set(trainingHistoryData.map(h => h.session_date))].map(d => new Date(d)).sort((a,b) => b.getTime() - a.getTime());
 
     let consecutiveDays = 0;
@@ -134,7 +130,6 @@ const fetchDogProfileData = async () => {
     
     trainingStats = {
         consecutiveDays: consecutiveDays,
-        averageSuccessRate: averageSuccessRate,
         badgesCount: badgesCount || 0,
     };
   }
@@ -142,7 +137,7 @@ const fetchDogProfileData = async () => {
   const fullDogInfo: FullDogInfo = {
     id: dogData.id,
     name: dogData.name || '',
-    age: dogData.age || { years: null, months: null },
+    age: typeof dogData.age === 'string' ? { years: 0, months: 0 } : (dogData.age || { years: 0, months: 0 }),
     gender: dogData.gender || '',
     breed: dogData.breed || '',
     weight: dogData.weight ? Number(dogData.weight) : null,
