@@ -60,3 +60,17 @@
     color: #0f172a; 
 }
 */
+
+
+@keyframes paw-print-loading {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+.paw-loader span {
+  animation: paw-print-loading 1.2s infinite ease-in-out;
+}
+
+.paw-loader span:nth-child(2) { animation-delay: 0.2s; }
+.paw-loader span:nth-child(3) { animation-delay: 0.4s; }
+.paw-loader span:nth-child(4) { animation-delay: 0.6s; }

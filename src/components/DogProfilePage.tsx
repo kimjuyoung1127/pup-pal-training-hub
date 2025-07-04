@@ -60,11 +60,23 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white p-6 space-y-6">
+      <div className="min-h-screen bg-white flex flex-col">
         <Header />
-        <Skeleton className="h-32 w-full mt-6" />
-        <Skeleton className="h-24 w-full" />
-        <Skeleton className="h-24 w-full" />
+        <div className="flex-grow flex flex-col items-center justify-center space-y-6 p-6">
+          <div className="paw-loader flex space-x-2 text-4xl text-sky-500">
+            <span>🐾</span>
+            <span>🐾</span>
+            <span>🐾</span>
+            <span>🐾</span>
+          </div>
+          <p className="text-lg font-semibold text-sky-700 font-pretendard animate-pulse">
+            프로필을 불러오는 중입니다...
+          </p>
+          <div className="w-full max-w-md space-y-4 mt-4">
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+        </div>
       </div>
     );
   }

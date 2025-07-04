@@ -10,16 +10,21 @@ import Step2_DogFeatures from './dog-info-steps/Step2_DogFeatures';
 import Step3_TrainingGoals from './dog-info-steps/Step3_TrainingGoals';
 import { useDogInfoOptions } from '@/hooks/useDogInfoOptions';
 import { useSaveDogInfo } from '@/hooks/useSaveDogInfo';
+import Confetti from 'react-confetti';
+import { useWindowSize } from 'react-use';
 
 const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [breedOpen, setBreedOpen] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const { width, height } = useWindowSize();
+
   const [dogInfo, setDogInfo] = useState<DogInfo>({
     name: '',
-    age: '',
+    age: { years: 0, months: 0 },
     gender: '',
     breed: '',
-    weight: '',
+    weight: 0,
     healthStatus: [],
     trainingGoals: []
   });
@@ -28,7 +33,10 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
 
   const { mutate: saveDog, isPending: isSaving } = useSaveDogInfo({
     onSuccess: (savedDogInfo) => {
-      onComplete(savedDogInfo);
+      setShowConfetti(true);
+      setTimeout(() => {
+        onComplete(savedDogInfo);
+      }, 3000); // 3초 후 페이지 전환
     },
   });
 
@@ -104,6 +112,23 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
         return null;
     }
   };
+
+  if (showConfetti) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-cream-50 to-orange-50 p-4">
+        <Confetti width={width} height={height} />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-center"
+        >
+          <h2 className="text-3xl font-bold text-gray-800 mb-4 font-pretendard">🎉 등록 완료! 🎉</h2>
+          <p className="text-lg text-gray-700 font-pretendard">우리 아이를 위한 맞춤 플랜을 준비 중이에요!</p>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-cream-50 to-orange-50 p-4">
