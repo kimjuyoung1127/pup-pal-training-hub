@@ -22,7 +22,7 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-100">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-sky-200 px-6 py-4 sticky top-0 z-10">
+      <div className="bg-white/80 backdrop-blur-sm border-b border-sky-200 px-6 py-4 sticky top-0 z-10 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="text-xl">🐾</div>

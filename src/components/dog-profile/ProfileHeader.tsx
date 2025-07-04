@@ -45,43 +45,43 @@ const getGenderEmoji = (gender: string) => {
 
 const ProfileHeader = ({ dogInfo, onImageUpload, onImageDelete }: ProfileHeaderProps) => {
   return (
-    <Card className="card-soft overflow-hidden bg-gradient-to-r from-sky-50 to-blue-50">
+    <Card className="overflow-hidden bg-sky-50 shadow-md border border-sky-100">
       <CardContent className="p-6">
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <Avatar className="w-20 h-20 border-2 border-white shadow-lg">
+        <div className="flex items-center space-x-6">
+          <div className="relative group">
+            <Avatar className="w-24 h-24 border-4 border-white shadow-lg transition-transform duration-300 group-hover:scale-105">
               {dogInfo.image_url ? (
                 <AvatarImage src={dogInfo.image_url} alt={dogInfo.name} className="object-cover" />
               ) : (
-                <AvatarFallback className="bg-sky-200 text-2xl">
+                <AvatarFallback className="bg-sky-200 text-4xl">
                   {getGenderEmoji(dogInfo.gender)}
                 </AvatarFallback>
               )}
             </Avatar>
-            <div className="absolute -bottom-1 -right-1 flex items-center">
-              <label htmlFor="dog-image-upload" className="bg-white rounded-full p-1.5 cursor-pointer shadow-md hover:bg-gray-100 transition-colors">
-                <Edit className="w-4 h-4 text-sky-800" />
+            <div className="absolute bottom-0 right-0 flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <label htmlFor="dog-image-upload" className="bg-white/80 backdrop-blur-sm rounded-full p-2 cursor-pointer shadow-md hover:bg-white transition-colors">
+                <Edit className="w-4 h-4 text-sky-600" />
                 <input id="dog-image-upload" type="file" className="hidden" accept="image/*" onChange={onImageUpload} />
               </label>
               {dogInfo.image_url && (
-                <Button variant="ghost" size="icon" className="bg-white rounded-full p-1.5 cursor-pointer shadow-md hover:bg-gray-100 transition-colors ml-1 w-7 h-7" onClick={onImageDelete}>
+                <Button variant="ghost" size="icon" className="bg-white/80 backdrop-blur-sm rounded-full p-2 cursor-pointer shadow-md hover:bg-white transition-colors w-8 h-8" onClick={onImageDelete}>
                   <Trash2 className="w-4 h-4 text-red-500" />
                 </Button>
               )}
             </div>
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-sky-900 mb-1 font-pretendard">
+            <h2 className="text-3xl font-extrabold text-gray-800 mb-1 font-pretendard tracking-tight">
               {dogInfo.name}
             </h2>
-            <p className="text-sky-800 mb-2 font-pretendard">
+            <p className="text-gray-600 mb-3 font-pretendard">
               {dogInfo.breed} • {dogInfo.gender === 'male' ? '남아' : '여아'}
             </p>
             <div className="flex space-x-2">
-              <Badge variant="secondary" className="bg-sky-100 text-sky-900">
+              <Badge variant="outline" className="border-sky-300 bg-sky-100 text-sky-800 font-semibold px-3 py-1">
                 {formatAge(dogInfo.age as any)}
               </Badge>
-              <Badge variant="secondary" className="bg-sky-100 text-sky-900">
+              <Badge variant="outline" className="border-blue-300 bg-blue-100 text-blue-800 font-semibold px-3 py-1">
                 {dogInfo.weight}kg
               </Badge>
             </div>

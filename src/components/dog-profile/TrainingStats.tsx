@@ -66,27 +66,33 @@ const TrainingStats = ({ stats }: TrainingStatsProps) => {
   return (
     <>
       <div className="grid grid-cols-3 gap-4">
-        <Card className="card-soft bg-sky-50 text-center p-4">
+        <Card className="bg-sky-50 shadow-md border border-sky-100 text-center p-4">
           <div className="text-2xl mb-2">📅</div>
-          <p className="text-lg font-bold text-sky-600">{stats.consecutiveDays}일</p>
+          <p className="text-lg font-bold text-sky-800">{stats.consecutiveDays}일</p>
           <p className="text-xs text-gray-500 font-pretendard">연속 훈련</p>
         </Card>
-        <Card 
-          className="card-soft bg-sky-50 text-center p-4 cursor-pointer"
+        <Card
+          className="bg-sky-50 shadow-md border border-sky-100 text-center p-4 cursor-pointer"
           onClick={incrementWalk}
-          onContextMenu={(e) => { e.preventDefault(); handleLongPress('walk'); }}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            handleLongPress('walk');
+          }}
         >
           <div className="text-2xl mb-2">🐾</div>
-          <p className="text-lg font-bold text-sky-600">{walkCount}회</p>
+          <p className="text-lg font-bold text-sky-800">{walkCount}회</p>
           <p className="text-xs text-gray-500 font-pretendard">산책</p>
         </Card>
-        <Card 
-          className="card-soft bg-sky-50 text-center p-4 cursor-pointer"
+        <Card
+          className="bg-sky-50 shadow-md border border-sky-100 text-center p-4 cursor-pointer"
           onClick={incrementPoop}
-          onContextMenu={(e) => { e.preventDefault(); handleLongPress('poop'); }}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            handleLongPress('poop');
+          }}
         >
           <div className="text-2xl mb-2">💩</div>
-          <p className="text-lg font-bold text-sky-600">{poopCount}회</p>
+          <p className="text-lg font-bold text-sky-800">{poopCount}회</p>
           <p className="text-xs text-gray-500 font-pretendard">응가</p>
         </Card>
       </div>

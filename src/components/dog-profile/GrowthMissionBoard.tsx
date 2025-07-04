@@ -28,10 +28,10 @@ const GrowthMissionBoard = ({ extendedProfile, dogId, onUpdate }: GrowthMissionB
 
     return (
         <>
-            <Card className="card-soft bg-sky-50">
+            <Card className="bg-sky-50 shadow-md border border-sky-100">
                 <CardHeader>
-                    <CardTitle className="text-sky-900 font-pretendard">🌱 강아지 성장 미션 보드</CardTitle>
-                    <p className="text-sm text-sky-700 font-pretendard">"프로필을 완성하고 더 정확한 훈련법을 추천받으세요!"</p>
+                    <CardTitle className="text-gray-800 font-pretendard font-bold">🌱 강아지 성장 미션 보드</CardTitle>
+                    <p className="text-sm text-gray-600 font-pretendard">"프로필을 완성하고 더 정확한 훈련법을 추천받으세요!"</p>
                     <div className="w-full bg-sky-200 rounded-full h-2.5 mt-2">
                         <motion.div
                             className="bg-sky-500 h-2.5 rounded-full"
