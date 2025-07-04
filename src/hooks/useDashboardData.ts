@@ -29,7 +29,7 @@ const fetchDog = async (): Promise<DogInfo | null> => {
   // 데이터 구조를 DogInfo 타입에 맞게 변환
   const dogInfo: DogInfo = {
     ...data,
-    age: data.age ? data.age : { years: null, months: null },
+    age: typeof data.age === 'object' ? data.age : { years: 0, months: 0 },
     weight: data.weight ? parseFloat(data.weight) : null,
     healthStatus: [], // DB에 해당 필드가 없으므로 빈 배열로 초기화
     trainingGoals: [], // DB에 해당 필드가 없으므로 빈 배열로 초기화
@@ -50,6 +50,22 @@ const fetchRandom = async <T extends TableName>(tableName: T): Promise<Tables<T>
     if (!data || data.length === 0) return null;
     return data[Math.floor(Math.random() * data.length)] as Tables<T>;
 }
+
+const fetchDailyMission = async (): Promise<Tables<'daily_missions'> | null> => {
+  const { data, error } = await supabase.from('daily_missions').select('*');
+  if (error) {
+    console.error('Error fetching daily missions:', error);
+    toast.error('오늘의 미션을 불러오는 데 실패했습니다.');
+    throw error;
+  }
+  if (!data || data.length === 0) return null;
+
+  // Simple pseudo-random selection based on day of the year
+  const today = new Date();
+  const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
+  const missionIndex = dayOfYear % data.length;
+  return data[missionIndex];
+};
 
 async function fetchYoutubeVideos(origin: string) {
   const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
@@ -110,8 +126,8 @@ export const useDashboardData = (originFilter: string) => {
   });
 
   const { data: mission, isLoading: isMissionLoading } = useQuery({
-    queryKey: ['random-mission'],
-    queryFn: () => fetchRandom('daily_missions'),
+    queryKey: ['daily-mission'],
+    queryFn: fetchDailyMission,
     staleTime: 1000 * 60 * 60 * 24, // 24 hours
   });
 

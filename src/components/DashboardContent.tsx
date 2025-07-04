@@ -4,7 +4,7 @@ import { useDashboardStore } from '@/store/dashboardStore';
 import { welcomeMessages } from '@/lib/welcomeMessages';
 import { trainingTips } from '@/lib/trainingTips';
 import { breedData, DogInfo, AgeGroup, GenderKey } from '@/types/dog'; // breedData import
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -12,6 +12,8 @@ import { BookOpen, BarChart3, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useDashboardData } from '@/hooks/useDashboardData';
+import { toast } from 'sonner';
+import confetti from 'canvas-confetti';
 
 interface Video {
   youtube_video_id: string;
@@ -39,6 +41,7 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
   const [filteredVideos, setFilteredVideos] = useState<Video[] | undefined>([]);
   const [showVideos, setShowVideos] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [showMission, setShowMission] = useState(true);
 
   console.log('Is Loading:', isLoading);
   console.log('Dog Data:', dog);
@@ -49,6 +52,13 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
 
   useEffect(() => {
     resetMissionIfNeeded();
+    const lastCompletionDate = localStorage.getItem('missionCompletionDate');
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (lastCompletionDate === todayStr) {
+      setShowMission(false);
+    } else {
+      setShowMission(true);
+    }
   }, [resetMissionIfNeeded]);
 
   useEffect(() => {
@@ -70,6 +80,19 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
       handleSearchVideos();
     }
   }, [originFilter]);
+
+  const handleMissionComplete = () => {
+    toggleMissionCompleted();
+    toast.success('오늘의 미션 완료! 멋져요! 🎉');
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+    });
+    setShowMission(false);
+    const todayStr = new Date().toISOString().split('T')[0];
+    localStorage.setItem('missionCompletionDate', todayStr);
+  };
 
   const handleSearchVideos = () => {
     if (originalVideos) {
@@ -227,25 +250,32 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
       )}
 
       {/* Daily mission */}
-      {mission && (
-        <motion.div variants={itemVariants}>
-          <Card className="card-soft p-6 bg-blue-100">
-            <div className="flex items-start space-x-3">
-              <div className="text-2xl">🎯</div>
-              <div className="flex-1">
-                <h3 className="font-bold text-sky-900 mb-2">오늘의 미션</h3>
-                <p className="text-sm text-sky-800 leading-relaxed">{mission.mission}</p>
+      <AnimatePresence>
+        {mission && showMission && !missionCompleted && (
+          <motion.div
+            variants={itemVariants}
+            initial="hidden"
+            animate="visible"
+            exit={{ opacity: 0, y: -20, transition: { duration: 0.5 } }}
+          >
+            <Card className="card-soft p-6 bg-blue-100">
+              <div className="flex items-start space-x-3">
+                <div className="text-2xl">🎯</div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-sky-900 mb-2">오늘의 미션</h3>
+                  <p className="text-sm text-sky-800 leading-relaxed">{mission.mission}</p>
+                </div>
+                <Checkbox
+                  checked={missionCompleted}
+                  onCheckedChange={handleMissionComplete}
+                  className="w-6 h-6 border-sky-400 data-[state=checked]:bg-sky-600"
+                  id="daily-mission"
+                />
               </div>
-              <Checkbox
-                checked={missionCompleted}
-                onCheckedChange={toggleMissionCompleted}
-                className="w-6 h-6 border-sky-400 data-[state=checked]:bg-sky-600"
-                id="daily-mission"
-              />
-            </div>
-          </Card>
-        </motion.div>
-      )}
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Action buttons */}
       <motion.div className="space-y-4" variants={itemVariants}>
@@ -285,3 +315,28 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
 };
 
 export default DashboardContent;
+
+
+const getDogReminder = (dog: DogInfo | null) => {
+  if (!dog || dog.weight === null || !dog.age || dog.age.years === null) return null;
+
+  const { weight, age, breed, gender } = dog;
+  const totalMonths = age.years * 12 + (age.months || 0);
+
+  const ageGroup: AgeGroup = totalMonths < 12 ? 'puppy' : (age.years < 8 ? 'adult' : 'senior');
+  const genderKey: GenderKey = gender === '수컷' ? 'male' : 'female';
+
+  const currentBreedData = breedData[breed] || breedData['믹스견'];
+  const idealWeight = currentBreedData.idealWeight[ageGroup][genderKey];
+  const [idealWeightLower, idealWeightUpper] = idealWeight;
+
+  if (weight > idealWeightUpper * 1.2) {
+    return `현재 체중(${weight}kg)이 적정 범위(${idealWeightLower}~${idealWeightUpper}kg)보다 많이 나가요. 관절 보호에 신경 써주세요. 🦴`;
+  } else if (weight > idealWeightUpper) {
+    return `현재 체중(${weight}kg)이 적정 범위(${idealWeightLower}~${idealWeightUpper}kg)를 살짝 넘었어요. 꾸준한 산책으로 관리해주세요. 🏃‍♂️`;
+  } else if (weight < idealWeightLower) {
+    return `현재 체중(${weight}kg)이 적정 범위(${idealWeightLower}~${idealWeightUpper}kg)보다 조금 미달이에요. 영양 균형을 확인하고 체력을 보충해주세요. 🍚`;
+  } else {
+    return `현재 적정 체중(${weight}kg)을 잘 유지하고 있어요! 👍`;
+  }
+};
