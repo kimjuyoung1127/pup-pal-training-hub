@@ -7,6 +7,8 @@ import { TrainingLog } from '@/hooks/useTrainingHistory';
 import TrainingIntro from './training-progress/TrainingIntro';
 import TrainingSteps from './training-progress/TrainingSteps';
 import TrainingSummary from './training-progress/TrainingSummary';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 // 아이콘 이름과 컴포넌트를 매핑하는 객체
 const iconMap: { [key: string]: LucideIcon } = {
@@ -50,7 +52,36 @@ const TrainingReplayPage = ({ trainingLog, onExit }: TrainingReplayPageProps) =>
     setFlowStep(2);
   };
 
-  const handleFinishSteps = () => {
+  const handleFinishSteps = async () => {
+    try {
+      const { data: allBadges, error: badgesError } = await supabase.from('badges').select('*').eq('name', '성공의 맛').single();
+      if (badgesError || !allBadges) {
+        throw new Error('뱃지를 찾을 수 없습니다.');
+      }
+
+      const successBadgeId = allBadges.id;
+
+      const { data: dogBadges, error: dogBadgesError } = await supabase
+        .from('dog_badges')
+        .select('badge_id')
+        .eq('dog_id', trainingLog.dog_id)
+        .eq('badge_id', successBadgeId);
+
+      if (dogBadgesError) {
+        throw dogBadgesError;
+      }
+
+      if (dogBadges && dogBadges.length === 0) {
+        const { error: insertError } = await supabase.from('dog_badges').insert({ dog_id: trainingLog.dog_id, badge_id: successBadgeId });
+        if (insertError) {
+          throw insertError;
+        }
+        toast.success(`🎉 뱃지 획득: 성공의 맛`);
+      }
+    } catch (error) {
+      console.error('뱃지 획득에 실패했습니다.', error);
+      toast.error('뱃지 획득에 실패했습니다.');
+    }
     setFlowStep(3);
   }
 

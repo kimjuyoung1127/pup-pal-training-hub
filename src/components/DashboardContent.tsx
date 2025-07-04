@@ -189,7 +189,7 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
       </motion.div>
 
       {/* Recommended video filter */}
-      <motion.div variants={itemVariants} className="space-y-4">
+      <motion.div variants={itemVariants} className="space-y-4 video-filter-card">
         <Card className="card-soft p-6 bg-sky-50">
           <h3 className="font-bold text-sky-900 mb-4">추천 영상 필터</h3>
           <div className="flex flex-col sm:flex-row gap-4 text-sky-900">
@@ -279,7 +279,7 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
 
       {/* Action buttons */}
       <motion.div className="space-y-4" variants={itemVariants}>
-        <Button onClick={() => navigate('/chat')} className="w-full btn-primary justify-between py-6 bg-blue-500 hover:bg-blue-600 text-white">
+        <Button onClick={() => navigate('/chat')} className="w-full btn-primary justify-between py-6 bg-blue-500 hover:bg-blue-600 text-white ai-coach-button">
           <div className="flex items-center space-x-3">
             <Sparkles className="w-5 h-5" />
             <span className="text-lg">AI 훈련 코치와 대화하기</span>
@@ -287,7 +287,7 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
           <div className="text-2xl">🤖</div>
         </Button>
 
-        <Button onClick={() => onNavigate('dog-info')} className="w-full btn-secondary justify-between py-6 bg-teal-500 hover:bg-teal-600 text-white">
+        <Button onClick={() => onNavigate('dog-info')} className="w-full btn-secondary justify-between py-6 bg-teal-500 hover:bg-teal-600 text-white dog-info-button">
           <div className="flex items-center space-x-3">
             <BookOpen className="w-5 h-5" />
             <span className="text-lg">강아지 정보 입력하기</span>
@@ -295,14 +295,14 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
           <div className="text-2xl">🐕</div>
         </Button>
 
-        <Button onClick={() => onNavigate('history')} className="w-full btn-secondary justify-between py-6 bg-indigo-500 hover:bg-indigo-600 text-white">
+        <Button onClick={() => onNavigate('history')} className="w-full btn-secondary justify-between py-6 bg-indigo-500 hover:bg-indigo-600 text-white training-history-button">
           <div className="flex items-center space-x-3">
             <BarChart3 className="w-5 h-5" />
             <span className="text-lg">훈련 기록 보기</span>
           </div>
           <div className="text-2xl">📊</div>
         </Button>
-        <Button onClick={() => window.open('https://puppyvill.com/jason', '_blank')} className="w-full btn-secondary justify-between py-6 bg-purple-500 hover:bg-purple-600 text-white">
+        <Button onClick={() => window.open('https://puppyvill.com/jason', '_blank')} className="w-full btn-secondary justify-between py-6 bg-purple-500 hover:bg-purple-600 text-white offline-training-button">
           <div className="flex items-center space-x-3">
             <Sparkles className="fas fa-handshake w-5 h-5"></Sparkles>
             <span className="text-lg">오프라인 훈련 받기</span>

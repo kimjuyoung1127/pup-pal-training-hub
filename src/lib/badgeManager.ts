@@ -65,7 +65,7 @@ export const checkAndAwardBadges = async (dogId: string) => {
         }
         
         // Badge 3: '성공의 맛'
-        const successTasteBadge = allBadges.find(b => b.name === '성공의 맛');
+        const successTasteBadge = allBadges.find(b => b.name === '한번 더');
         if (successTasteBadge && !dogBadgeIds.includes(successTasteBadge.id)) {
             const firstLog = [...trainingHistory].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())[0];
             if (firstLog && firstLog.success_rate && Number(firstLog.success_rate) === 100) {

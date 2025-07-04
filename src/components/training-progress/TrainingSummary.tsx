@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Award } from 'lucide-react';
 import { TrainingLog } from '@/hooks/useTrainingHistory';
+import confetti from 'canvas-confetti';
 
 interface Badge {
   id: number;
@@ -43,6 +44,34 @@ const TrainingSummary = ({ onNavigate, onExit, newlyAwardedBadges = [], isReplay
       setCompletionMessage(completionMessages[randomIndex]);
     }
   }, [newlyAwardedBadges]);
+
+  useEffect(() => {
+    if (isReplay) return;
+
+    const triggerConfetti = () => {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+      });
+
+      if (newlyAwardedBadges.length > 0) {
+        // 뱃지 획득 시 더 화려한 효과
+        setTimeout(() => {
+          confetti({
+            particleCount: 150,
+            spread: 120,
+            origin: { y: 0.5, x: 0.5 },
+            angle: 90,
+            startVelocity: 30,
+            ticks: 400,
+          });
+        }, 300);
+      }
+    };
+
+    triggerConfetti();
+  }, [isReplay]); // 의존성 배열에서 newlyAwardedBadges 제거
 
   return (
     <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="p-6 text-center flex flex-col items-center justify-center h-full">
