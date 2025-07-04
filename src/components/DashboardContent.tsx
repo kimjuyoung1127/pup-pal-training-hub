@@ -8,8 +8,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { BookOpen, BarChart3, Sparkles } from 'lucide-react';
+import { BookOpen, BarChart3, Sparkles, HelpCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import Joyride, { Step, CallBackProps } from 'react-joyride';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { toast } from 'sonner';
@@ -27,9 +28,11 @@ interface Video {
 // Props 타입 정의
 interface DashboardContentProps {
   onNavigate: (page: string) => void;
+  runTour: boolean;
+  setRunTour: (run: boolean) => void;
 }
 
-const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
+const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentProps) => {
   const [originFilter, setOriginFilter] = useState('all');
   const { dog, tip, videos, mission, isLoading } = useDashboardData(originFilter);
   const { missionCompleted, toggleMissionCompleted, resetMissionIfNeeded } = useDashboardStore();
@@ -42,6 +45,67 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
   const [showVideos, setShowVideos] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [showMission, setShowMission] = useState(true);
+
+  const tourSteps: Step[] = [
+    {
+      target: '.video-filter-card',
+      title: '영상 필터',
+      content: '여기서 원하는 국가/언어의 훈련 영상을 볼 수 있어요.',
+      disableBeacon: true,
+    },
+    {
+      target: '.ai-coach-button',
+      title: 'AI 훈련 코치',
+      content: 'AI 훈련 코치와 대화하며 맞춤형 훈련 계획을 세워보세요.',
+    },
+    {
+      target: '.dog-info-button',
+      title: '강아지 정보',
+      content: '강아지 정보를 입력하고 더 정확한 추천을 받아보세요.',
+    },
+    {
+      target: '.training-history-button',
+      title: '훈련 기록',
+      content: '이전 훈련 기록을 확인하고 진행 상황을 추적할 수 있습니다.',
+    },
+    {
+      target: '.offline-training-button',
+      title: '오프라인 훈련',
+      content: '오프라인 훈련 정보를 확인하고 예약할 수 있습니다.',
+    },
+    {
+      target: '.bottom-nav-dashboard',
+      title: '홈',
+      content: '언제든지 홈으로 돌아오려면 이 버튼을 누르세요.',
+    },
+    {
+      target: '.bottom-nav-dog-profile',
+      title: '강아지 프로필',
+      content: '강아지 프로필을 확인하고 관리할 수 있습니다.',
+    },
+    {
+      target: '.bottom-nav-training',
+      title: '훈련 시작',
+      content: '다양한 훈련 프로그램을 시작할 수 있습니다.',
+    },
+    {
+      target: '.bottom-nav-history',
+      title: '훈련 기록',
+      content: '훈련 기록을 보고 성과를 추적하세요.',
+    },
+    {
+      target: '.bottom-nav-settings',
+      title: '설정',
+      content: '계정을 관리하고 사진을 추가해요.',
+    },
+  ];
+
+  const handleJoyrideCallback = (data: CallBackProps) => {
+    const { status } = data;
+    if (['finished', 'skipped'].includes(status)) {
+      setRunTour(false);
+    }
+  };
 
   console.log('Is Loading:', isLoading);
   console.log('Dog Data:', dog);
@@ -151,11 +215,46 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
 
   return (
     <motion.div
-      className="p-6 space-y-6"
+      className="p-6 space-y-6 relative"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
+      <Joyride
+        steps={tourSteps}
+        run={runTour}
+        continuous
+        showProgress={false}
+        showSkipButton
+        callback={handleJoyrideCallback}
+        locale={{
+          back: '이전',
+          close: '닫기',
+          last: '시작하기',
+          next: '다음',
+          skip: '건너뛰기',
+        }}
+        styles={{
+          options: {
+            primaryColor: '#0ea5e9', // sky-500
+            textColor: '#0c4a6e', // sky-900
+            arrowColor: '#ffffff',
+            backgroundColor: '#ffffff',
+            overlayColor: 'rgba(0, 0, 0, 0.5)',
+          },
+          buttonClose: {
+            color: '#0c4a6e',
+          },
+          buttonNext: {
+            backgroundColor: '#0ea5e9',
+            color: 'white',
+          },
+          buttonBack: {
+            color: '#0ea5e9',
+            marginRight: 'auto',
+          },
+        }}
+      />
       {/* Welcome card */}
       <motion.div variants={itemVariants}>
         <Card className="card-soft p-6 bg-sky-100">
@@ -304,10 +403,10 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
         </Button>
         <Button onClick={() => window.open('https://puppyvill.com/jason', '_blank')} className="w-full btn-secondary justify-between py-6 bg-purple-500 hover:bg-purple-600 text-white offline-training-button">
           <div className="flex items-center space-x-3">
-            <Sparkles className="fas fa-handshake w-5 h-5"></Sparkles>
-            <span className="text-lg">오프라인 훈련 받기</span>
+            <BookOpen className="w-5 h-5" />
+            <span className="text-lg">오프라인 훈련소 가기</span>
           </div>
-          <div className="text-2xl">🤝</div>
+          <div className="text-2xl">🎓</div>
         </Button>
       </motion.div>
     </motion.div>
@@ -315,7 +414,6 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
 };
 
 export default DashboardContent;
-
 
 const getDogReminder = (dog: DogInfo | null) => {
   if (!dog || dog.weight === null || !dog.age || dog.age.years === null) return null;
