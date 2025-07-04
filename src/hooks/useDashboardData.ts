@@ -4,9 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Tables } from '@/integrations/supabase/types';
 import { useEffect, useState } from 'react';
+import { DogInfo } from '@/types/dog';
 
-
-const fetchDog = async () => {
+const fetchDog = async (): Promise<DogInfo | null> => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
@@ -23,7 +23,19 @@ const fetchDog = async () => {
     toast.error('강아지 정보를 불러오는 데 실패했습니다.');
     throw error;
   }
-  return data;
+
+  if (!data) return null;
+
+  // 데이터 구조를 DogInfo 타입에 맞게 변환
+  const dogInfo: DogInfo = {
+    ...data,
+    age: data.age ? data.age : { years: null, months: null },
+    weight: data.weight ? parseFloat(data.weight) : null,
+    healthStatus: [], // DB에 해당 필드가 없으므로 빈 배열로 초기화
+    trainingGoals: [], // DB에 해당 필드가 없으므로 빈 배열로 초기화
+  };
+
+  return dogInfo;
 };
 
 type TableName = 'training_tips' | 'recommended_videos' | 'daily_missions';

@@ -36,7 +36,7 @@ export const missionCategories: MissionCategory[] = [
         missions: [
             { key: 'social_level', title: '사회성', question: '다른 강아지나 사람들과의 사회성은 어떤가요?', type: 'radio', options: ['좋음', '보통', '부족'] },
             { key: 'owner_proximity', title: '보호자와의 관계', question: '보호자와의 거리감은 어느 정도인가요?', type: 'radio', options: ['항상 함께 있음', '혼자 있는 시간 많음'] },
-            { key: 'past_experience', title: '과거 경험', question: '딩딩이에게 특별한 과거 경험이 있나요?', type: 'radio', options: ['입양', '유기', '가정견', '모름'] },
+            { key: 'past_experience', title: '과거 경험', question: '아이에게 특별한 과거 경험이 있나요?', type: 'radio', options: ['입양', '유기', '가정견', '모름'] },
             { key: 'sensitive_items', title: '민감 요소', question: '특별히 민감하게 반응하는 것이 있나요?', type: 'array', placeholder: '쉼표(,)로 구분하여 입력' },
         ],
     },
