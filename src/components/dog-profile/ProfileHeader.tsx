@@ -39,15 +39,6 @@ const formatAge = (age: { years: number | null; months: number | null; }) => {
   return ageString.trim() || '나이 정보 없음';
 };
 
-const getWeightLabel = (weight: string) => {
-  switch (weight) {
-    case 'small': return '소형견 (7kg 미만)';
-    case 'medium': return '중형견 (7kg ~ 25kg)';
-    case 'large': return '대형견 (25kg 이상)';
-    default: return weight;
-  }
-};
-
 const getGenderEmoji = (gender: string) => {
   return gender === 'male' ? '🐕' : '🐕‍🦺';
 };
@@ -91,7 +82,7 @@ const ProfileHeader = ({ dogInfo, onImageUpload, onImageDelete }: ProfileHeaderP
                 {formatAge(dogInfo.age as any)}
               </Badge>
               <Badge variant="secondary" className="bg-sky-100 text-sky-900">
-                {getWeightLabel(dogInfo.weight)}
+                {dogInfo.weight}kg
               </Badge>
             </div>
           </div>
