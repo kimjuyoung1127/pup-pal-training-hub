@@ -32,10 +32,10 @@ export const saveDogInfo = async (dogInfo: DogInfo) => {
             .from('dogs')
             .update({
                 name: dogInfo.name,
-                age: `${dogInfo.age.years}년 ${dogInfo.age.months}개월`,
+                age: `${dogInfo.age.years}년 ${dogInfo.age.months}개월`, // Convert age object to string format
                 gender: dogInfo.gender,
                 breed: dogInfo.breed,
-                weight: dogInfo.weight,
+                weight: dogInfo.weight.toString(),
                 user_id: user.id
             })
             .eq('id', dogId);
@@ -81,13 +81,11 @@ export const saveDogInfo = async (dogInfo: DogInfo) => {
 
     } else {
         // Insert new dog (original logic)
-        const ageString = `${dogInfo.age.years || 0}년 ${dogInfo.age.months || 0}개월`;
-
         const { data: dogData, error: dogError } = await supabase
           .from('dogs')
           .insert({
             name: dogInfo.name,
-            age: ageString,
+            age: `${dogInfo.age.years}년 ${dogInfo.age.months}개월`, // Convert age object to string format
             gender: dogInfo.gender,
             breed: dogInfo.breed,
             weight: dogInfo.weight,

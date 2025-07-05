@@ -149,7 +149,12 @@ const GeminiChatPage = () => {
     <div className="flex flex-col h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 p-4 flex items-center space-x-2 sticky top-0 z-10">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => navigate('/')}
+          className="text-sky-600 hover:text-sky-800 bg-transparent hover:bg-sky-100 focus:ring-0"
+        >
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div className="flex items-center space-x-3">
@@ -219,10 +224,14 @@ const GeminiChatPage = () => {
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder={isDogProfileLoading ? "강아지 정보를 불러오는 중..." : "멍멍코치에게 메시지 보내기..."}
-            className="flex-1 border-gray-200 focus:border-orange-400 bg-white text-black"
+            className="flex-1 bg-white text-gray-800 placeholder-gray-600 border border-gray-300 rounded-full py-2 px-4 focus:outline-none focus:border-orange-500"
             disabled={isLoading || isDogProfileLoading}
           />
-          <Button onClick={handleSendMessage} disabled={isLoading || isDogProfileLoading} className="bg-orange-500 hover:bg-orange-600">
+          <Button 
+            onClick={handleSendMessage} 
+            disabled={isLoading || isDogProfileLoading}
+            className="bg-orange-500 hover:bg-orange-600 text-gray-800 rounded-full p-2"
+          >
             <Send className="w-5 h-5" />
           </Button>
         </div>

@@ -34,7 +34,7 @@ const Step1_BasicInfo: React.FC<Props> = ({ dogInfo, setDogInfo }) => {
           <Label htmlFor="age" className="text-gray-800 font-medium">나이</Label>
           <div className="flex space-x-2 mt-2">
             <div className="w-1/2">
-              <Select onValueChange={(value) => setDogInfo(prev => ({ ...prev, age: { ...prev.age, years: parseInt(value) } }))} value={dogInfo.age?.years?.toString() || undefined}>
+              <Select onValueChange={(value) => setDogInfo(prev => ({ ...prev, age: { years: parseInt(value), months: prev.age?.months ?? 0 } }))} value={dogInfo.age?.years?.toString()}>
                 <SelectTrigger className="bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl text-gray-900">
                   <SelectValue placeholder="년" />
                 </SelectTrigger>
@@ -46,7 +46,7 @@ const Step1_BasicInfo: React.FC<Props> = ({ dogInfo, setDogInfo }) => {
               </Select>
             </div>
             <div className="w-1/2">
-              <Select onValueChange={(value) => setDogInfo(prev => ({ ...prev, age: { ...prev.age, months: parseInt(value) } }))} value={dogInfo.age?.months?.toString() || undefined}>
+              <Select onValueChange={(value) => setDogInfo(prev => ({ ...prev, age: { years: prev.age?.years ?? 0, months: parseInt(value) } }))} value={dogInfo.age?.months?.toString()}>
                 <SelectTrigger className="bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl text-gray-900">
                   <SelectValue placeholder="개월" />
                 </SelectTrigger>

@@ -129,10 +129,20 @@ const fetchDogProfileData = async () => {
 
   const trainingStats = { consecutiveDays, badgesCount };
 
+  let ageObject = { years: null, months: null };
+  if (typeof dogData.age === 'string') {
+    const parts = dogData.age.split('년');
+    const years = parseInt(parts[0]) || 0;
+    const months = parts[1] ? parseInt(parts[1].replace('개월', '')) || 0 : 0;
+    ageObject = { years, months };
+  } else if (dogData.age && typeof dogData.age === 'object') {
+    ageObject = dogData.age;
+  }
+
   const fullDogInfo: FullDogInfo = {
     id: dogData.id,
     name: dogData.name || '',
-    age: typeof dogData.age === 'object' ? dogData.age : { years: 0, months: 0 },
+    age: ageObject,
     gender: dogData.gender || '',
     breed: dogData.breed || '',
     weight: dogData.weight ? Number(dogData.weight) : null,
@@ -273,7 +283,7 @@ export const useDogProfile = (): UseDogProfileReturn => {
     trainingStats,
     isLoading,
     isDeleting,
-    extendedProfile,
+    extendedProfile: extendedProfile as FullDogExtendedProfile | null | undefined,
     fetchDogProfile: refetch,
     handleImageUpload,
     handleImageDelete,
