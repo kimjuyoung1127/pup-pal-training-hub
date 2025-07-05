@@ -136,6 +136,7 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
         </motion.div>
         
         <motion.div
+          className="mission-board-section" // Joyride 타겟을 위한 클래스 추가
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}

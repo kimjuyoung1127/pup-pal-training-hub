@@ -10,19 +10,22 @@ import BottomNavigation from '@/components/BottomNavigation';
 import TrainingHistoryPage from '@/components/TrainingHistoryPage';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
-import TrainingProgressPage from '@/components/TrainingProgressPage'; // TrainingProgressPage 임포트
-import TrainingReplayPage from '@/components/TrainingReplayPage'; // TrainingReplayPage 임포트
-import { TrainingProgram } from '@/lib/trainingData'; // TrainingProgram 임포트
-import { TrainingLog } from '@/hooks/useTrainingHistory'; // TrainingLog 임포트
+import TrainingProgressPage from '@/components/TrainingProgressPage';
+import TrainingReplayPage from '@/components/TrainingReplayPage';
+import { TrainingProgram } from '@/lib/trainingData';
+import { TrainingLog } from '@/hooks/useTrainingHistory';
+import Joyride, { Step, CallBackProps } from 'react-joyride';
 
 const Index = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState<'onboarding' | 'login' | 'dashboard' | 'dog-info' | 'dog-profile' | 'training' | 'training-progress' | 'training-replay' | 'history' | 'settings'>('onboarding');
   const [dogInfo, setDogInfo] = useState<any>(null);
-  const [editingDogInfo, setEditingDogInfo] = useState<any>(null); // 편집할 강아지 정보를 저장할 상태
+  const [editingDogInfo, setEditingDogInfo] = useState<any>(null);
   const [trainingParams, setTrainingParams] = useState<{ trainingProgram: TrainingProgram, dogId: string } | null>(null);
   const [replayParams, setReplayParams] = useState<{ trainingLog: TrainingLog } | null>(null);
+  const [runTour, setRunTour] = useState(false);
+  const [tourSteps, setTourSteps] = useState<Step[]>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -55,13 +58,10 @@ const Index = () => {
   };
 
   const handleLogin = () => {
-    // This is now mainly handled by onAuthStateChange.
-    // It can be kept for non-OAuth login methods if any are added in the future.
     setCurrentPage('dashboard');
   };
 
   const handleNavigate = (page: string, params?: any) => {
-    console.log(`Navigating to: ${page}`, params);
     if (page === 'training-progress' && params) {
       setTrainingParams(params);
       setCurrentPage('training-progress');
@@ -69,7 +69,7 @@ const Index = () => {
       setReplayParams(params);
       setCurrentPage('training-replay');
     } else if (page === 'dog-info') {
-      setEditingDogInfo(params?.dogInfo || null); // 편집할 정보 설정
+      setEditingDogInfo(params?.dogInfo || null);
       setCurrentPage('dog-info');
     } else if (page === 'dog-profile') {
       setCurrentPage('dog-profile');
@@ -82,17 +82,62 @@ const Index = () => {
     } else if (page === 'history') {
       setCurrentPage('history');
     }
+    console.log(`Navigating to: ${page}`, params); // 페이지 전환 로그 추가
   };
 
   const handleDogInfoComplete = (completedDogInfo: any) => {
     console.log('Dog info completed:', completedDogInfo);
     setDogInfo(completedDogInfo);
-    setEditingDogInfo(null); // 편집 정보 초기화
-    // 강아지 정보 입력/수정 완료 후 프로필 페이지로 이동
-    setCurrentPage('dog-profile');
+    setEditingDogInfo(null);
+    setCurrentPage('dog-profile'); // 페이지를 즉시 전환합니다.
+
+    // 튜토리얼을 본 적 없는 경우에만 실행하도록 설정합니다.
+    const tourShown = localStorage.getItem('missionBoardTourShown');
+    if (!tourShown) {
+      const newTourSteps: Step[] = [
+        {
+          target: '.mission-board-section',
+          content: '강아지 정보 입력이 완료되었습니다! 🎉 이제 우리 강아지만을 위한 맞춤형 훈련 미션 보드를 확인해보세요.',
+          disableBeacon: true,
+          title: '미션 보드 도착!',
+        },
+      ];
+      setTourSteps(newTourSteps);
+      setRunTour(true);
+      localStorage.setItem('missionBoardTourShown', 'true'); // 튜토리얼을 봤다고 기록합니다.
+    }
   };
 
-  // 하단 네비게이션을 보여줄 페이지들
+  // useEffect 훅은 더 이상 필요 없으므로 삭제하거나 주석 처리합니다.
+  /*
+  useEffect(() => {
+    if (currentPage === 'dog-profile' && dogInfo) {
+      console.log('Current page is dog-profile, starting tour.');
+      const tourShown = localStorage.getItem('missionBoardTourShown');
+      if (!tourShown) {
+        const newTourSteps: Step[] = [
+          {
+            target: '.mission-board-section',
+            content: '강아지 정보 입력이 완료되었습니다! 🎉 이제 우리 강아지만을 위한 맞춤형 훈련 미션 보드를 확인해보세요.',
+            disableBeacon: true,
+            title: '미션 보드 도착!',
+          },
+        ];
+        setTourSteps(newTourSteps);
+        setRunTour(true);
+        localStorage.setItem('missionBoardTourShown', 'true');
+      }
+    }
+  }, [currentPage, dogInfo]);
+  */
+
+  const handleJoyrideCallback = (data: CallBackProps) => {
+    const { status } = data;
+    if (['finished', 'skipped'].includes(status)) {
+      setRunTour(false);
+    }
+  };
+
   const showBottomNav = ['dashboard', 'dog-info', 'dog-profile', 'training', 'settings', 'history', 'training-progress'].includes(currentPage);
 
   const renderPage = () => {
@@ -122,7 +167,6 @@ const Index = () => {
             onExit={() => handleNavigate('dashboard')} 
           />;
         }
-        // trainingParams가 없으면 대시보드로 리디렉션
         return <DashboardPage onNavigate={handleNavigate} />;
       case 'training-replay':
         if (replayParams) {
@@ -147,6 +191,34 @@ const Index = () => {
 
   return (
     <div className={`relative min-h-screen ${showBottomNav ? 'pb-20' : ''}`}>
+      <Joyride
+        steps={tourSteps}
+        run={runTour}
+        callback={handleJoyrideCallback}
+        continuous
+        showProgress
+        showSkipButton
+        locale={{
+          back: '이전',
+          close: '닫기',
+          last: '마지막',
+          next: '다음',
+          skip: '건너뛰기',
+        }}
+        styles={{
+          options: {
+            zIndex: 10000,
+            primaryColor: '#0ea5e9',
+          },
+          tooltip: {
+            borderRadius: '0.5rem',
+          },
+          buttonNext: {
+            backgroundColor: '#0ea5e9',
+            borderRadius: '0.375rem',
+          },
+        }}
+      />
       {renderPage()}
       {showBottomNav && (
         <BottomNavigation 
