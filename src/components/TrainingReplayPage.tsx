@@ -54,33 +54,41 @@ const TrainingReplayPage = ({ trainingLog, onExit }: TrainingReplayPageProps) =>
 
   const handleFinishSteps = async () => {
     try {
-      const { data: allBadges, error: badgesError } = await supabase.from('badges').select('*').eq('name', '성공의 맛').single();
-      if (badgesError || !allBadges) {
-        throw new Error('뱃지를 찾을 수 없습니다.');
-      }
+      const { data: replayBadge, error: badgeError } = await supabase
+        .from('badges')
+        .select('id')
+        .eq('name', '한번 더')
+        .single();
 
-      const successBadgeId = allBadges.id;
+      if (badgeError || !replayBadge) {
+        console.error('한번 더 뱃지를 찾을 수 없습니다.');
+        // 뱃지를 못찾아도 플로우는 계속 진행
+      } else {
+        const { data: existingBadge, error: existingBadgeError } = await supabase
+          .from('dog_badges')
+          .select('id')
+          .eq('dog_id', trainingLog.dog_id)
+          .eq('badge_id', replayBadge.id)
+          .single();
 
-      const { data: dogBadges, error: dogBadgesError } = await supabase
-        .from('dog_badges')
-        .select('badge_id')
-        .eq('dog_id', trainingLog.dog_id)
-        .eq('badge_id', successBadgeId);
-
-      if (dogBadgesError) {
-        throw dogBadgesError;
-      }
-
-      if (dogBadges && dogBadges.length === 0) {
-        const { error: insertError } = await supabase.from('dog_badges').insert({ dog_id: trainingLog.dog_id, badge_id: successBadgeId });
-        if (insertError) {
-          throw insertError;
+        if (existingBadgeError && existingBadgeError.code !== 'PGRST116') {
+          throw existingBadgeError;
         }
-        toast.success(`🎉 뱃지 획득: 성공의 맛`);
+
+        if (!existingBadge) {
+          const { error: insertError } = await supabase.from('dog_badges').insert({
+            dog_id: trainingLog.dog_id,
+            badge_id: replayBadge.id,
+          });
+
+          if (insertError) throw insertError;
+
+          toast.success(`🎉 뱃지 획득: 한번 더`);
+        }
       }
     } catch (error) {
       console.error('뱃지 획득에 실패했습니다.', error);
-      toast.error('뱃지 획득에 실패했습니다.');
+      toast.error('뱃지 획득 처리 중 오류가 발생했습니다.');
     }
     setFlowStep(3);
   }

@@ -115,8 +115,8 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
                                                 <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-2">
                                                     {['예', '아니오'].map(option => (
                                                         <FormItem key={option} className="flex items-center space-x-2 space-y-0">
-                                                            <FormControl><RadioGroupItem value={option} className="bg-white border-gray-300" /></FormControl>
-                                                            <FormLabel className="font-normal" style={{ color: '#111827' }}>{option}</FormLabel>
+                                                            <FormControl><RadioGroupItem value={option} className="bg-white border-gray-400 text-gray-900" /></FormControl>
+                                                            <FormLabel className="font-normal text-gray-800">{option}</FormLabel>
                                                         </FormItem>
                                                     ))}
                                                 </RadioGroup>
@@ -125,14 +125,14 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
                                                     {mission.options.map(option => (
                                                         <FormItem key={option} className="flex items-center space-x-3 space-y-0">
                                                           <FormControl>
-                                                            <RadioGroupItem value={option} className="bg-white border-gray-300" />
+                                                            <RadioGroupItem value={option} className="bg-white border-gray-400 text-gray-900" />
                                                           </FormControl>
-                                                          <FormLabel className="font-normal" style={{ color: '#111827' }}>{option}</FormLabel>
+                                                          <FormLabel className="font-normal text-gray-800">{option}</FormLabel>
                                                         </FormItem>
                                                       ))}
                                                 </RadioGroup>
                                             ) : (
-                                                <Textarea placeholder={mission.placeholder} {...field} className="bg-white" style={{ color: '#111827' }} />
+                                                <Textarea placeholder={mission.placeholder} {...field} className="bg-white text-gray-900 border-gray-300" />
                                             )}
                                         </FormControl>
                                         <FormMessage />

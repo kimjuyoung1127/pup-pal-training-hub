@@ -49,7 +49,7 @@ export const checkAndAwardBadges = async (dogId: string) => {
         
         const { data: trainingHistory, error: historyError } = await supabase
             .from('training_history')
-            .select('session_date, success_rate, created_at')
+            .select('*') // Select all columns to ensure is_ai_training is included
             .eq('dog_id', dogId)
             .order('created_at', { ascending: false });
 
@@ -61,17 +61,13 @@ export const checkAndAwardBadges = async (dogId: string) => {
         // Badge 1: '첫 훈련 파트너'
         const firstTrainingBadge = allBadges.find(b => b.name === '첫 훈련 파트너');
         if (firstTrainingBadge && !dogBadgeIds.includes(firstTrainingBadge.id)) {
-            newBadgesToAward.push({ dog_id: dogId, badge_id: firstTrainingBadge.id });
-        }
-        
-        // Badge 3: '성공의 맛'
-        const successTasteBadge = allBadges.find(b => b.name === '한번 더');
-        if (successTasteBadge && !dogBadgeIds.includes(successTasteBadge.id)) {
-            const firstLog = [...trainingHistory].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())[0];
-            if (firstLog && firstLog.success_rate && Number(firstLog.success_rate) === 100) {
-                newBadgesToAward.push({ dog_id: dogId, badge_id: successTasteBadge.id });
+            // 전체 훈련 기록이 1개일 때만 획득
+            if (trainingHistory.length === 1) {
+                newBadgesToAward.push({ dog_id: dogId, badge_id: firstTrainingBadge.id });
             }
         }
+        
+        // '한번 더' 뱃지 로직 제거
 
         // Badge 2: '꾸준함의 상징'
         const consistencyBadge = allBadges.find(b => b.name === '꾸준함의 상징');

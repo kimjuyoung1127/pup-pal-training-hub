@@ -45,7 +45,7 @@ const TrainingLog = ({ onSave, isSaving }: TrainingLogProps) => {
         <Textarea
           id="notes"
           placeholder="댕댕이가 집중을 잘했어요!"
-          className="mt-2 min-h-[120px] bg-sky-50 border-sky-200 focus:ring-sky-500"
+          className="mt-2 min-h-[120px] bg-sky-50 border-sky-200 focus:ring-sky-500 text-gray-900"
           value={trainingResult.notes}
           onChange={(e) => setTrainingResult(prev => ({...prev, notes: e.target.value}))}
         />
