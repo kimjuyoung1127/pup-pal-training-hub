@@ -160,7 +160,7 @@ export const useDogProfile = () => {
   const queryClient = useQueryClient();
 
   const { data: profileData, isLoading, error } = useQuery({
-    queryKey: ['dogProfile'],
+    queryKey: ['dog-profile'],
     queryFn: fetchDogProfileData,
     staleTime: 1000 * 60 * 5, // 5분 동안 fresh 상태 유지
   });
@@ -206,7 +206,7 @@ export const useDogProfile = () => {
     },
     onSuccess: () => {
       toast.success('프로필 이미지가 업데이트되었습니다.');
-      queryClient.invalidateQueries({ queryKey: ['dogProfile'] });
+      queryClient.invalidateQueries({ queryKey: ['dog-profile'] });
     },
     onError: (error: any) => {
       console.error('Error uploading image:', error);
@@ -234,7 +234,7 @@ export const useDogProfile = () => {
     },
     onSuccess: () => {
       toast.success('프로필 이미지가 삭제되었습니다.');
-      queryClient.invalidateQueries({ queryKey: ['dogProfile'] });
+      queryClient.invalidateQueries({ queryKey: ['dog-profile'] });
     },
     onError: (error: any) => {
       console.error('Error deleting image:', error);
@@ -270,7 +270,7 @@ export const useDogProfile = () => {
     onSuccess: () => {
       toast.dismiss();
       toast.success('강아지 프로필이 삭제되었습니다.');
-      queryClient.setQueryData(['dogProfile'], null);
+      queryClient.setQueryData(['dog-profile'], null);
     },
     onError: (error: any) => {
       console.error('Error deleting dog profile:', error);
@@ -287,7 +287,7 @@ export const useDogProfile = () => {
     isLoading,
     isDeleting: deleteProfileMutation.isPending,
     extendedProfile: profileData?.extendedProfile ?? null,
-    fetchDogProfile: () => queryClient.invalidateQueries({ queryKey: ['dogProfile'] }),
+    fetchDogProfile: () => queryClient.invalidateQueries({ queryKey: ['dog-profile'] }),
     handleImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => uploadImageMutation.mutate(event),
     handleImageDelete: () => { if (profileData?.dogInfo?.image_url) deleteImageMutation.mutate() },
     handleDeleteDogProfile: () => { if (profileData?.dogInfo) deleteProfileMutation.mutate() },

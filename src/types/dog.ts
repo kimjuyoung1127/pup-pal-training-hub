@@ -492,8 +492,7 @@ export const dogBreeds = [
   "푸들",
   "프렌치 불독",
   "풍산개",
-  "허스키",
-  "말티폼"
+  "허스키"
 ].sort((a, b) => {
   if (a === "잘 모르겠어요") return 1;
   if (b === "잘 모르겠어요") return -1;
