@@ -9,11 +9,13 @@ import NotFound from "./pages/NotFound";
 import GeminiChatPage from "./components/GeminiChatPage";
 import TrainingHistoryPage from './components/TrainingHistoryPage';
 import TrainingProgressPage from './components/TrainingProgressPage';
+import TrainingReplayPage from './components/TrainingReplayPage';
 import SettingsPage from './components/SettingsPage';
 import DogBadges from './components/DogBadges'; // DogBadgesPage 대신 DogBadges를 임포트합니다.
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 import AboutUsPage from './pages/AboutUsPage';
+import PricingPage from './pages/PricingPage'; // PricingPage import 추가
 
 const queryClient = new QueryClient();
 
@@ -29,6 +31,8 @@ const App = () => (
           <Route path="/PrivacyPolicyPage" element={<PrivacyPolicyPage />} />
           <Route path="/TermsOfServicePage" element={<TermsOfServicePage />} />
           <Route path="/AboutUsPage" element={<AboutUsPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="/training-history" element={<TrainingHistoryPage onNavigate={function (page: string, params?: any): void {
             throw new Error("Function not implemented.");

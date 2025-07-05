@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { type User as SupabaseUser } from '@supabase/supabase-js';
-import { Card, CardHeader } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { LogOut, Loader2, FileText, Info, Shield } from 'lucide-react';
 import { MediaGallery } from './settings/MediaGallery';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDogProfile } from '@/hooks/useDogProfile';
 
 // 로딩 상태를 표시하는 스피너 컴포넌트
 const LoadingSpinner = () => (
@@ -97,6 +98,7 @@ const Header = () => (
 const SettingsPage = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const { plan } = useDogProfile();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -113,10 +115,25 @@ const SettingsPage = () => {
   }
 
   return (
-    <div className="bg-gray-50 text-gray-900 min-h-screen">
+    <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
       <Header />
       <div className="p-6 space-y-6">
         <UserProfile user={user} />
+        
+        {plan === 'free' && (
+          <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+            <CardHeader>
+              <CardTitle className="text-blue-800 dark:text-blue-300">Pro 플랜으로 업그레이드</CardTitle>
+              <CardDescription className="text-blue-700 dark:text-blue-400">모든 기능을 제한 없이 사용해보세요.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link to="/pricing">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">자세히 보기</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        )}
+
         <MediaGallery />
         <SettingsActions />
       </div>

@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { ArrowLeft, Send, Dog } from 'lucide-react';
-import { toast } from 'sonner';
 import { useDogProfile, FullDogInfo, FullDogExtendedProfile } from '@/hooks/useDogProfile';
+import { toast } from 'sonner';
 
 interface Message {
   role: 'user' | 'model';
@@ -18,72 +18,109 @@ interface Message {
 // 강아지 프로필과 확장 프로필을 결합하고, 불필요한 속성을 제거한 타입을 정의합니다.
 type ChatDogProfile = Omit<FullDogInfo & FullDogExtendedProfile, 'id' | 'dog_id' | 'created_at' | 'updated_at'>;
 
+// 프로필 요약 함수
+const createProfileSummary = (
+  profile: Partial<ChatDogProfile>,
+  dogName: string,
+  healthNames: string[],
+  trainingNames: string[]
+): string => {
+  let summary = `[SYSTEM] 사용자의 강아지 '${dogName}'에 대한 프로필 요약입니다. 이 정보를 바탕으로 전문적이고 친근한 훈련사처럼 한국어로 답변해주세요.\n`;
+  summary += `- 이름: ${dogName}\n`;
+  if (profile.age) summary += `- 나이: ${profile.age.years}살 ${profile.age.months}개월\n`;
+  if (profile.breed) summary += `- 견종: ${profile.breed}\n`;
+  if (healthNames.length > 0) summary += `- 건강 상태: ${healthNames.join(', ')}\n`;
+  if (trainingNames.length > 0) summary += `- 훈련 목표: ${trainingNames.join(', ')}\n`;
+  if (profile.sensitive_factors) summary += `- 민감 반응 요소: ${profile.sensitive_factors}\n`;
+  if (profile.known_behaviors && profile.known_behaviors.length > 0) summary += `- 알려진 행동: ${profile.known_behaviors.join(', ')}\n`;
+  summary += "이 프로필을 참고하여, 사용자의 질문에 맞춤형 조언을 제공해야 합니다.";
+  return summary;
+};
+
 const GeminiChatPage = () => {
   const navigate = useNavigate();
-  const { dogInfo, extendedProfile } = useDogProfile();
+  const { dogInfo, extendedProfile, healthStatusNames, trainingGoalNames, plan, isLoading: isDogProfileLoading } = useDogProfile();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionMessageCount, setSessionMessageCount] = useState(0); // 세션 메시지 카운트
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
   useEffect(() => {
-    if (dogInfo && extendedProfile) {
-      const fullProfile = { ...dogInfo, ...extendedProfile };
-      // 민감하거나 불필요한 정보 제거
-      delete (fullProfile as any).id;
-      delete (fullProfile as any).dog_id;
-      delete (fullProfile as any).created_at;
-      delete (fullProfile as any).updated_at;
+    if (isDogProfileLoading) return; // 프로필 로딩 중에는 아무것도 하지 않음
 
-      const systemMessage: Message = {
-        role: 'user', // 시스템 메시지를 user 역할로 보내 AI가 인식하도록 함
-        parts: [{
-          text: `[SYSTEM] 다음은 사용자의 강아지 프로필입니다. 이 정보를 바탕으로 모든 답변을 제공해주세요: ${JSON.stringify(fullProfile, null, 2)}`
-        }]
-      };
-
-      const initialBotMessage: Message = {
-        role: 'model',
-        parts: [{
-          text: `안녕하세요! 저는 강아지 훈련 전문가, 멍멍코치입니다. ${dogInfo.name}와(과) 관련된 모든 훈련과 행동 문제에 대해 상담해드릴 수 있어요. 무엇을 도와드릴까요?`
-        }]
-      };
-
-      // 시스템 메시지를 가장 먼저, 그 다음 봇의 인사 메시지를 설정합니다.
-      // 시스템 메시지는 UI에 렌더링하지 않을 것입니다.
-      setMessages([systemMessage, initialBotMessage]);
+    let greeting = "안녕하세요! 저는 강아지 훈련 전문가, 멍멍코치입니다.";
+    if (dogInfo) {
+      greeting += ` ${dogInfo.name}와(과)의 즐거운 생활을 위해 무엇이든 물어보세요.`;
+      if (trainingGoalNames && trainingGoalNames.length > 0) {
+        greeting += `\n\n${dogInfo.name}의 훈련 목표인 '${trainingGoalNames.join(', ')}'에 대해 먼저 이야기해볼까요?`;
+      } else if (healthStatusNames && healthStatusNames.length > 0) {
+        greeting += `\n\n${dogInfo.name}의 건강 상태(${healthStatusNames.join(', ')})와 관련해서 궁금한 점이 있으신가요?`;
+      }
+    } else {
+      greeting += " 강아지 프로필을 등록하시면 더 정확한 상담을 받을 수 있어요. 무엇을 도와드릴까요?";
     }
-  }, [dogInfo, extendedProfile]);
+
+    const initialBotMessage: Message = {
+      role: 'model',
+      parts: [{ text: greeting }]
+    };
+    setMessages([initialBotMessage]);
+
+  }, [dogInfo, healthStatusNames, trainingGoalNames, isDogProfileLoading]);
 
   const handleSendMessage = async () => {
-    if (input.trim() === '' || isLoading) return;
+    if (input.trim() === '' || isLoading || isDogProfileLoading) return;
+
+    if (plan === 'free' && sessionMessageCount >= 10) {
+      toast.error("무료 대화 횟수를 모두 사용했어요.", {
+        description: "Pro 플랜으로 업그레이드하고 무제한으로 대화해보세요!",
+        action: {
+          label: "업그레이드",
+          onClick: () => navigate('/pricing'), // 가격 정책 페이지로 이동
+        },
+      });
+      return; // 함수 실행 중단
+    }
 
     const userMessage: Message = { role: 'user', parts: [{ text: input }] };
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
+    
+    let fullProfile: Partial<ChatDogProfile> = {};
+    if (dogInfo && extendedProfile) {
+      const combinedProfile = { ...dogInfo, ...extendedProfile };
+      delete (combinedProfile as any).id;
+      delete (combinedProfile as any).dog_id;
+      delete (combinedProfile as any).created_at;
+      delete (combinedProfile as any).updated_at;
+      fullProfile = combinedProfile;
+    }
+
+    const systemMessageText = createProfileSummary(
+      fullProfile,
+      dogInfo?.name || '강아지',
+      healthStatusNames || [],
+      trainingGoalNames || []
+    );
+
+    const systemMessage: Message = {
+      role: 'user',
+      parts: [{ text: systemMessageText }]
+    };
+
+    // 항상 최신 대화 기록과 함께 시스템 메시지를 전송
+    const messagesToSend = [systemMessage, ...messages, userMessage];
+
+    setMessages(prev => [...prev, userMessage]);
     const currentInput = input;
     setInput('');
     setIsLoading(true);
 
     try {
-      let fullProfile: Partial<ChatDogProfile> = {}; // fullProfile에 대한 명시적 타입 정의
-      if (dogInfo && extendedProfile) {
-        const combinedProfile = { ...dogInfo, ...extendedProfile };
-        
-        // delete 연산자는 'any' 타입 또는 선택적 속성에만 사용할 수 있으므로, 타입 단언을 사용합니다.
-        delete (combinedProfile as any).id;
-        delete (combinedProfile as any).dog_id;
-        delete (combinedProfile as any).created_at;
-        delete (combinedProfile as any).updated_at;
-
-        fullProfile = combinedProfile;
-      }
-
       const { data, error } = await supabase.functions.invoke('gemini-plaintext-chat', { 
-        body: { history: newMessages, dogProfile: fullProfile }, // fullProfile을 백엔드로 전달
+        body: { history: messagesToSend, dogProfile: fullProfile },
       });
 
-      console.log('Supabase function response:', data); // 응답 데이터 콘솔에 출력
+      console.log('Supabase function response:', data);
 
       if (error) {
         throw error;
@@ -95,10 +132,13 @@ const GeminiChatPage = () => {
         parts: [{ text: data }] // 'data'를 직접 사용
       }; 
       setMessages(prev => [...prev, botMessage]);
+      // 메시지 전송 성공 시 카운트 증가
+      setSessionMessageCount(prev => prev + 1);
+
     } catch (err: any) {
       console.error(err);
       toast.error('메시지를 보내는 데 실패했습니다. 다시 시도해주세요.');
-      setMessages(messages);
+      setMessages(prevMessages => prevMessages.slice(0, -1)); // 실패 시 사용자 메시지 제거
       setInput(currentInput);
     } finally {
       setIsLoading(false);
@@ -178,11 +218,11 @@ const GeminiChatPage = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="멍멍코치에게 메시지 보내기..."
+            placeholder={isDogProfileLoading ? "강아지 정보를 불러오는 중..." : "멍멍코치에게 메시지 보내기..."}
             className="flex-1 border-gray-200 focus:border-orange-400 bg-white text-black"
-            disabled={isLoading}
+            disabled={isLoading || isDogProfileLoading}
           />
-          <Button onClick={handleSendMessage} disabled={isLoading || input.trim() === ''}>
+          <Button onClick={handleSendMessage} disabled={isLoading || isDogProfileLoading} className="bg-orange-500 hover:bg-orange-600">
             <Send className="w-5 h-5" />
           </Button>
         </div>
