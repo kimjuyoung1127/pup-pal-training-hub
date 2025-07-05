@@ -61,7 +61,7 @@ const AiTrainingRecommender = ({ onSelectTraining }: AiTrainingRecommenderProps)
       // 확장된 프롬프트
       const prompt = `당신은 반려견 행동 수정 전문가입니다.
 
-      다음 강아지 프로필을 기반으로, **전문적이고 창의적인 맞춤형 훈련 초급,중급,고급 중 2가지**를 추천해주세요. 
+      다음 강아지 프로필 중 훈련목표를 위주로, **전문적이고 창의적인 맞춤형 훈련 초급,중급,고급 중 2가지**를 추천해주세요. 
       **강아지의 나이, 품종, 건강 상태, 활동 수준, 성격, 약한 부위**를 종합적으로 고려해 주세요.
       긍정강화, 부정강화 , 긍정처벌, 부정처벌 등의 복합적인 트레이닝 방법으로 훈련을 추천해주세요.
       
@@ -107,8 +107,19 @@ const AiTrainingRecommender = ({ onSelectTraining }: AiTrainingRecommenderProps)
 
       if (error) throw error;
 
+      const responseData = Array.isArray(data) ? data : data?.response;
+
+      if (!responseData) {
+        console.error("Invalid response structure from AI function:", data);
+        throw new Error("AI 응답이 비어있거나 잘못된 형식입니다.");
+      }
+
       try {
-        let cleanedResponse = data.response.replace(/```json/g, '').replace(/```/g, '').trim();
+        // If responseData is already an object (array), stringify it for cleaning.
+        // Otherwise, it's already a string.
+        const responseString = typeof responseData === 'string' ? responseData : JSON.stringify(responseData);
+
+        let cleanedResponse = responseString.replace(/```json/g, '').replace(/```/g, '').trim();
         
         const startIndex = cleanedResponse.indexOf('[');
         let lastIndex = cleanedResponse.lastIndexOf(']');
