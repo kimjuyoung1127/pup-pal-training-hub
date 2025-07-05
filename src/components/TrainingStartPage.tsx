@@ -15,7 +15,7 @@ const TrainingStartPage = ({
 }) => {
   const [selectedAiTraining, setSelectedAiTraining] = useState<TrainingProgram | null>(null);
   const [isTrainingActive, setIsTrainingActive] = useState(false);
-  const { dogInfo } = useDogProfile(); // useDogProfile 훅 사용
+  const { dogInfo, trainingGoalNames } = useDogProfile(); // trainingGoalNames 추가
 
   const quickTips = ['간식을 미리 준비해주세요 🦴', '조용한 환경에서 훈련하세요 🤫', '긍정적인 보상을 잊지 마세요 ❤️', '강아지의 컨디션을 확인하세요 😊'];
   
@@ -65,6 +65,7 @@ const TrainingStartPage = ({
           <AiTrainingRecommender 
             onSelectTraining={handleSelectAiTraining} 
             selectedTrainingTitle={selectedAiTraining?.title || null}
+            trainingGoals={trainingGoalNames} // trainingGoals prop 전달
           />
         </motion.div>
 

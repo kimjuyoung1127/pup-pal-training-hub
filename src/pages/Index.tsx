@@ -20,6 +20,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState<'onboarding' | 'login' | 'dashboard' | 'dog-info' | 'dog-profile' | 'training' | 'training-progress' | 'training-replay' | 'history' | 'settings'>('onboarding');
   const [dogInfo, setDogInfo] = useState<any>(null);
+  const [editingDogInfo, setEditingDogInfo] = useState<any>(null); // 편집할 강아지 정보를 저장할 상태
   const [trainingParams, setTrainingParams] = useState<{ trainingProgram: TrainingProgram, dogId: string } | null>(null);
   const [replayParams, setReplayParams] = useState<{ trainingLog: TrainingLog } | null>(null);
 
@@ -68,6 +69,7 @@ const Index = () => {
       setReplayParams(params);
       setCurrentPage('training-replay');
     } else if (page === 'dog-info') {
+      setEditingDogInfo(params?.dogInfo || null); // 편집할 정보 설정
       setCurrentPage('dog-info');
     } else if (page === 'dog-profile') {
       setCurrentPage('dog-profile');
@@ -85,8 +87,9 @@ const Index = () => {
   const handleDogInfoComplete = (completedDogInfo: any) => {
     console.log('Dog info completed:', completedDogInfo);
     setDogInfo(completedDogInfo);
-    // 강아지 정보 입력 완료 후 훈련 페이지로 이동
-    setCurrentPage('training');
+    setEditingDogInfo(null); // 편집 정보 초기화
+    // 강아지 정보 입력/수정 완료 후 프로필 페이지로 이동
+    setCurrentPage('dog-profile');
   };
 
   // 하단 네비게이션을 보여줄 페이지들
@@ -101,7 +104,7 @@ const Index = () => {
       case 'dashboard':
         return <DashboardPage onNavigate={handleNavigate} />;
       case 'dog-info':
-        return <DogInfoPage onComplete={handleDogInfoComplete} />;
+        return <DogInfoPage onComplete={handleDogInfoComplete} dogInfoToEdit={editingDogInfo} />;
       case 'dog-profile':
         return <DogProfilePage onNavigate={handleNavigate} />;
       case 'training':

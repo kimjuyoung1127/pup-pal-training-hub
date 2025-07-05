@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -13,7 +13,12 @@ import { useSaveDogInfo } from '@/hooks/useSaveDogInfo';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
 
-const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void }) => {
+interface DogInfoPageProps {
+  onComplete: (dogInfo: DogInfo) => void;
+  dogInfoToEdit?: DogInfo | null;
+}
+
+const DogInfoPage = ({ onComplete, dogInfoToEdit }: DogInfoPageProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [breedOpen, setBreedOpen] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -28,6 +33,19 @@ const DogInfoPage = ({ onComplete }: { onComplete: (dogInfo: DogInfo) => void })
     healthStatus: [],
     trainingGoals: []
   });
+
+  useEffect(() => {
+    if (dogInfoToEdit) {
+      let ageObject = dogInfoToEdit.age;
+      if (typeof ageObject === 'string') {
+        const parts = (ageObject as string).split('년');
+        const years = parseInt(parts[0]) || 0;
+        const months = parts[1] ? parseInt(parts[1].replace('개월', '')) || 0 : 0;
+        ageObject = { years, months };
+      }
+      setDogInfo({ ...dogInfoToEdit, age: ageObject });
+    }
+  }, [dogInfoToEdit]);
 
   const { healthOptions, trainingGoalOptions, isLoading: optionsLoading } = useDogInfoOptions();
 

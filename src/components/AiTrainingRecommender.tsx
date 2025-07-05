@@ -26,10 +26,11 @@ interface AiTrainingProgram {
 
 interface AiTrainingRecommenderProps {
   onSelectTraining: (training: TrainingProgram) => void;
-  selectedTrainingTitle: string | null; // 이 prop은 더 이상 하이라이트에 사용되지 않지만, 호환성을 위해 남겨둡니다.
+  selectedTrainingTitle: string | null;
+  trainingGoals?: string[]; // trainingGoals prop 추가
 }
 
-const AiTrainingRecommender = ({ onSelectTraining }: AiTrainingRecommenderProps) => {
+const AiTrainingRecommender = ({ onSelectTraining, trainingGoals }: AiTrainingRecommenderProps) => {
   const { dogInfo, extendedProfile, isLoading: isProfileLoading } = useDogProfile();
   const [aiRecommendations, setAiRecommendations] = useState<AiTrainingProgram[]>([]);
   const [highlightedTitle, setHighlightedTitle] = useState<string | null>(null);
@@ -61,15 +62,16 @@ const AiTrainingRecommender = ({ onSelectTraining }: AiTrainingRecommenderProps)
       // 확장된 프롬프트
       const prompt = `당신은 반려견 행동 수정 전문가입니다.
 
-      다음 강아지 프로필과 **핵심 훈련 목표**를 기반으로, 전문적이고 창의적인 맞춤형 훈련 2가지를 추천해주세요.
+      다음 **핵심 훈련 목표**를 최우선으로 달성하기 위한 전문적이고 창의적인 맞춤형 훈련 2가지를 추천해주세요.
       추천하는 훈련은 반드시 아래 **핵심 훈련 목표** 달성에 직접적으로 기여해야 합니다.
-      강아지의 나이, 품종, 건강 상태, 활동 수준, 성격, 약한 부위 등 프로필 정보도 종합적으로 고려해주세요.
+      아래 **강아지 프로필**은 훈련 강도, 난이도, 주의사항 등을 설정할 때 참고용으로만 활용하세요.
+      훈련목표와 상관없는 추천은 금지
       긍정강화, 부정강화, 긍정처벌, 부정처벌 등 복합적인 트레이닝 방법을 활용하여 훈련 계획을 세워주세요.
 
-      🎯 **핵심 훈련 목표:**
-      ${JSON.stringify(fullProfile.trainingGoals, null, 2)}
+      🎯 **핵심 훈련 목표 (가장 중요한 추천 기준):**
+      ${JSON.stringify(trainingGoals && trainingGoals.length > 0 ? trainingGoals : fullProfile.trainingGoals, null, 2)}
 
-      🐶 **강아지 프로필:**
+      🐶 **강아지 프로필 (참고용):**
       ${JSON.stringify(fullProfile, null, 2)}
       
       📋 훈련 하나당 반드시 다음 구조를 따르세요:

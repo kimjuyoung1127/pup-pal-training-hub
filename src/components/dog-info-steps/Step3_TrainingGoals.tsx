@@ -8,11 +8,12 @@ import { DogInfo } from '@/types/dog';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Skeleton } from '@/components/ui/skeleton';
 
-type Option = {
+// Option 타입을 useDogInfoOptions에서 직접 가져오지 않으므로, 여기서 정의합니다.
+interface Option {
   id: number;
   label: string;
   icon: string;
-};
+}
 
 interface Props {
   dogInfo: DogInfo;

@@ -79,10 +79,27 @@ const fetchDogProfileData = async () => {
   const { data: healthStatusData } = healthStatusIds.length > 0 ? await supabase.from('health_status_options').select('name').in('id', healthStatusIds) : { data: [] };
   const fetchedHealthStatusNames = healthStatusData?.map(s => s.name) || [];
       
-  const { data: behaviorLinks } = await supabase.from('dog_desired_behaviors').select('behavior_option_id').eq('dog_id', dogData.id);
+  // 훈련 목표를 가져오는 부분을 아래와 같이 수정합니다.
+  const { data: behaviorLinks, error: behaviorLinksError } = await supabase
+    .from('dog_desired_behaviors')
+    .select(`
+      behavior_option_id,
+      behavior_options ( name )
+    `)
+    .eq('dog_id', dogData.id);
+
+  if (behaviorLinksError) {
+    console.error('Error fetching behavior links:', behaviorLinksError);
+  }
+  // 추가된 콘솔 로그
+  console.log('Behavior links from DB:', behaviorLinks);
+
   const behaviorIds = behaviorLinks?.map(l => l.behavior_option_id) || [];
-  const { data: behaviorData } = behaviorIds.length > 0 ? await supabase.from('behavior_options').select('name').in('id', behaviorIds) : { data: [] };
-  const fetchedTrainingGoalNames = behaviorData?.map(g => g.name) || [];
+  const fetchedTrainingGoalNames = behaviorLinks?.map(l => l.behavior_options.name) || [];
+
+  // 추가된 콘솔 로그
+  console.log('Extracted behavior IDs:', behaviorIds);
+  console.log('Fetched training goal names:', fetchedTrainingGoalNames);
 
   const { data: trainingHistoryData } = await supabase
     .from('training_history')
@@ -137,7 +154,25 @@ const fetchDogProfileData = async () => {
   const fullDogInfo: FullDogInfo = {
     id: dogData.id,
     name: dogData.name || '',
-    age: typeof dogData.age === 'string' ? { years: 0, months: 0 } : (dogData.age || { years: 0, months: 0 }),
+    age: (() => {
+      if (!dogData.age) return { years: 0, months: 0 };
+      if (typeof dogData.age === 'object' && dogData.age !== null) return dogData.age;
+      if (typeof dogData.age === 'string') {
+        try {
+          return JSON.parse(dogData.age);
+        } catch (e) {
+          const ageAsNumber = parseFloat(dogData.age);
+          if (!isNaN(ageAsNumber)) {
+            return { years: ageAsNumber, months: 0 };
+          }
+          console.error('Could not parse dog age from string:', dogData.age);
+        }
+      }
+      if (typeof dogData.age === 'number') {
+        return { years: dogData.age, months: 0 };
+      }
+      return { years: 0, months: 0 };
+    })(),
     gender: dogData.gender || '',
     breed: dogData.breed || '',
     weight: dogData.weight ? Number(dogData.weight) : null,
@@ -162,7 +197,7 @@ export const useDogProfile = () => {
   const { data: profileData, isLoading, error } = useQuery({
     queryKey: ['dog-profile'],
     queryFn: fetchDogProfileData,
-    staleTime: 1000 * 60 * 5, // 5분 동안 fresh 상태 유지
+    staleTime: 0, // 5분 -> 0으로 변경하여 항상 최신 데이터 요청
   });
 
   useEffect(() => {

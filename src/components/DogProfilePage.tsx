@@ -14,7 +14,7 @@ import DeleteProfileDialog from './dog-profile/DeleteProfileDialog';
 import GrowthMissionBoard from './dog-profile/GrowthMissionBoard';
 
 interface DogProfilePageProps {
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, params?: any) => void;
 }
 
 const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
@@ -47,7 +47,7 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onNavigate('dog-info')}
+          onClick={() => onNavigate('dog-info', { dogInfo: { ...dogInfo, ...extendedProfile } })}
           className="bg-white text-sky-600 hover:bg-sky-100 hover:text-sky-800 border border-sky-300 focus:ring-0 focus:ring-offset-0"
         >
           <Edit className="w-4 h-4 mr-1" />
