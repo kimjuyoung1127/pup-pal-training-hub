@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, History } from 'lucide-react';
 import { TrainingLog, useTrainingHistory } from '@/hooks/useTrainingHistory';
 import { useDogProfile } from '@/hooks/useDogProfile';
 import { useDogBadges } from '@/hooks/useDogBadges';
@@ -12,12 +12,14 @@ import EmptyTrainingHistory from './training-history/EmptyTrainingHistory';
 import TrainingHistoryList from './training-history/TrainingHistoryList';
 import { motion } from 'framer-motion';
 import { useToast } from './ui/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface TrainingHistoryPageProps {
   onNavigate: (page: string, params?: any) => void;
 }
 
 const TrainingHistoryPage: React.FC<TrainingHistoryPageProps> = ({ onNavigate }) => {
+  const navigate = useNavigate();
   const { dogInfo, isLoading: isLoadingDogProfile } = useDogProfile();
   const { data: trainingHistory, isLoading: isLoadingHistory, isError: isErrorHistory } = useTrainingHistory(dogInfo?.id);
   const { data: badges, isLoading: isLoadingBadges } = useDogBadges(dogInfo?.id);
@@ -72,11 +74,9 @@ const TrainingHistoryPage: React.FC<TrainingHistoryPageProps> = ({ onNavigate })
       className="mx-auto bg-white min-h-screen"
     >
       <div className="bg-white/80 backdrop-blur-sm border-b border-cream-200 px-4 py-4 sticky top-0 z-10">
-        <div className="flex items-center">
-          <Button size="icon" onClick={() => onNavigate('/')} className="bg-transparent hover:bg-gray-100 focus:ring-0 focus:ring-offset-0">
-            <ArrowLeft className="h-6 w-6 text-gray-700" />
-          </Button>
-          <h1 className="text-lg font-bold text-cream-800 ml-2 font-pretendard">훈련 기록</h1>
+        <div className="flex items-center relative">
+          <History className="w-6 h-6 mr-2 text-cream-800" />
+          <h1 className="text-lg font-bold text-cream-800 font-pretendard">훈련 기록</h1>
         </div>
       </div>
       

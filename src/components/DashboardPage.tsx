@@ -27,7 +27,7 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
           <div className="flex items-center space-x-3">
             <div className="text-xl">🐾</div>
             <div>
-              <h1 className="text-lg font-bold text-sky-900">멍멍 AI</h1>
+              <h1 className="text-lg font-bold text-sky-900">멍멍트레이너 AI</h1>
               <p className="text-sm text-sky-700">반려견과 함께 성장해요</p>
             </div>
           </div>

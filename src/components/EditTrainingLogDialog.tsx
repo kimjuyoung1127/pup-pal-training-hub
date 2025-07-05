@@ -63,6 +63,8 @@ const EditTrainingLogDialog = ({ log, dogId, onOpenChange }: EditTrainingLogDial
         notes: log.notes ?? '',
       });
       console.log('Form reset with log data.');
+    } else {
+      form.reset(); // 폼을 기본값으로 리셋합니다.
     }
   }, [log, form]);
 
@@ -86,7 +88,7 @@ const EditTrainingLogDialog = ({ log, dogId, onOpenChange }: EditTrainingLogDial
   };
 
   return (
-    <Dialog open={!!log} onOpenChange={onOpenChange}>
+    <Dialog open={log !== null} onOpenChange={onOpenChange}>
       <DialogContent className="bg-white sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-gray-800">훈련 기록 수정</DialogTitle>
