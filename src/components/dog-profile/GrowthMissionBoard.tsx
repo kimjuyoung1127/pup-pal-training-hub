@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FullDogExtendedProfile } from '@/hooks/useDogProfile';
 import { motion } from 'framer-motion';
@@ -14,6 +14,19 @@ interface GrowthMissionBoardProps {
 }
 
 const GrowthMissionBoard = ({ extendedProfile, dogId, onUpdate }: GrowthMissionBoardProps) => {
+    const [openCategory, setOpenCategory] = useState<string | undefined>(undefined);
+
+    const handleCategoryUpdateAndAdvance = (updatedCategoryKey: string) => {
+        onUpdate();
+        const currentIndex = missionCategories.findIndex(c => c.key === updatedCategoryKey);
+        if (currentIndex > -1 && currentIndex < missionCategories.length - 1) {
+            const nextCategoryKey = missionCategories[currentIndex + 1].key;
+            setOpenCategory(nextCategoryKey);
+        } else {
+            setOpenCategory(undefined); // 마지막 카테고리였으면 닫기
+        }
+    };
+
     const allMissions = missionCategories.flatMap(c => c.missions);
     
     const completionCount = allMissions.filter(m => {
@@ -43,14 +56,14 @@ const GrowthMissionBoard = ({ extendedProfile, dogId, onUpdate }: GrowthMissionB
                     <p className="text-right text-sm font-semibold text-sky-800 font-pretendard mt-1">프로필 완성도 {completionPercent}%</p>
                 </CardHeader>
                 <CardContent>
-                    <Accordion type="single" collapsible className="w-full">
+                    <Accordion type="single" collapsible className="w-full" value={openCategory} onValueChange={setOpenCategory}>
                         {missionCategories.map(category => (
                             <ProfileCategoryForm
                                 key={category.key}
                                 category={category}
                                 dogId={dogId}
                                 extendedProfile={extendedProfile}
-                                onUpdate={onUpdate}
+                                onUpdate={() => handleCategoryUpdateAndAdvance(category.key)}
                             />
                         ))}
                     </Accordion>
