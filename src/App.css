@@ -63,14 +63,31 @@
 
 
 @keyframes paw-print-loading {
-  0%, 100% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.2); opacity: 1; }
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  20% {
+    transform: translateY(-20px);
+    opacity: 1;
+  }
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .paw-loader span {
-  animation: paw-print-loading 1.2s infinite ease-in-out;
+  display: inline-block;
+  margin: 0 5px;
+  font-size: 2rem; /* 발바닥 크기 조정 */
+  color: #fbbf24; /* 노란색 계열로 변경 */
+  animation: paw-print-loading 1.5s infinite;
+  opacity: 0; /* 애니메이션 시작 전에는 보이지 않도록 설정 */
 }
 
+.paw-loader span:nth-child(1) { animation-delay: 0s; }
 .paw-loader span:nth-child(2) { animation-delay: 0.2s; }
 .paw-loader span:nth-child(3) { animation-delay: 0.4s; }
 .paw-loader span:nth-child(4) { animation-delay: 0.6s; }

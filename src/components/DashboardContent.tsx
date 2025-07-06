@@ -15,6 +15,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
+import '@/App.css'; // App.css import 추가
+
+// PawPrintLoading 컴포넌트 추가
+const PawPrintLoading = () => (
+  <div className="paw-loader">
+    <span>🐾</span>
+    <span>🐾</span>
+    <span>🐾</span>
+    <span>🐾</span>
+  </div>
+);
 
 interface Video {
   youtube_video_id: string;
@@ -210,7 +221,11 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
   };
 
   if (isLoading) {
-    return <div>Loading...</div>; // 간단한 로딩 상태 표시
+    return (
+      <div className="fixed inset-0 flex justify-center items-center bg-white bg-opacity-80 z-50">
+        <PawPrintLoading />
+      </div>
+    );
   }
 
   return (
