@@ -68,7 +68,7 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
   const tourSteps = [
     {
       target: '.ai-coach-button',
-      content: 'AI 훈련 코치와 대화하며 강아지 훈련련에 대한 해결책을 찾아보세요.',
+      content: 'AI 훈련 코치와 대화하며 강아지 훈련에 대한 해결책을 찾아보세요.',
       disableBeacon: true,
       disableScrolling: false,
     },
@@ -312,7 +312,7 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
         <Button onClick={() => window.open('https://puppyvill.com/jason', '_blank')} className="w-full btn-secondary justify-between py-6 bg-purple-500 hover:bg-purple-600 text-white offline-training-button">
           <div className="flex items-center space-x-3">
             <BookOpen className="w-5 h-5" />
-            <span className="text-lg">오프라인 훈련소 가기</span>
+            <span className="text-lg">오프라인 훈련 받아보기</span>
           </div>
           <div className="text-2xl">🎓</div>
         </Button>
