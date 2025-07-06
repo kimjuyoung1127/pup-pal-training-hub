@@ -27,6 +27,43 @@ const Index = () => {
   const [runTour, setRunTour] = useState(false);
   const [tourSteps, setTourSteps] = useState<Step[]>([]);
 
+  const startTour = () => {
+    const newTourSteps: Step[] = [
+      {
+        target: '.dashboard-welcome-message',
+        content: '멍멍트레이너에 오신 것을 환영합니다! 간단한 둘러보기를 시작할게요.',
+        disableBeacon: true,
+        title: '환영합니다!',
+      },
+      {
+        target: '.mission-board-section',
+        content: '이곳에서 강아지를 위한 맞춤형 훈련 미션을 확인하고 완료할 수 있어요.',
+        disableBeacon: true,
+        title: '오늘의 미션 보드',
+      },
+      {
+        target: '.training-videos-section',
+        content: '다양한 훈련 영상을 보며 따라 해보세요. 원하는 영상을 검색할 수도 있답니다.',
+        disableBeacon: true,
+        title: '훈련 영상 라이브러리',
+      },
+      {
+        target: '.ai-recommendation-section',
+        content: 'AI가 강아지의 특성에 맞는 훈련을 추천해 드려요.',
+        disableBeacon: true,
+        title: 'AI 훈련 추천',
+      },
+      {
+        target: '.bottom-navigation-bar',
+        content: '하단 메뉴를 통해 프로필, 훈련 기록 등 다른 페이지로 쉽게 이동할 수 있습니다.',
+        disableBeacon: true,
+        title: '간편한 이동',
+      },
+    ];
+    setTourSteps(newTourSteps);
+    setRunTour(true);
+  };
+
   useEffect(() => {
     setLoading(true);
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -58,6 +95,11 @@ const Index = () => {
   };
 
   const handleLogin = () => {
+    const isFirstLogin = !localStorage.getItem('hasVisited');
+    if (isFirstLogin) {
+      startTour();
+      localStorage.setItem('hasVisited', 'true');
+    }
     setCurrentPage('dashboard');
   };
 
@@ -147,7 +189,7 @@ const Index = () => {
       case 'login':
         return <LoginPage onLogin={handleLogin} />;
       case 'dashboard':
-        return <DashboardPage onNavigate={handleNavigate} />;
+        return <DashboardPage onNavigate={handleNavigate} runTour={runTour} setRunTour={setRunTour} startTour={startTour} />;
       case 'dog-info':
         return <DogInfoPage onComplete={handleDogInfoComplete} dogInfoToEdit={editingDogInfo} />;
       case 'dog-profile':
@@ -167,7 +209,12 @@ const Index = () => {
             onExit={() => handleNavigate('dashboard')} 
           />;
         }
-        return <DashboardPage onNavigate={handleNavigate} />;
+        return <DashboardPage 
+          onNavigate={handleNavigate}
+          runTour={runTour}
+          setRunTour={setRunTour}
+          startTour={startTour}
+        />;
       case 'training-replay':
         if (replayParams) {
           return <TrainingReplayPage 
@@ -175,9 +222,19 @@ const Index = () => {
             onExit={() => handleNavigate('history')}
           />;
         }
-        return <DashboardPage onNavigate={handleNavigate} />;
+        return <DashboardPage 
+          onNavigate={handleNavigate}
+          runTour={runTour}
+          setRunTour={setRunTour}
+          startTour={startTour}
+        />;
       default:
-        return <DashboardPage onNavigate={handleNavigate} />;
+        return <DashboardPage 
+          onNavigate={handleNavigate}
+          runTour={runTour}
+          setRunTour={setRunTour}
+          startTour={startTour}
+        />;
     }
   };
 

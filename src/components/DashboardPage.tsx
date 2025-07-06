@@ -1,24 +1,17 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Settings, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import DashboardContent from './DashboardContent';
 
-const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) => {
-  const [runTour, setRunTour] = useState(false);
+interface DashboardPageProps {
+  onNavigate: (page: string, params?: any) => void;
+  runTour: boolean;
+  setRunTour: (run: boolean) => void;
+  startTour: () => void;
+}
 
-  useEffect(() => {
-    const isFirstLogin = !localStorage.getItem('hasVisited');
-    if (isFirstLogin) {
-      setRunTour(true);
-      localStorage.setItem('hasVisited', 'true');
-    }
-  }, []);
-
-  const startTour = () => {
-    setRunTour(true);
-  };
-
+const DashboardPage = ({ onNavigate, runTour, setRunTour, startTour }: DashboardPageProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-100">
       {/* Header */}
@@ -34,7 +27,7 @@ const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => void }) =
           <div className="flex items-center space-x-2">
             <Button
               size="sm"
-              onClick={startTour}
+              onClick={startTour} // Index.tsx에서 받은 startTour 함수를 연결합니다.
               className="text-sky-600 hover:text-sky-800 bg-transparent hover:bg-sky-100 focus:ring-0"
             >
               <HelpCircle className="w-5 h-5" />

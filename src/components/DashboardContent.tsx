@@ -49,6 +49,14 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
   const { missionCompleted, toggleMissionCompleted, resetMissionIfNeeded } = useDashboardStore();
   const navigate = useNavigate();
 
+  const [internalRunTour, setInternalRunTour] = useState(false);
+
+  useEffect(() => {
+    if (runTour && !isLoading) {
+      setInternalRunTour(true);
+    }
+  }, [runTour, isLoading]);
+
   const [randomWelcome, setRandomWelcome] = useState('');
   const [randomTip, setRandomTip] = useState('');
   const [originalVideos, setOriginalVideos] = useState<Video[] | undefined>([]);
@@ -57,57 +65,60 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
   const [hasSearched, setHasSearched] = useState(false);
   const [showMission, setShowMission] = useState(true);
 
-  const tourSteps: Step[] = [
-    {
-      target: '.video-filter-card',
-      title: '영상 필터',
-      content: '여기서 원하는 국가/언어의 훈련 영상을 볼 수 있어요.',
-      disableBeacon: true,
-    },
+  const tourSteps = [
     {
       target: '.ai-coach-button',
-      title: 'AI 훈련 코치',
-      content: 'AI 훈련 코치와 대화하며 맞춤형 훈련 계획을 세워보세요.',
+      content: 'AI 훈련 코치와 대화하며 강아지 훈련련에 대한 해결책을 찾아보세요.',
+      disableBeacon: true,
+      disableScrolling: false,
     },
     {
       target: '.dog-info-button',
-      title: '강아지 정보',
-      content: '강아지 정보를 입력하고 더 정확한 추천을 받아보세요.',
+      content: '강아지 정보를 입력하고 맞춤형 훈련 추천을 받아보세요.',
+      disableBeacon: true,
+      disableScrolling: false,
     },
     {
       target: '.training-history-button',
-      title: '훈련 기록',
-      content: '이전 훈련 기록을 확인하고 진행 상황을 추적할 수 있습니다.',
+      content: '지난 훈련 기록을 확인하고 강아지의 성장 과정을 지켜보세요.',
+      disableBeacon: true,
+      disableScrolling: false,
     },
     {
       target: '.offline-training-button',
-      title: '오프라인 훈련',
-      content: '오프라인 훈련 정보를 확인하고 예약할 수 있습니다.',
+      content: '오프라인 훈련 정보를 확인하고 전문가의 도움을 받아보세요.',
+      disableBeacon: true,
+      disableScrolling: false,
     },
     {
       target: '.bottom-nav-dashboard',
-      title: '홈',
-      content: '언제든지 홈으로 돌아오려면 이 버튼을 누르세요.',
+      content: '홈 화면으로 돌아와 주요 기능들을 이용할 수 있습니다.',
+      disableBeacon: true,
+      disableScrolling: false,
     },
     {
       target: '.bottom-nav-dog-profile',
-      title: '강아지 프로필',
-      content: '강아지 프로필을 확인하고 관리할 수 있습니다.',
+      content: '강아지의 프로필 현황을 확인하세요.',
+      disableBeacon: true,
+      disableScrolling: false,
     },
     {
       target: '.bottom-nav-training',
-      title: '훈련 시작',
       content: '다양한 훈련 프로그램을 시작할 수 있습니다.',
+      disableBeacon: true,
+      disableScrolling: false,
     },
     {
       target: '.bottom-nav-history',
-      title: '훈련 기록',
-      content: '훈련 기록을 보고 성과를 추적하세요.',
+      content: '훈련 기록을 확인할할 수 있습니다.',
+      disableBeacon: true,
+      disableScrolling: false,
     },
     {
       target: '.bottom-nav-settings',
-      title: '설정',
-      content: '계정을 관리하고 사진을 추가해요.',
+      content: '계정, 구독 등 다양한 설정을 변경할 수 있습니다.',
+      disableBeacon: true,
+      disableScrolling: false,
     },
   ];
 
@@ -115,6 +126,7 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
     const { status } = data;
     if (['finished', 'skipped'].includes(status)) {
       setRunTour(false);
+      setInternalRunTour(false);
     }
   };
 
@@ -237,11 +249,12 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
     >
       <Joyride
         steps={tourSteps}
-        run={runTour}
+        run={internalRunTour}
         continuous
         showProgress={false}
         showSkipButton
         callback={handleJoyrideCallback}
+        scrollOffset={100} // 상단 여백 100px 추가
         locale={{
           back: '이전',
           close: '닫기',
@@ -270,8 +283,43 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
           },
         }}
       />
+
+      {/* Action buttons */}
+      <motion.div className="space-y-4 action-buttons" variants={itemVariants}>
+        <Button onClick={() => navigate('/chat')} className="w-full btn-primary justify-between py-6 bg-blue-500 hover:bg-blue-600 text-white ai-coach-button">
+          <div className="flex items-center space-x-3">
+            <Sparkles className="w-5 h-5" />
+            <span className="text-lg">AI 훈련 코치와 대화하기</span>
+          </div>
+          <div className="text-2xl">🤖</div>
+        </Button>
+
+        <Button onClick={() => onNavigate('dog-info')} className="w-full btn-secondary justify-between py-6 bg-teal-500 hover:bg-teal-600 text-white dog-info-button">
+          <div className="flex items-center space-x-3">
+            <BookOpen className="w-5 h-5" />
+            <span className="text-lg">강아지 정보 입력하기</span>
+          </div>
+          <div className="text-2xl">🐕</div>
+        </Button>
+
+        <Button onClick={() => onNavigate('history')} className="w-full btn-secondary justify-between py-6 bg-indigo-500 hover:bg-indigo-600 text-white training-history-button">
+          <div className="flex items-center space-x-3">
+            <BarChart3 className="w-5 h-5" />
+            <span className="text-lg">훈련 기록 보기</span>
+          </div>
+          <div className="text-2xl">📊</div>
+        </Button>
+        <Button onClick={() => window.open('https://puppyvill.com/jason', '_blank')} className="w-full btn-secondary justify-between py-6 bg-purple-500 hover:bg-purple-600 text-white offline-training-button">
+          <div className="flex items-center space-x-3">
+            <BookOpen className="w-5 h-5" />
+            <span className="text-lg">오프라인 훈련소 가기</span>
+          </div>
+          <div className="text-2xl">🎓</div>
+        </Button>
+      </motion.div>
+
       {/* Welcome card */}
-      <motion.div variants={itemVariants}>
+      <motion.div variants={itemVariants} className="welcome-card">
         <Card className="card-soft p-6 bg-sky-100">
           <div className="flex items-center space-x-4">
             <div className="text-4xl">👋</div>
@@ -287,8 +335,23 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
         </Card>
       </motion.div>
 
+      {/* Dog reminder */}
+      {reminder && (
+        <motion.div variants={itemVariants} className="dog-reminder-card">
+          <Card className="card-soft p-6 bg-blue-100">
+            <div className="flex items-start space-x-3">
+              <div className="text-2xl">🐶</div>
+              <div>
+                <h3 className="font-bold text-sky-900 mb-2">{dogName} 리마인드</h3>
+                <p className="text-sm text-sky-800 leading-relaxed">{reminder}</p>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+      )}
+
       {/* Training tip */}
-      <motion.div variants={itemVariants}>
+      <motion.div variants={itemVariants} className="training-tip-card">
         <Card className="card-soft p-6 bg-gradient-to-r from-sky-100 to-blue-200">
           <div className="flex items-start space-x-3">
             <div className="text-2xl">💡</div>
@@ -348,21 +411,6 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
         </motion.div>
       ))}
 
-      {/* Dog reminder */}
-      {reminder && (
-        <motion.div variants={itemVariants}>
-          <Card className="card-soft p-6 bg-blue-100">
-            <div className="flex items-start space-x-3">
-              <div className="text-2xl">🐶</div>
-              <div>
-                <h3 className="font-bold text-sky-900 mb-2">{dogName} 리마인드</h3>
-                <p className="text-sm text-sky-800 leading-relaxed">{reminder}</p>
-              </div>
-            </div>
-          </Card>
-        </motion.div>
-      )}
-
       {/* Daily mission */}
       <AnimatePresence>
         {mission && showMission && !missionCompleted && (
@@ -371,6 +419,7 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
             initial="hidden"
             animate="visible"
             exit={{ opacity: 0, y: -20, transition: { duration: 0.5 } }}
+            className="daily-mission-card"
           >
             <Card className="card-soft p-6 bg-blue-100">
               <div className="flex items-start space-x-3">
@@ -391,39 +440,6 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
         )}
       </AnimatePresence>
 
-      {/* Action buttons */}
-      <motion.div className="space-y-4" variants={itemVariants}>
-        <Button onClick={() => navigate('/chat')} className="w-full btn-primary justify-between py-6 bg-blue-500 hover:bg-blue-600 text-white ai-coach-button">
-          <div className="flex items-center space-x-3">
-            <Sparkles className="w-5 h-5" />
-            <span className="text-lg">AI 훈련 코치와 대화하기</span>
-          </div>
-          <div className="text-2xl">🤖</div>
-        </Button>
-
-        <Button onClick={() => onNavigate('dog-info')} className="w-full btn-secondary justify-between py-6 bg-teal-500 hover:bg-teal-600 text-white dog-info-button">
-          <div className="flex items-center space-x-3">
-            <BookOpen className="w-5 h-5" />
-            <span className="text-lg">강아지 정보 입력하기</span>
-          </div>
-          <div className="text-2xl">🐕</div>
-        </Button>
-
-        <Button onClick={() => onNavigate('history')} className="w-full btn-secondary justify-between py-6 bg-indigo-500 hover:bg-indigo-600 text-white training-history-button">
-          <div className="flex items-center space-x-3">
-            <BarChart3 className="w-5 h-5" />
-            <span className="text-lg">훈련 기록 보기</span>
-          </div>
-          <div className="text-2xl">📊</div>
-        </Button>
-        <Button onClick={() => window.open('https://puppyvill.com/jason', '_blank')} className="w-full btn-secondary justify-between py-6 bg-purple-500 hover:bg-purple-600 text-white offline-training-button">
-          <div className="flex items-center space-x-3">
-            <BookOpen className="w-5 h-5" />
-            <span className="text-lg">오프라인 훈련소 가기</span>
-          </div>
-          <div className="text-2xl">🎓</div>
-        </Button>
-      </motion.div>
     </motion.div>
   );
 };
