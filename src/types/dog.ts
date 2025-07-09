@@ -361,6 +361,14 @@ export const breedData: BreedData = {
       senior: { male: [42, 48], female: [38, 43] }
     }
   },
+  "카바푸": {
+    size: "medium",
+    idealWeight: {
+      puppy: { male: [1.5, 3.5], female: [1.3, 3] },
+      adult: { male: [6, 12], female: [5, 11] },
+      senior: { male: [5.5, 11], female: [4.5, 10] }
+    }
+  },
   "코카 스파니엘": {
     size: "medium",
     idealWeight: {

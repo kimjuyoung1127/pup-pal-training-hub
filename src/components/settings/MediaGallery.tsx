@@ -50,7 +50,7 @@ export const MediaGallery = () => {
     return (
         <Card className="bg-sky-50 shadow-md border border-sky-100">
             <CardHeader className="bg-transparent text-sky-800 flex flex-row items-center justify-between">
-                <CardTitle>추억 저장소</CardTitle>
+                <CardTitle>갤러리</CardTitle>
                 <Button onClick={handleUploadClick} disabled={uploadMutation.isPending} className="bg-sky-600 hover:bg-sky-700 text-white">
                     {uploadMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
                     업로드
