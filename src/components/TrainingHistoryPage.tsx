@@ -71,12 +71,12 @@ const TrainingHistoryPage: React.FC<TrainingHistoryPageProps> = ({ onNavigate })
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="mx-auto bg-white min-h-screen"
+      className="mx-auto bg-gradient-to-br from-gray-50 to-slate-100 min-h-screen"
     >
-      <div className="bg-white/80 backdrop-blur-sm border-b border-cream-200 px-4 py-4 sticky top-0 z-10">
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 py-4 sticky top-0 z-10">
         <div className="flex items-center relative">
-          <History className="w-6 h-6 mr-2 text-cream-800" />
-          <h1 className="text-lg font-bold text-cream-800 font-pretendard">훈련 기록</h1>
+          <History className="w-6 h-6 mr-2 text-sky-800" />
+          <h1 className="text-lg font-bold text-sky-800 font-pretendard">훈련 기록</h1>
         </div>
       </div>
       

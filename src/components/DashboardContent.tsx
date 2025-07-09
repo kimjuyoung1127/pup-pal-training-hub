@@ -65,60 +65,31 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
   const [hasSearched, setHasSearched] = useState(false);
   const [showMission, setShowMission] = useState(true);
 
-  const tourSteps = [
+  const tourSteps: Step[] = [
     {
       target: '.ai-coach-button',
-      content: 'AI 훈련 코치와 대화하며 강아지 훈련에 대한 해결책을 찾아보세요.',
+      title: 'AI 훈련 코치',
+      content: 'AI 훈련 코치와 대화하며 강아지 훈련에 대한 도움을 받을 수 있습니다.',
       disableBeacon: true,
-      disableScrolling: false,
+      disableScrolling: false, // 스크롤 활성화
     },
     {
       target: '.dog-info-button',
-      content: '강아지 정보를 입력하고 맞춤형 훈련 추천을 받아보세요.',
-      disableBeacon: true,
-      disableScrolling: false,
+      title: '강아지 정보 입력',
+      content: '강아지의 정보를 입력하고 맞춤형 서비스를 받아보세요.',
+      disableScrolling: false, // 스크롤 활성화
     },
     {
       target: '.training-history-button',
-      content: '지난 훈련 기록을 확인하고 강아지의 성장 과정을 지켜보세요.',
-      disableBeacon: true,
-      disableScrolling: false,
+      title: '훈련 기록 보기',
+      content: '이곳에서 강아지의 훈련 진행 상황을 확인할 수 있습니다.',
+      disableScrolling: false, // 스크롤 활성화
     },
     {
       target: '.offline-training-button',
-      content: '오프라인 훈련 정보를 확인하고 전문가의 도움을 받아보세요.',
-      disableBeacon: true,
-      disableScrolling: false,
-    },
-    {
-      target: '.bottom-nav-dashboard',
-      content: '홈 화면으로 돌아와 주요 기능들을 이용할 수 있습니다.',
-      disableBeacon: true,
-      disableScrolling: false,
-    },
-    {
-      target: '.bottom-nav-dog-profile',
-      content: '강아지의 프로필 현황을 확인하세요.',
-      disableBeacon: true,
-      disableScrolling: false,
-    },
-    {
-      target: '.bottom-nav-training',
-      content: '다양한 훈련 프로그램을 시작할 수 있습니다.',
-      disableBeacon: true,
-      disableScrolling: false,
-    },
-    {
-      target: '.bottom-nav-history',
-      content: '훈련 기록을 확인할할 수 있습니다.',
-      disableBeacon: true,
-      disableScrolling: false,
-    },
-    {
-      target: '.bottom-nav-settings',
-      content: '계정, 구독 등 다양한 설정을 변경할 수 있습니다.',
-      disableBeacon: true,
-      disableScrolling: false,
+      title: '오프라인 훈련소 가기',
+      content: '전문가의 도움이 필요하다면 오프라인 훈련소 정보를 찾아보세요.',
+      disableScrolling: false, // 스크롤 활성화
     },
   ];
 

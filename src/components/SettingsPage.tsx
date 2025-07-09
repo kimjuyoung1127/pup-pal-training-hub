@@ -23,7 +23,7 @@ const UserProfile = ({ user }: { user: SupabaseUser | null }) => {
   const userAvatar = user?.user_metadata?.avatar_url;
 
   return (
-    <Card className="shadow-sm bg-white">
+    <Card className="shadow-md bg-sky-50 border border-sky-100">
       <CardHeader>
         <div className="flex items-center space-x-4">
           <Avatar className="h-16 w-16">
@@ -31,8 +31,8 @@ const UserProfile = ({ user }: { user: SupabaseUser | null }) => {
             <AvatarFallback>{userName ? userName.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
           </Avatar>
           <div>
-            <p className="text-lg font-semibold">{userName || '사용자'}</p>
-            <p className="text-sm text-slate-950">
+            <p className="text-lg font-semibold text-sky-800">{userName || '사용자'}</p>
+            <p className="text-sm text-sky-700">
               {userEmail || '이메일을 찾을 수 없습니다.'}
             </p>
           </div>
@@ -50,46 +50,50 @@ const SettingsActions = () => {
 
   return (
     <div className="mt-8 space-y-4">
-      <div className="space-y-2 pt-4 border-t border-gray-200">
-        <h3 className="px-4 text-sm font-semibold text-gray-500">정보</h3>
-        <Link to="/AboutUsPage">
-          <Button className="w-full justify-start p-4 bg-transparent hover:bg-gray-100 focus:ring-0 text-gray-800">
-            <Info className="w-5 h-5 mr-3" />
-            서비스 소개
-          </Button>
-        </Link>
-        <Link to="/TermsOfServicePage">
-          <Button className="w-full justify-start p-4 bg-transparent hover:bg-gray-100 focus:ring-0 text-gray-800">
-            <FileText className="w-5 h-5 mr-3" />
-            서비스 이용약관
-          </Button>
-        </Link>
-        <Link to="/PrivacyPolicyPage">
-          <Button className="w-full justify-start p-4 bg-transparent hover:bg-gray-100 focus:ring-0 text-gray-800">
-            <Shield className="w-5 h-5 mr-3" />
-            개인정보처리방침
-          </Button>
-        </Link>
-      </div>
+      <Card className="bg-sky-50 shadow-md border border-sky-100">
+        <CardContent className="p-2">
+          <h3 className="px-4 pt-2 text-sm font-semibold text-sky-800">정보</h3>
+          <Link to="/AboutUsPage">
+            <Button className="w-full justify-start p-4 bg-transparent hover:bg-sky-100 focus:ring-0 text-sky-800">
+              <Info className="w-5 h-5 mr-3 text-sky-600" />
+              서비스 소개
+            </Button>
+          </Link>
+          <Link to="/TermsOfServicePage">
+            <Button className="w-full justify-start p-4 bg-transparent hover:bg-sky-100 focus:ring-0 text-sky-800">
+              <FileText className="w-5 h-5 mr-3 text-sky-600" />
+              서비스 이용약관
+            </Button>
+          </Link>
+          <Link to="/PrivacyPolicyPage">
+            <Button className="w-full justify-start p-4 bg-transparent hover:bg-sky-100 focus:ring-0 text-sky-800">
+              <Shield className="w-5 h-5 mr-3 text-sky-600" />
+              개인정보처리방침
+            </Button>
+          </Link>
+        </CardContent>
+      </Card>
 
-      <div className="pt-4 border-t border-gray-200">
-        <Button
-          className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 p-4 bg-transparent focus:ring-0"
-          onClick={handleLogout}
-        >
-          <LogOut className="w-5 h-5 mr-3" />
-          로그아웃
-        </Button>
-      </div>
+      <Card className="bg-sky-50 shadow-md border border-sky-100">
+        <CardContent className="p-0">
+          <Button
+            className="w-full justify-start text-sky-500 hover:text-sky-600 bg-transparent hover:bg-sky-100 p-4 focus:ring-0 rounded-lg"
+            onClick={handleLogout}
+          >
+            <LogOut className="w-5 h-5 mr-3" />
+            로그아웃
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
 // 헤더 컴포넌트 추가
 const Header = () => (
-  <div className="bg-gray-50/80 backdrop-blur-sm border-b border-gray-200 px-6 py-4 sticky top-0 z-10">
+  <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 py-4 sticky top-0 z-10">
     <div className="flex items-center justify-between">
-      <h1 className="text-lg font-bold text-gray-800 font-pretendard">설정</h1>
+      <h1 className="text-lg font-bold text-sky-800 font-pretendard">설정</h1>
     </div>
   </div>
 );
@@ -115,20 +119,20 @@ const SettingsPage = () => {
   }
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+    <div className="bg-gradient-to-br from-gray-50 to-slate-100 min-h-screen">
       <Header />
-      <div className="p-6 space-y-6">
+      <div className="p-4 space-y-6">
         <UserProfile user={user} />
         
         {plan === 'free' && (
-          <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+          <Card className="bg-sky-50 shadow-md border border-sky-100">
             <CardHeader>
-              <CardTitle className="text-blue-800 dark:text-blue-300">Pro 플랜으로 업그레이드</CardTitle>
-              <CardDescription className="text-blue-700 dark:text-blue-400">모든 기능을 제한 없이 사용해보세요.</CardDescription>
+              <CardTitle className="text-sky-800">Pro 플랜으로 업그레이드</CardTitle>
+              <CardDescription className="text-sky-700">모든 기능을 제한 없이 사용해보세요.</CardDescription>
             </CardHeader>
             <CardContent>
               <Link to="/pricing">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">자세히 보기</Button>
+                <Button className="w-full bg-sky-600 hover:bg-sky-700 text-white">자세히 보기</Button>
               </Link>
             </CardContent>
           </Card>

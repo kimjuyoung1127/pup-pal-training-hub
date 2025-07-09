@@ -9,11 +9,11 @@ interface EmptyTrainingHistoryProps {
 
 const EmptyTrainingHistory = ({ onNavigate }: EmptyTrainingHistoryProps) => {
     return (
-        <div className="text-center py-16 text-gray-500 flex flex-col items-center bg-gray-50 rounded-xl shadow-sm">
-            <ShieldQuestion className="w-16 h-16 mb-4 text-gray-400" />
+        <div className="text-center py-16 text-sky-700 flex flex-col items-center bg-sky-50 rounded-xl shadow-md border border-sky-100">
+            <ShieldQuestion className="w-16 h-16 mb-4 text-sky-400" />
             <p className="font-semibold text-lg">기록된 훈련이 없어요.</p>
             <p className="mt-1">첫 훈련을 시작하고 기록을 남겨보세요!</p>
-            <Button onClick={() => onNavigate('training')} className="mt-6 bg-blue-500 hover:bg-blue-600 text-white">훈련 시작하기</Button>
+            <Button onClick={() => onNavigate('training')} className="mt-6 bg-sky-600 hover:bg-sky-700 text-white">훈련 시작하기</Button>
         </div>
     );
 };

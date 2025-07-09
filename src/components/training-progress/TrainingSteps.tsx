@@ -52,7 +52,7 @@ const TrainingSteps = ({
           <CarouselNext className="right-[-50px] bg-sky-100 hover:bg-sky-200 text-sky-700 border-sky-200" />
         </Carousel>
       </div>
-      <Progress value={(currentStep + 1) / steps.length * 100} className="w-full my-4 [&>div]:bg-sky-500" />
+      <Progress value={(currentStep + 1) / steps.length * 100} className="w-full my-4 [&>div]:bg-sky-600" />
       {currentStep === steps.length - 1 && <Button onClick={onFinishSteps} size="lg" className="bg-sky-600 hover:bg-sky-700 text-white w-full py-4 mt-4">
           <Check className="mr-2" />
           {isReplay ? '재생 완료' : '훈련 완료'}

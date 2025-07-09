@@ -47,14 +47,14 @@ const DogBadges = ({ badges, isLoading }: DogBadgesProps) => {
     duration: 0.5,
     delay: 0.2
   }}>
-      <Card className="mb-6">
-        <CardHeader className="bg-white">
-          <CardTitle className="flex items-center text-xl font-bold text-black">
+      <Card className="mb-6 bg-sky-50 shadow-md border border-sky-100">
+        <CardHeader className="bg-transparent">
+          <CardTitle className="flex items-center text-xl font-bold text-sky-800">
             <Award className="mr-2 h-6 w-6 text-yellow-500" />
             도전과제
           </CardTitle>
         </CardHeader>
-        <CardContent className="bg-white p-4">
+        <CardContent className="bg-transparent p-4">
           <TooltipProvider delayDuration={100}>
             <div className="grid grid-cols-4 sm:grid-cols-5 gap-4">
               {badges.map((badge, index) => <Tooltip key={badge.id}>
@@ -74,7 +74,7 @@ const DogBadges = ({ badges, isLoading }: DogBadgesProps) => {
                       <span className={`text-4xl filter transition-all duration-300 ${badge.achieved ? 'grayscale-0' : 'grayscale hover:grayscale-0'}`}>
                         {badge.icon || '🏅'}
                       </span>
-                      <UiBadge variant="secondary" className="text-xs px-2 py-0.5 whitespace-nowrap bg-slate-50 text-black">{badge.name}</UiBadge>
+                      <UiBadge variant="secondary" className="text-xs px-2 py-0.5 whitespace-nowrap bg-sky-100 text-sky-800">{badge.name}</UiBadge>
                     </motion.div>
                   </TooltipTrigger>
                   <TooltipContent className="bg-gray-800 text-white rounded-md p-2">

@@ -11,19 +11,19 @@ const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
       icon: '🐕',
       title: '안녕하세요!\n멍멍트레이너입니다',
       description: '반려견과 함께하는 특별한 훈련 여정을\n시작해보세요',
-      bgGradient: 'from-orange-200 to-cream-200'
+      bgGradient: 'from-sky-100 to-sky-200'
     },
     {
       icon: '🤖',
       title: 'AI 맞춤 훈련\n추천받기',
       description: '우리 강아지만을 위한\n특별한 훈련 계획을 만들어드려요',
-      bgGradient: 'from-cream-200 to-orange-200'
+      bgGradient: 'from-sky-200 to-sky-100'
     },
     {
       icon: '📊',
       title: '성장하는 모습을\n기록하기',
       description: '매일매일 발전하는 우리 강아지의\n성장 과정을 함께 추적해요',
-      bgGradient: 'from-orange-100 to-cream-300'
+      bgGradient: 'from-sky-100 to-sky-300'
     }
   ];
 
@@ -42,12 +42,12 @@ const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-cream-50 to-orange-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-sky-50 to-sky-100">
       {/* Header with logo */}
       <div className="flex items-center justify-center pt-12 pb-8">
         <div className="flex items-center space-x-2">
           <div className="text-2xl">🐾</div>
-          <h1 className="text-xl font-bold text-cream-800">멍멍트레이너</h1>
+          <h1 className="text-xl font-bold text-sky-800">멍멍트레이너</h1>
         </div>
       </div>
 
@@ -63,10 +63,10 @@ const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
                 <div className="text-8xl mb-8 animate-bounce-gentle">
                   {slide.icon}
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-cream-800 mb-6 leading-tight whitespace-pre-line">
+                <h2 className="text-2xl md:text-3xl font-bold text-sky-800 mb-6 leading-tight whitespace-pre-line">
                   {slide.title}
                 </h2>
-                <p className="text-lg text-cream-700 leading-relaxed whitespace-pre-line max-w-md">
+                <p className="text-lg text-sky-700 leading-relaxed whitespace-pre-line max-w-md">
                   {slide.description}
                 </p>
               </div>
@@ -82,7 +82,7 @@ const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
           variant="ghost"
           onClick={prevSlide}
           disabled={currentSlide === 0}
-          className="text-cream-600 hover:text-cream-800 disabled:opacity-30"
+          className="text-sky-600 hover:text-sky-800 disabled:opacity-30"
         >
           이전
         </Button>
@@ -94,8 +94,8 @@ const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
               key={index}
               className={`w-3 h-3 rounded-full transition-all duration-200 ${
                 index === currentSlide 
-                  ? 'bg-orange-500 scale-125' 
-                  : 'bg-cream-300'
+                  ? 'bg-sky-500 scale-125' 
+                  : 'bg-sky-200'
               }`}
             />
           ))}
@@ -104,7 +104,7 @@ const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
         {/* Next/Start button */}
         <Button
           onClick={nextSlide}
-          className="btn-primary flex items-center space-x-2"
+          className="bg-sky-600 hover:bg-sky-700 text-white flex items-center space-x-2"
         >
           <span>{currentSlide === slides.length - 1 ? '시작하기' : '다음'}</span>
           <ChevronRight className="w-4 h-4" />

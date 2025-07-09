@@ -53,7 +53,7 @@ const GrowthMissionBoard = ({ extendedProfile, dogId, onUpdate }: GrowthMissionB
                             transition={{ duration: 0.8 }}
                         />
                     </div>
-                    <p className="text-right text-sm font-semibold text-sky-800 font-pretendard mt-1">프로필 완성도 {completionPercent}%</p>
+                    <p className="text-right text-sm font-semibold text-sky-800 font-pretendard mt-4">프로필 완성도 {completionPercent}%</p>
                 </CardHeader>
                 <CardContent>
                     <Accordion type="single" collapsible className="w-full" value={openCategory} onValueChange={setOpenCategory}>

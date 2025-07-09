@@ -44,12 +44,12 @@ const LoginPage = ({ onLogin }: { onLogin: () => void }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-cream-50 to-orange-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-sky-50 to-sky-100">
       {/* Header */}
       <div className="flex items-center justify-center pt-12 pb-8">
         <div className="flex items-center space-x-2">
           <div className="text-2xl">🐾</div>
-          <h1 className="text-xl font-bold text-cream-800">멍멍트레이너</h1>
+          <h1 className="text-xl font-bold text-sky-800">멍멍트레이너</h1>
         </div>
       </div>
 
@@ -59,10 +59,10 @@ const LoginPage = ({ onLogin }: { onLogin: () => void }) => {
           {/* Illustration area */}
           <div className="text-center mb-12">
             <div className="text-6xl mb-6 animate-bounce-gentle">🐕‍🦺</div>
-            <h2 className="text-2xl font-bold text-cream-800 mb-4">
+            <h2 className="text-2xl font-bold text-sky-800 mb-4">
               환영합니다!
             </h2>
-            <p className="text-cream-700 leading-relaxed">
+            <p className="text-sky-700 leading-relaxed">
               우리 강아지와 함께하는<br />
               특별한 훈련 여정을 시작해보세요
             </p>
@@ -95,7 +95,7 @@ const LoginPage = ({ onLogin }: { onLogin: () => void }) => {
 
           {/* Terms */}
           <div className="mt-8 text-center">
-            <p className="text-xs text-cream-600 leading-relaxed">
+            <p className="text-xs text-sky-600 leading-relaxed">
               계속 진행하시면 <span className="underline">서비스 이용약관</span> 및 <span className="underline">개인정보처리방침</span>에<br />
               동의하는 것으로 간주됩니다.
             </p>

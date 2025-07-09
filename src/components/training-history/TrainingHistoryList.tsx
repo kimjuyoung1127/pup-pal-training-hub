@@ -54,16 +54,16 @@ const TrainingHistoryList = ({ trainingHistory, onEdit, onDelete, onRetry }: Tra
                             exit={{ opacity: 0, scale: 0.95, y: -20 }}
                             transition={{ duration: 0.4, ease: "easeInOut" }}
                         >
-                            <AccordionItem value={`item-${date}`} className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm transition-shadow hover:shadow-md">
-                                <AccordionTrigger className="px-6 py-4 text-lg font-bold text-gray-800 hover:no-underline data-[state=open]:border-b data-[state=open]:border-gray-100">
+                            <AccordionItem value={`item-${date}`} className="bg-sky-50 rounded-xl border border-sky-100 overflow-hidden shadow-md transition-shadow hover:shadow-lg">
+                                <AccordionTrigger className="px-6 py-4 text-lg font-bold text-sky-800 hover:no-underline data-[state=open]:border-b data-[state=open]:border-sky-100">
                                     <div className="flex items-center gap-3">
                                         <span>{formattedDate}</span>
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-sky-100 text-sky-800">
                                             {logsForDate.length}회 훈련
                                         </span>
                                     </div>
                                 </AccordionTrigger>
-                                <AccordionContent className="px-4 pt-2 pb-4 bg-gray-50">
+                                <AccordionContent className="px-4 pt-2 pb-4 bg-sky-50/50">
                                     <div className="space-y-3">
                                       <AnimatePresence>
                                         {logsForDate.map(item => (

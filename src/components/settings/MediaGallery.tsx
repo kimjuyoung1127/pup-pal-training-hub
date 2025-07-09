@@ -48,10 +48,10 @@ export const MediaGallery = () => {
     }
 
     return (
-        <Card>
-            <CardHeader className="bg-white text-dark-grey flex flex-row items-center justify-between ">
+        <Card className="bg-sky-50 shadow-md border border-sky-100">
+            <CardHeader className="bg-transparent text-sky-800 flex flex-row items-center justify-between">
                 <CardTitle>추억 저장소</CardTitle>
-                <Button onClick={handleUploadClick} disabled={uploadMutation.isPending}>
+                <Button onClick={handleUploadClick} disabled={uploadMutation.isPending} className="bg-sky-600 hover:bg-sky-700 text-white">
                     {uploadMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
                     업로드
                 </Button>
@@ -63,7 +63,7 @@ export const MediaGallery = () => {
                     accept="image/*,video/*"
                 />
             </CardHeader>
-            <CardContent className="bg-white">
+            <CardContent className="bg-transparent">
                 {media && media.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {media.map((item) => (
@@ -101,7 +101,7 @@ export const MediaGallery = () => {
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-10 text-gray-500">
+                    <div className="text-center py-10 text-sky-700">
                         <p>업로드된 사진이나 영상이 없습니다.</p>
                         <p className="text-sm">첫 추억을 기록해보세요!</p>
                     </div>
