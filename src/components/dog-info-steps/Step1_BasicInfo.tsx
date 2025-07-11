@@ -26,7 +26,7 @@ const Step1_BasicInfo: React.FC<Props> = ({ dogInfo, setDogInfo }) => {
             value={dogInfo.name}
             onChange={(e) => setDogInfo(prev => ({ ...prev, name: e.target.value }))}
             placeholder="예: 바둑이"
-            className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 focus:ring-2 focus:ring-orange-100 rounded-xl text-gray-900 placeholder:text-gray-500"
+            className="mt-2 bg-white border-2 border-sky-200 focus:border-sky-300 focus:ring-2 focus:ring-sky-100 rounded-xl text-gray-900 placeholder:text-gray-500"
           />
         </div>
 
@@ -35,24 +35,24 @@ const Step1_BasicInfo: React.FC<Props> = ({ dogInfo, setDogInfo }) => {
           <div className="flex space-x-2 mt-2">
             <div className="w-1/2">
               <Select onValueChange={(value) => setDogInfo(prev => ({ ...prev, age: { years: parseInt(value), months: prev.age?.months ?? 0 } }))} value={dogInfo.age?.years?.toString()}>
-                <SelectTrigger className="bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl text-gray-900">
+                <SelectTrigger className="bg-white border-2 border-sky-200 focus:border-sky-300 rounded-xl text-gray-900">
                   <SelectValue placeholder="년" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-cream-200 z-50">
+                <SelectContent className="bg-white border-sky-200 z-50">
                   {[...Array(21).keys()].map(year => (
-                    <SelectItem key={year} value={year.toString()} className="text-gray-800 hover:bg-orange-100 focus:bg-orange-100">{year}년</SelectItem>
+                    <SelectItem key={year} value={year.toString()} className="text-gray-800 hover:bg-sky-100 focus:bg-sky-100">{year}년</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="w-1/2">
               <Select onValueChange={(value) => setDogInfo(prev => ({ ...prev, age: { years: prev.age?.years ?? 0, months: parseInt(value) } }))} value={dogInfo.age?.months?.toString()}>
-                <SelectTrigger className="bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl text-gray-900">
+                <SelectTrigger className="bg-white border-2 border-sky-200 focus:border-sky-300 rounded-xl text-gray-900">
                   <SelectValue placeholder="개월" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-cream-200 z-50">
+                <SelectContent className="bg-white border-sky-200 z-50">
                   {[...Array(12).keys()].map(month => (
-                    <SelectItem key={month} value={month.toString()} className="text-gray-800 hover:bg-orange-100 focus:bg-orange-100">{month}개월</SelectItem>
+                    <SelectItem key={month} value={month.toString()} className="text-gray-800 hover:bg-sky-100 focus:bg-sky-100">{month}개월</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

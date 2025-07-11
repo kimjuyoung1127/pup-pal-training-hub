@@ -26,7 +26,7 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
     isLoading,
     isDeleting,
     extendedProfile,
-    fetchDogProfile,
+    refetchDogProfile,
     handleImageUpload,
     handleImageDelete,
     handleDeleteDogProfile,
@@ -131,6 +131,7 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
+          className="achievements-card" // 클래스 추가
         >
           <TrainingStats stats={trainingStats} />
         </motion.div>
@@ -141,7 +142,7 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <GrowthMissionBoard extendedProfile={extendedProfile} dogId={dogInfo.id} onUpdate={fetchDogProfile} />
+          <GrowthMissionBoard extendedProfile={extendedProfile} dogId={dogInfo.id} onUpdate={refetchDogProfile} />
         </motion.div>
 
         <motion.div

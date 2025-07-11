@@ -32,7 +32,7 @@ const Step2_DogFeatures: React.FC<Props> = ({ dogInfo, setDogInfo, breedOpen, se
                 variant="outline"
                 role="combobox"
                 aria-expanded={breedOpen}
-                className="w-full justify-between mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl text-gray-900 hover:bg-cream-50"
+                className="w-full justify-between mt-2 bg-white border-2 border-sky-200 focus:border-sky-300 rounded-xl text-gray-900 hover:bg-sky-50"
               >
                 {dogInfo.breed
                   ? dogBreeds.find((breed) => breed === dogInfo.breed)
@@ -40,7 +40,7 @@ const Step2_DogFeatures: React.FC<Props> = ({ dogInfo, setDogInfo, breedOpen, se
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0 bg-white border-cream-200 shadow-lg z-50">
+            <PopoverContent className="w-full p-0 bg-white border-sky-200 shadow-lg z-50">
               <Command className="bg-white">
                 <CommandInput 
                   placeholder="견종을 검색해보세요..." 
@@ -89,7 +89,7 @@ const Step2_DogFeatures: React.FC<Props> = ({ dogInfo, setDogInfo, breedOpen, se
               setDogInfo(prev => ({ ...prev, weight: value === '' ? null : parseFloat(value) }));
             }}
             placeholder="예: 5.2"
-            className="mt-2 bg-white border-2 border-cream-200 focus:border-orange-300 rounded-xl text-gray-900"
+            className="mt-2 bg-white border-2 border-sky-200 focus:border-sky-300 rounded-xl text-gray-900"
           />
         </div>
       </div>

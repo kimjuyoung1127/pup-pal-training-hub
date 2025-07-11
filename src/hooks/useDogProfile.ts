@@ -171,7 +171,7 @@ interface UseDogProfileReturn {
   isLoading: boolean;
   isDeleting: boolean;
   extendedProfile: FullDogExtendedProfile | null | undefined;
-  fetchDogProfile: UseQueryResult<Awaited<ReturnType<typeof fetchDogProfileData>>, Error>['refetch'];
+  refetchDogProfile: UseQueryResult<Awaited<ReturnType<typeof fetchDogProfileData>>, Error>['refetch'];
   handleImageUpload: (event: ChangeEvent<HTMLInputElement>) => void;
   handleImageDelete: () => void;
   handleDeleteDogProfile: () => void;
@@ -284,7 +284,7 @@ export const useDogProfile = (): UseDogProfileReturn => {
     isLoading,
     isDeleting,
     extendedProfile: extendedProfile as FullDogExtendedProfile | null | undefined,
-    fetchDogProfile: refetch,
+    refetchDogProfile: refetch,
     handleImageUpload,
     handleImageDelete,
     handleDeleteDogProfile,

@@ -15,6 +15,7 @@ import TrainingReplayPage from '@/components/TrainingReplayPage';
 import { TrainingProgram } from '@/lib/trainingData';
 import { TrainingLog } from '@/hooks/useTrainingHistory';
 import Joyride, { Step, CallBackProps } from 'react-joyride';
+import { useDogProfile } from '@/hooks/useDogProfile';
 
 const Index = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -26,12 +27,18 @@ const Index = () => {
   const [replayParams, setReplayParams] = useState<{ trainingLog: TrainingLog } | null>(null);
   const [runTour, setRunTour] = useState(false);
   const [tourSteps, setTourSteps] = useState<Step[]>([]);
+  const { dogInfo: profileDogInfo, isLoading: isDogInfoLoading, refetchDogProfile } = useDogProfile();
+  const [justCompletedProfile, setJustCompletedProfile] = useState(false);
+  const [activeTour, setActiveTour] = useState<'dashboard' | 'profile' | null>(null);
 
   const startTour = () => {
+    const tourShown = localStorage.getItem('dashboardTourShown');
+    if (tourShown) return;
+
     const newTourSteps: Step[] = [
       {
         target: '.dashboard-welcome-message',
-        content: '멍멍트레이너에 오신 것을 환영합니다! 간단한 둘러보기를 시작할게요.',
+        content: '멍멍트레이너 AI에 오신 것을 환영합니다! 간단한 둘러보기를 시작할게요.',
         disableBeacon: true,
         title: '환영합니다!',
       },
@@ -62,7 +69,51 @@ const Index = () => {
     ];
     setTourSteps(newTourSteps);
     setRunTour(true);
+    setActiveTour('dashboard');
   };
+
+  const startProfileTour = React.useCallback(() => {
+    const profileTourShown = localStorage.getItem('profileTourShown');
+    if (!profileTourShown) {
+      window.scrollTo(0, 0);
+      const newTourSteps = [
+        {
+          target: '.dog-profile-card',
+          title: '강아지 프로필',
+          content: '이곳에서 강아지의 기본 정보를 확인하고 수정할 수 있습니다.',
+          disableBeacon: true,
+        },
+        {
+          target: '.health-metrics-card',
+          title: '건강 상태',
+          content: '강아지의 건강 상태와 병원 방문 기록을 추적하고 관리하세요.',
+        },
+        {
+          target: '.training-goals-card',
+          title: '훈련 목표',
+          content: '설정된 훈련 목표를 확인하고 달성 현황을 관리할 수 있습니다.',
+        },
+        {
+          target: '.achievements-card',
+          title: '일일 통계',
+          content: '연속 훈련일, 산책, 배변 횟수 등 일일 통계를 확인하세요.',
+        },
+        {
+          target: '.mission-board-section',
+          title: '성장 미션 보드',
+          content: '강아지의 성장 과정을 확인하고 다음 목표를 설정하여 동기를 부여하세요.',
+        },
+        {
+          target: '.quick-actions-card',
+          title: '빠른 액션',
+          content: '정보 수정이나 훈련 시작 등 자주 사용하는 기능을 빠르게 이용할 수 있습니다.',
+        },
+      ];
+      setTourSteps(newTourSteps);
+      setRunTour(true);
+      setActiveTour('profile');
+    }
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -79,15 +130,23 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    if (loading) return;
+    if (loading || isDogInfoLoading) return;
 
     if (session) {
-      setCurrentPage('dashboard');
+      if (profileDogInfo) {
+        setCurrentPage('dashboard');
+        const tourShown = localStorage.getItem('dashboardTourShown');
+        if (!tourShown) {
+          startTour();
+        }
+      } else {
+        setCurrentPage('dog-info');
+      }
     } else {
       const onboardingComplete = localStorage.getItem('onboardingComplete');
       setCurrentPage(onboardingComplete ? 'login' : 'onboarding');
     }
-  }, [session, loading]);
+  }, [session, loading, profileDogInfo, isDogInfoLoading]);
 
   const handleOnboardingComplete = () => {
     localStorage.setItem('onboardingComplete', 'true');
@@ -95,12 +154,13 @@ const Index = () => {
   };
 
   const handleLogin = () => {
+    // The main useEffect will handle navigation based on profileDogInfo
+    // This function can be used for other login-specific logic if needed
     const isFirstLogin = !localStorage.getItem('hasVisited');
     if (isFirstLogin) {
-      startTour();
+      // The tour will start on the dashboard if profile exists
       localStorage.setItem('hasVisited', 'true');
     }
-    setCurrentPage('dashboard');
   };
 
   const handleNavigate = (page: string, params?: any) => {
@@ -115,6 +175,7 @@ const Index = () => {
       setCurrentPage('dog-info');
     } else if (page === 'dog-profile') {
       setCurrentPage('dog-profile');
+      startProfileTour();
     } else if (page === 'training') {
       setCurrentPage('training');
     } else if (page === 'dashboard') {
@@ -127,56 +188,24 @@ const Index = () => {
     console.log(`Navigating to: ${page}`, params); // 페이지 전환 로그 추가
   };
 
-  const handleDogInfoComplete = (completedDogInfo: any) => {
+  const handleDogInfoComplete = async (completedDogInfo: any) => {
     console.log('Dog info completed:', completedDogInfo);
     setDogInfo(completedDogInfo);
     setEditingDogInfo(null);
-    setCurrentPage('dog-profile'); // 페이지를 즉시 전환합니다.
-
-    // 튜토리얼을 본 적 없는 경우에만 실행하도록 설정합니다.
-    const tourShown = localStorage.getItem('missionBoardTourShown');
-    if (!tourShown) {
-      const newTourSteps: Step[] = [
-        {
-          target: '.mission-board-section',
-          content: '강아지 정보 입력이 완료되었습니다! 🎉 이제 우리 강아지만을 위한 맞춤형 훈련 미션 보드를 확인해보세요.',
-          disableBeacon: true,
-          title: '미션 보드 도착!',
-        },
-      ];
-      setTourSteps(newTourSteps);
-      setRunTour(true);
-      localStorage.setItem('missionBoardTourShown', 'true'); // 튜토리얼을 봤다고 기록합니다.
-    }
+    await refetchDogProfile(); // Refetch profile to trigger useEffect
+    setCurrentPage('dashboard'); // Navigate to dashboard
   };
-
-  // useEffect 훅은 더 이상 필요 없으므로 삭제하거나 주석 처리합니다.
-  /*
-  useEffect(() => {
-    if (currentPage === 'dog-profile' && dogInfo) {
-      console.log('Current page is dog-profile, starting tour.');
-      const tourShown = localStorage.getItem('missionBoardTourShown');
-      if (!tourShown) {
-        const newTourSteps: Step[] = [
-          {
-            target: '.mission-board-section',
-            content: '강아지 정보 입력이 완료되었습니다! 🎉 이제 우리 강아지만을 위한 맞춤형 훈련 미션 보드를 확인해보세요.',
-            disableBeacon: true,
-            title: '미션 보드 도착!',
-          },
-        ];
-        setTourSteps(newTourSteps);
-        setRunTour(true);
-        localStorage.setItem('missionBoardTourShown', 'true');
-      }
-    }
-  }, [currentPage, dogInfo]);
-  */
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status } = data;
     if (['finished', 'skipped'].includes(status)) {
       setRunTour(false);
+      if (activeTour === 'dashboard') {
+        localStorage.setItem('dashboardTourShown', 'true');
+      } else if (activeTour === 'profile') {
+        localStorage.setItem('profileTourShown', 'true');
+      }
+      setActiveTour(null);
     }
   };
 
@@ -249,12 +278,11 @@ const Index = () => {
   return (
     <div className={`relative min-h-screen ${showBottomNav ? 'pb-20' : ''}`}>
       <Joyride
-        steps={tourSteps}
         run={runTour}
-        callback={handleJoyrideCallback}
+        steps={tourSteps}
         continuous
-        showProgress
         showSkipButton
+        callback={handleJoyrideCallback}
         locale={{
           back: '이전',
           close: '닫기',
@@ -288,3 +316,4 @@ const Index = () => {
 };
 
 export default Index;
+

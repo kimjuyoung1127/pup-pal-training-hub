@@ -39,23 +39,23 @@ interface Video {
 // Props 타입 정의
 interface DashboardContentProps {
   onNavigate: (page: string) => void;
-  runTour: boolean;
-  setRunTour: (run: boolean) => void;
 }
 
-const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentProps) => {
+const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
   const [originFilter, setOriginFilter] = useState('all');
   const { dog, tip, videos, mission, isLoading } = useDashboardData(originFilter);
   const { missionCompleted, toggleMissionCompleted, resetMissionIfNeeded } = useDashboardStore();
   const navigate = useNavigate();
 
-  const [internalRunTour, setInternalRunTour] = useState(false);
+  const [runTour, setRunTour] = useState(false);
 
   useEffect(() => {
-    if (runTour && !isLoading) {
-      setInternalRunTour(true);
+    const isFirstVisit = localStorage.getItem('hasVisitedDashboard') !== 'true';
+    if (isFirstVisit) {
+      setRunTour(true);
+      localStorage.setItem('hasVisitedDashboard', 'true');
     }
-  }, [runTour, isLoading]);
+  }, []);
 
   const [randomWelcome, setRandomWelcome] = useState('');
   const [randomTip, setRandomTip] = useState('');
@@ -97,7 +97,6 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
     const { status } = data;
     if (['finished', 'skipped'].includes(status)) {
       setRunTour(false);
-      setInternalRunTour(false);
     }
   };
 
@@ -220,7 +219,7 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
     >
       <Joyride
         steps={tourSteps}
-        run={internalRunTour}
+        run={runTour}
         continuous
         showProgress={false}
         showSkipButton

@@ -40,7 +40,7 @@ const getGenderEmoji = (gender: string) => {
 
 const ProfileHeader = ({ dogInfo, onImageUpload, onImageDelete }: ProfileHeaderProps) => {
   return (
-    <Card className="overflow-hidden bg-sky-50 shadow-md border border-sky-100">
+    <Card className="overflow-hidden bg-sky-50 shadow-md border border-sky-100 dog-profile-card">
       <CardContent className="p-6">
         <div className="flex items-center space-x-6">
           <div className="relative group">

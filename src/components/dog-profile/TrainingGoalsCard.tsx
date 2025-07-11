@@ -10,7 +10,7 @@ interface TrainingGoalsCardProps {
 
 const TrainingGoalsCard = ({ trainingGoalNames }: TrainingGoalsCardProps) => {
   return (
-    <Card className="bg-sky-50 shadow-md border border-sky-100">
+    <Card className="bg-sky-50 shadow-md border border-sky-100 training-goals-card">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center space-x-2 text-gray-800 font-pretendard">
           <Target className="w-5 h-5 text-sky-500" />

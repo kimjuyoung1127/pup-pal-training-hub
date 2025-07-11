@@ -133,7 +133,7 @@ const DogInfoPage = ({ onComplete, dogInfoToEdit }: DogInfoPageProps) => {
 
   if (showConfetti) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-cream-50 to-orange-50 p-4">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-sky-50 to-sky-100 p-4">
         <Confetti width={width} height={height} />
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -141,30 +141,30 @@ const DogInfoPage = ({ onComplete, dogInfoToEdit }: DogInfoPageProps) => {
           transition={{ duration: 0.5 }}
           className="text-center"
         >
-          <h2 className="text-3xl font-bold text-gray-800 mb-4 font-pretendard">🎉 등록 완료! 🎉</h2>
-          <p className="text-lg text-gray-700 font-pretendard">우리 아이를 위한 맞춤 플랜을 준비 중이에요!</p>
+          <h2 className="text-3xl font-bold text-sky-800 mb-4 font-pretendard">🎉 등록 완료! 🎉</h2>
+          <p className="text-lg text-sky-700 font-pretendard">우리 아이를 위한 맞춤 플랜을 준비 중이에요!</p>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-cream-50 to-orange-50 p-4">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-sky-50 to-sky-100 p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-2">
           <div className="text-xl">🐾</div>
-          <h1 className="text-lg font-bold text-gray-800 font-pretendard">멍멍트레이너</h1>
+          <h1 className="text-lg font-bold text-sky-800 font-pretendard">멍멍트레이너</h1>
         </div>
-        <div className="text-sm text-gray-600 font-pretendard">
+        <div className="text-sm text-sky-600 font-pretendard">
           {currentStep + 1} / 3
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="w-full bg-cream-200 rounded-full h-2 mb-8">
+      <div className="w-full bg-sky-200 rounded-full h-2 mb-8">
         <motion.div 
-          className="bg-orange-500 h-2 rounded-full"
+          className="bg-sky-500 h-2 rounded-full"
           initial={{ width: 0 }}
           animate={{ width: `${((currentStep + 1) / 3) * 100}%` }}
           transition={{ duration: 0.5, ease: "easeOut" }}
@@ -179,10 +179,10 @@ const DogInfoPage = ({ onComplete, dogInfoToEdit }: DogInfoPageProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-2xl font-bold text-gray-800 mb-2 font-pretendard">
+          <h2 className="text-2xl font-bold text-sky-800 mb-2 font-pretendard">
             {stepTitles[currentStep]}
           </h2>
-          <p className="text-gray-700 font-pretendard">
+          <p className="text-sky-700 font-pretendard">
             {stepDescriptions[currentStep]}
           </p>
         </motion.div>
