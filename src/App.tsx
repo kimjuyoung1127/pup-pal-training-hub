@@ -16,6 +16,8 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 import AboutUsPage from './pages/AboutUsPage';
 import PricingPage from './pages/PricingPage'; // PricingPage import 추가
+import SuccessPage from './pages/SuccessPage';
+import FailPage from './pages/FailPage';
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,8 @@ const App = () => (
           <Route path="/TermsOfServicePage" element={<TermsOfServicePage />} />
           <Route path="/AboutUsPage" element={<AboutUsPage />} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/success" element={<SuccessPage />} />
+          <Route path="/fail" element={<FailPage />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="/training-history" element={<TrainingHistoryPage onNavigate={function (page: string, params?: any): void {

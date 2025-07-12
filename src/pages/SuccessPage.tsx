@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 
 const SuccessPage: React.FC = () => {
@@ -9,8 +9,7 @@ const SuccessPage: React.FC = () => {
 
   useEffect(() => {
     // TODO: 서버에 결제 승인 요청 보내기
-    // 이 곳에서 서버로 paymentKey, orderId, amount를 보내 최종 결제 승인을 요청하고,
-    // 데이터베이스에 사용자의 플랜을 'pro'로 업데이트해야 합니다.
+    // Bootpay로부터 받은 receipt_id를 사용하여 서버에서 결제를 검증하고 완료 처리해야 합니다.
     // 예: fetch('/api/confirm-payment', { method: 'POST', body: JSON.stringify({ paymentKey, orderId, amount }) });
   }, [paymentKey, orderId, amount]);
 
@@ -22,7 +21,7 @@ const SuccessPage: React.FC = () => {
         <div className="p-4 bg-gray-100 rounded-md dark:bg-gray-700 text-left">
           <p><strong>주문 ID:</strong> {orderId}</p>
           <p><strong>결제 금액:</strong> {amount ? `${Number(amount).toLocaleString()}원` : 'N/A'}</p>
-          <p><strong>Payment Key:</strong> {paymentKey}</p>
+          <p><strong>영수증 ID:</strong> {paymentKey}</p>
         </div>
         <Link to="/dashboard" className="w-full inline-block px-4 py-2 text-lg font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">
           대시보드로 이동

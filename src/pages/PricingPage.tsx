@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
-import { loadTossPayments } from '@tosspayments/payment-sdk';
+import { Bootpay } from '@bootpay/client-js';
 import { supabase } from '@/integrations/supabase/client';
 import { type User } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
@@ -25,16 +25,34 @@ const PricingPage = () => {
       return;
     }
 
-    const tossPayments = await loadTossPayments(import.meta.env.VITE_TOSS_PAYMENTS_CLIENT_KEY || '');
-
-    tossPayments.requestPayment('카드', {
-      amount: 4900,
-      orderId: `pro-plan-${user.id}-${new Date().getTime()}`,
-      orderName: 'Pro 플랜 구독',
-      customerName: user.user_metadata?.full_name || user.email,
-      successUrl: `${window.location.origin}/success`,
-      failUrl: `${window.location.origin}/pricing`,
-    });
+    try {
+      const response = await Bootpay.requestPayment({
+        application_id: import.meta.env.VITE_BOOTPAY_APPLICATION_ID || '',
+        price: 4900,
+        order_name: 'Pro 플랜 구독',
+        order_id: `pro-plan-${user.id}-${new Date().getTime()}`,
+        pg: '토스페이먼츠',
+        method: '카드',
+        user: {
+          id: user.id,
+          username: user.user_metadata?.full_name || user.email,
+          email: user.email,
+        },
+        extra: {
+          open_type: 'iframe',
+        }
+      });
+      if (response.event === 'done') {
+        // 결제 완료시 success 페이지로 이동
+        // TODO: 서버로 영수증 ID(response.data.receipt_id)를 보내 결제 검증 및 완료 처리
+        navigate(`/success?orderId=${response.data.order_id}&amount=${response.data.price}&paymentKey=${response.data.receipt_id}`);
+      }
+    } catch (error) {
+      console.error(error);
+      const err = error as any;
+      // 결제 실패시 fail 페이지로 이동
+      navigate(`/fail?message=${err.message}&code=${err.code || 'UNKNOWN_ERROR'}`);
+    }
   };
 
   return (
