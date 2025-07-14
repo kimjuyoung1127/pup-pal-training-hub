@@ -3,6 +3,8 @@ import React from 'react';
 import { Settings, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import DashboardContent from './DashboardContent';
+import AdSense from './ads/AdSense';
+import { useDogProfile } from '@/hooks/useDogProfile';
 
 interface DashboardPageProps {
   onNavigate: (page: string, params?: any) => void;
@@ -12,6 +14,7 @@ interface DashboardPageProps {
 }
 
 const DashboardPage = ({ onNavigate, runTour, setRunTour, startTour }: DashboardPageProps) => {
+  const { plan } = useDogProfile();
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-100">
       {/* Header */}
@@ -44,6 +47,11 @@ const DashboardPage = ({ onNavigate, runTour, setRunTour, startTour }: Dashboard
       </div>
 
       <DashboardContent onNavigate={onNavigate} runTour={runTour} setRunTour={setRunTour} />
+            {plan === 'free' && (
+        <div className="p-4">
+          <AdSense />
+        </div>
+      )}
     </div>
   );
 };
