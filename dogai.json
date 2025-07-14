@@ -2,5 +2,42 @@
   "projectName": "AI Development",
   "developmentLog": "C:\\Users\\gmdqn\\.gemini\\mcp\\dogai_plan\\log.md",
   "githubRepo": "kimjuyoung1127/pup-pal-training-hub",
-  "tasks": []
+  "tasks": [
+    {
+      "id": "task-22",
+      "title": "Supabase: 초대 코드 테이블 및 엣지 함수 생성",
+      "status": "Done",
+      "approved": true
+    },
+    {
+      "id": "task-23",
+      "title": "UI: `SettingsPage.tsx`에 초대 코드 입력 필드 추가 (디자인 통일성 강조)",
+      "status": "Done",
+      "approved": false
+    },
+    {
+      "id": "task-24",
+      "title": "기능: 초대 코드 제출 및 상태 업데이트 로직 구현",
+      "status": "In Progress",
+      "approved": false
+    },
+    {
+      "id": "task-25",
+      "title": "연동: `GeminiChatPage.tsx`에서 구독 상태 확인 로직 적용",
+      "status": "In Progress",
+      "approved": false
+    },
+    {
+      "id": "task-26",
+      "title": "버전 관리: 각 단계 완료 후 GitHub에 푸시",
+      "status": "In Progress",
+      "approved": false
+    },
+    {
+      "id": "task-27",
+      "title": "최종 테스트 및 정리",
+      "status": "In Progress",
+      "approved": false
+    }
+  ]
 }
