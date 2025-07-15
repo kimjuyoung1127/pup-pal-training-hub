@@ -9,6 +9,7 @@ export default defineConfig({
     react(),
     sitemap({
       hostname: 'https://mungai.co.kr',
+      lastmod: new Date(),
       // sitemap에 포함할 경로 목록
       dynamicRoutes: [
         '/',
@@ -19,10 +20,14 @@ export default defineConfig({
         '/AboutUsPage',
       ],
       // sitemap에서 제외할 경로 목록
-      exclude: ['/success', '/fail'],
+      exclude: ['/success', '/fail', '/*.html'],
       robots: [
         {
           userAgent: '*',
+          allow: '/',
+        },
+        {
+          userAgent: 'Yeti',
           allow: '/',
         },
       ],
