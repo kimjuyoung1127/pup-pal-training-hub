@@ -5,18 +5,17 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import GeminiChatPage from "./components/GeminiChatPage";
-import TrainingHistoryPage from './components/TrainingHistoryPage';
-import TrainingProgressPage from './components/TrainingProgressPage';
-import TrainingReplayPage from './components/TrainingReplayPage';
-import SettingsPage from './components/SettingsPage';
-import DogBadges from './components/DogBadges'; // DogBadgesPage 대신 DogBadges를 임포트합니다.
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 import AboutUsPage from './pages/AboutUsPage';
-import PricingPage from './pages/PricingPage'; // PricingPage import 추가
+import PricingPage from './pages/PricingPage';
 import SuccessPage from './pages/SuccessPage';
 import FailPage from './pages/FailPage';
+import BlogPage from './pages/BlogPage';
+import BlogDetailPage from './pages/BlogDetailPage';
+import MbtiTestPage from './pages/MbtiTestPage';
+import FilterWizardPage from './pages/FilterWizardPage';
+import WoofpediaLayout from './pages/WoofpediaLayout';
 
 const queryClient = new QueryClient();
 
@@ -27,8 +26,18 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/chat" element={<GeminiChatPage />} />
+          {/* Woofpedia 기능 그룹 (공통 헤더/푸터 적용) */}
+          <Route element={<WoofpediaLayout />}>
+            <Route path="/" element={<BlogPage />} />
+            <Route path="/blog/:id" element={<BlogDetailPage />} />
+            <Route path="/mbti-test" element={<MbtiTestPage />} />
+            <Route path="/filter-wizard" element={<FilterWizardPage />} />
+          </Route>
+
+          {/* Mungai 핵심 기능은 /app 경로 하위에 위치 */}
+          <Route path="/app/*" element={<Index />} />
+
+          {/* 기타 독립적인 페이지들 */}
           <Route path="/PrivacyPolicyPage" element={<PrivacyPolicyPage />} />
           <Route path="/TermsOfServicePage" element={<TermsOfServicePage />} />
           <Route path="/AboutUsPage" element={<AboutUsPage />} />
@@ -36,19 +45,7 @@ const App = () => (
           <Route path="/success" element={<SuccessPage />} />
           <Route path="/fail" element={<FailPage />} />
           
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="/training-history" element={<TrainingHistoryPage onNavigate={function (page: string, params?: any): void {
-            throw new Error("Function not implemented.");
-          } } />} />
-            throw new Error("Function not implemented.");
-          <Route path="/training-progress/:programId" element={<TrainingProgressPage trainingProgram={undefined} onNavigate={function (page: string): void {
-            throw new Error("Function not implemented.");
-          } } onExit={function (): void {
-            throw new Error("Function not implemented.");
-          } } dogId={""} />} />
-    
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/dog-badges" element={<DogBadges badges={[]} isLoading={false} />} /> {/* DogBadges 컴포넌트를 사용하고 필요한 props를 전달합니다. */}
+          {/* 404 Not Found */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
