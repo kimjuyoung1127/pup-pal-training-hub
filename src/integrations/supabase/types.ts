@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -7,29 +7,34 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instanciate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.3 (519615d)"
+  }
   public: {
     Tables: {
       ai_recommendations: {
         Row: {
-          id: string
-          dog_id: string
-          user_id: string
-          recommendations: Json
           created_at: string
+          dog_id: string
+          id: string
+          recommendations: Json | null
+          user_id: string | null
         }
         Insert: {
-          id?: string
-          dog_id: string
-          user_id: string
-          recommendations: Json
           created_at?: string
+          dog_id?: string
+          id?: string
+          recommendations?: Json | null
+          user_id?: string | null
         }
         Update: {
-          id?: string
-          dog_id?: string
-          user_id?: string
-          recommendations?: Json
           created_at?: string
+          dog_id?: string
+          id?: string
+          recommendations?: Json | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -37,13 +42,6 @@ export type Database = {
             columns: ["dog_id"]
             isOneToOne: false
             referencedRelation: "dogs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ai_recommendations_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -83,6 +81,141 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      breed_details: {
+        Row: {
+          adaptability: number | null
+          affection_level: number | null
+          barking_level: number | null
+          breed_id: string
+          energy_level: number | null
+          exercise_needs: number | null
+          friendliness_with_kids: number | null
+          friendliness_with_pets: number | null
+          friendliness_with_strangers: number | null
+          grooming_needs: number | null
+          playfulness: number | null
+          shedding_level: number | null
+          trainability: number | null
+        }
+        Insert: {
+          adaptability?: number | null
+          affection_level?: number | null
+          barking_level?: number | null
+          breed_id: string
+          energy_level?: number | null
+          exercise_needs?: number | null
+          friendliness_with_kids?: number | null
+          friendliness_with_pets?: number | null
+          friendliness_with_strangers?: number | null
+          grooming_needs?: number | null
+          playfulness?: number | null
+          shedding_level?: number | null
+          trainability?: number | null
+        }
+        Update: {
+          adaptability?: number | null
+          affection_level?: number | null
+          barking_level?: number | null
+          breed_id?: string
+          energy_level?: number | null
+          exercise_needs?: number | null
+          friendliness_with_kids?: number | null
+          friendliness_with_pets?: number | null
+          friendliness_with_strangers?: number | null
+          grooming_needs?: number | null
+          playfulness?: number | null
+          shedding_level?: number | null
+          trainability?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "breed_details_breed_id_fkey"
+            columns: ["breed_id"]
+            isOneToOne: true
+            referencedRelation: "breeds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      breed_diseases: {
+        Row: {
+          breed_id: string
+          description: string | null
+          disease_name: string
+          id: string
+        }
+        Insert: {
+          breed_id: string
+          description?: string | null
+          disease_name: string
+          id?: string
+        }
+        Update: {
+          breed_id?: string
+          description?: string | null
+          disease_name?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "breed_diseases_breed_id_fkey"
+            columns: ["breed_id"]
+            isOneToOne: false
+            referencedRelation: "breeds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      breeds: {
+        Row: {
+          avg_life_expectancy: unknown | null
+          avg_weight: unknown | null
+          dog_mbti: string | null
+          history: string | null
+          id: string
+          name_en: string
+          name_ko: string
+          popularity_score: number | null
+          size_type: string | null
+          summary: string | null
+          thumbnail_url: string | null
+        }
+        Insert: {
+          avg_life_expectancy?: unknown | null
+          avg_weight?: unknown | null
+          dog_mbti?: string | null
+          history?: string | null
+          id?: string
+          name_en: string
+          name_ko: string
+          popularity_score?: number | null
+          size_type?: string | null
+          summary?: string | null
+          thumbnail_url?: string | null
+        }
+        Update: {
+          avg_life_expectancy?: unknown | null
+          avg_weight?: unknown | null
+          dog_mbti?: string | null
+          history?: string | null
+          id?: string
+          name_en?: string
+          name_ko?: string
+          popularity_score?: number | null
+          size_type?: string | null
+          summary?: string | null
+          thumbnail_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "breeds_dog_mbti_fkey"
+            columns: ["dog_mbti"]
+            isOneToOne: false
+            referencedRelation: "mbti_descriptions"
+            referencedColumns: ["mbti_type"]
+          },
+        ]
       }
       daily_missions: {
         Row: {
@@ -174,7 +307,6 @@ export type Database = {
           created_at: string
           dog_id: string
           family_composition: string | null
-          family_elderly: boolean | null
           family_kids: boolean | null
           favorite_snacks: string | null
           favorites: string[] | null
@@ -198,7 +330,6 @@ export type Database = {
           created_at?: string
           dog_id: string
           family_composition?: string | null
-          family_elderly?: boolean | null
           family_kids?: boolean | null
           favorite_snacks?: string | null
           favorites?: string[] | null
@@ -222,7 +353,6 @@ export type Database = {
           created_at?: string
           dog_id?: string
           family_composition?: string | null
-          family_elderly?: boolean | null
           family_kids?: boolean | null
           favorite_snacks?: string | null
           favorites?: string[] | null
@@ -332,6 +462,51 @@ export type Database = {
         }
         Relationships: []
       }
+      invitation_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          id: number
+          is_used: boolean | null
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          id?: never
+          is_used?: boolean | null
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          id?: never
+          is_used?: boolean | null
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: []
+      }
+      mbti_descriptions: {
+        Row: {
+          description: string | null
+          mbti_type: string
+          title: string | null
+        }
+        Insert: {
+          description?: string | null
+          mbti_type: string
+          title?: string | null
+        }
+        Update: {
+          description?: string | null
+          mbti_type?: string
+          title?: string | null
+        }
+        Relationships: []
+      }
       media: {
         Row: {
           created_at: string
@@ -385,37 +560,46 @@ export type Database = {
       }
       training_history: {
         Row: {
+          ai_training_details: Json | null
           created_at: string
-          dog_id: string
+          dog_id: string | null
           duration_minutes: number | null
-          id: string
+          id: number
+          is_ai_training: boolean | null
           notes: string | null
-          session_date: string
+          session_date: string | null
           success_rate: number | null
+          training_program_id: string | null
           training_type: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
+          ai_training_details?: Json | null
           created_at?: string
-          dog_id: string
+          dog_id?: string | null
           duration_minutes?: number | null
-          id?: string
+          id?: number
+          is_ai_training?: boolean | null
           notes?: string | null
-          session_date?: string
+          session_date?: string | null
           success_rate?: number | null
+          training_program_id?: string | null
           training_type?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
+          ai_training_details?: Json | null
           created_at?: string
-          dog_id?: string
+          dog_id?: string | null
           duration_minutes?: number | null
-          id?: string
+          id?: number
+          is_ai_training?: boolean | null
           notes?: string | null
-          session_date?: string
+          session_date?: string | null
           success_rate?: number | null
+          training_program_id?: string | null
           training_type?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -445,15 +629,85 @@ export type Database = {
         }
         Relationships: []
       }
+      user_profiles: {
+        Row: {
+          id: string
+          plan: string | null
+          plan_expiry_date: string | null
+        }
+        Insert: {
+          id: string
+          plan?: string | null
+          plan_expiry_date?: string | null
+        }
+        Update: {
+          id?: string
+          plan?: string | null
+          plan_expiry_date?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_filtered_breeds: {
+        Args: { p_answers: Json }
+        Returns: {
+          id: string
+          name_ko: string
+          name_en: string
+          thumbnail_url: string
+          size_type: string
+        }[]
+      }
+      get_filtered_breeds_v2: {
+        Args: { p_answers: Json }
+        Returns: {
+          id: string
+          name_ko: string
+          name_en: string
+          thumbnail_url: string
+          size_type: string
+        }[]
+      }
+      get_filtered_breeds_v3: {
+        Args: { p_answers: Json }
+        Returns: {
+          id: string
+          name_ko: string
+          name_en: string
+          thumbnail_url: string
+          size_type: string
+          total_score: number
+        }[]
+      }
+      get_filtered_breeds_v4: {
+        Args: { p_answers: Json }
+        Returns: {
+          id: string
+          name_ko: string
+          name_en: string
+          thumbnail_url: string
+          size_type: string
+          total_score: number
+        }[]
+      }
+      get_filtered_breeds_v5: {
+        Args: { p_answers: Json }
+        Returns: {
+          id: string
+          name_ko: string
+          name_en: string
+          thumbnail_url: string
+          size_type: string
+          total_score: number
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      plan_type: "free" | "pro"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -461,21 +715,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -493,14 +751,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -516,14 +776,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -539,14 +801,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -554,63 +818,24 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      plan_type: ["free", "pro"],
+    },
   },
 } as const
-
-
-Tables: {
-  ai_recommendations: {
-    Row: {
-      id: string
-      dog_id: string
-      user_id: string
-      recommendations: Json
-      created_at: string
-    }
-    Insert: {
-      id?: string
-      dog_id: string
-      user_id: string
-      recommendations: Json
-      created_at?: string
-    }
-    Update: {
-      id?: string
-      dog_id?: string
-      user_id?: string
-      recommendations?: Json
-      created_at?: string
-    }
-    Relationships: [
-      {
-        foreignKeyName: "ai_recommendations_dog_id_fkey"
-        columns: ["dog_id"]
-        isOneToOne: false
-        referencedRelation: "dogs"
-        referencedColumns: ["id"]
-      }
-      {
-        foreignKeyName: "ai_recommendations_user_id_fkey"
-        columns: ["user_id"]
-        isOneToOne: false
-        referencedRelation: "users"
-        referencedColumns: ["id"]
-      }
-    ]
-  }
-}

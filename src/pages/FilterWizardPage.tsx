@@ -1,297 +1,377 @@
+"use client";
 
-import React from 'react';
-import { useWizardStore } from '@/store/useWizardStore';
-import { useMutation } from '@tanstack/react-query';
-import { woofpediaClient } from '@/lib/woofpediaClient';
+import React, { useState, useTransition, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Link } from 'react-router-dom';
-import { Loader2, RefreshCw, ArrowLeft, Sparkles, Heart, PawPrint, Wand2 } from 'lucide-react';
+import { Loader2, RefreshCw, PawPrint, Heart, Sparkles, ArrowLeft } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import Footer from '@/components/Footer';
 
+// 임시 Breed 타입 정의
+type Breed = {
+  id: string;
+  name_ko: string;
+  name_en: string;
+  thumbnail_url: string | null;
+  size_type: string | null;
+};
+
+// 임시 BreedCard 컴포넌트
+const BreedCard = ({ breed }: { breed: Breed }) => {
+  // 인라인 스타일 정의
+  const cardStyle = {
+    overflow: "hidden",
+    borderRadius: "1.5rem",
+    border: "2px solid #FED7AA",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    transition: "all 0.3s ease",
+    backgroundColor: "#ffffff"
+  };
+
+  const cardHoverStyle = {
+    boxShadow: "0 10px 15px rgba(0, 0, 0, 0.1)",
+    transform: "scale(1.05)"
+  };
+
+  const imageStyle = {
+    width: "100%",
+    height: "12rem",
+    objectFit: "cover" as const,
+    borderTopLeftRadius: "1.25rem",
+    borderTopRightRadius: "1.25rem"
+  };
+
+  const titleStyle = {
+    fontSize: "1.125rem",
+    fontWeight: "bold",
+    background: "linear-gradient(to right, #F97316, #EC4899, #A855F7)",
+    WebkitBackgroundClip: "text" as const,
+    WebkitTextFillColor: "transparent" as const,
+    padding: "0.5rem 0"
+  };
+
+  const subtitleStyle = {
+    fontSize: "0.875rem",
+    color: "#6B7280"
+  };
+
+  const tagStyle = {
+    fontSize: "0.75rem",
+    background: "linear-gradient(to right, #FEF3C7, #FCE7F3)",
+    color: "#9A3412",
+    padding: "0.25rem 0.5rem",
+    borderRadius: "9999px",
+    border: "1px solid #FED7AA",
+    display: "inline-block",
+    marginTop: "0.5rem"
+  };
+
+  const [isHovered, setIsHovered] = React.useState(false);
+
+  return (
+    <Link to={`/blog/${breed.id}`}>
+      <div 
+        style={{
+          ...cardStyle,
+          ...(isHovered ? cardHoverStyle : {})
+        }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div>
+          <img 
+            src={breed.thumbnail_url || 'https://via.placeholder.com/300'} 
+            alt={breed.name_ko} 
+            style={imageStyle} 
+          />
+        </div>
+        <div style={{ padding: "1rem" }}>
+          <div style={titleStyle}>{breed.name_ko}</div>
+          <p style={subtitleStyle}>{breed.name_en}</p>
+        </div>
+        <div style={{ padding: "0 1rem 1rem 1rem" }}>
+          <span style={tagStyle}>{breed.size_type || '정보 없음'}</span>
+        </div>
+      </div>
+    </Link>
+  );
+};
+
 const questions = [
-    { 
-        id: 'environment', 
-        title: '어떤 환경에서 함께하게 되나요?', 
-        emoji: '🏠',
-        options: [
-            { value: 'apartment', label: '🏢 아파트/빌라 (소음과 공간 중요)', color: 'from-pink-100 to-rose-100' },
-            { value: 'houseWithYard', label: '🏡 마당이 있는 집 (자유로운 활동)', color: 'from-green-100 to-emerald-100' }
-        ] 
-    },
-    { 
-        id: 'activity', 
-        title: '강아지와 어떤 활동을 즐기고 싶으신가요?', 
-        emoji: '🎾',
-        options: [
-            { value: 'calm', label: '😌 주로 실내에서, 차분한 시간을', color: 'from-blue-100 to-cyan-100' },
-            { value: 'moderate', label: '🚶‍♀️ 가벼운 산책과 동네 친구 만나기', color: 'from-yellow-100 to-amber-100' },
-            { value: 'active', label: '🏃‍♂️ 등산, 달리기 등 역동적인 활동을 함께!', color: 'from-red-100 to-orange-100' }
-        ] 
-    },
-    { 
-        id: 'social', 
-        title: '주로 누구와 함께 시간을 보내게 될까요?', 
-        emoji: '👥',
-        options: [
-            { value: 'alone', label: '🤫 저와 조용히, 또는 혼자서도 잘 지내요', color: 'from-purple-100 to-violet-100' },
-            { value: 'family', label: '👨‍👩‍👧‍👦 온 가족, 그리고 가끔 오는 손님들과 함께', color: 'from-pink-100 to-rose-100' },
-            { value: 'socialButterfly', label: '🎉 새로운 사람과 다른 강아지를 만나는 걸 즐겨요', color: 'from-green-100 to-teal-100' }
-        ] 
-    },
-    { 
-        id: 'care', 
-        title: '강아지를 돌보는 데 얼마나 신경 쓸 수 있나요?', 
-        emoji: '💝',
-        options: [
-            { value: 'easy', label: '🌱 처음이라, 훈련이 쉽고 관리가 편했으면 해요', color: 'from-green-100 to-lime-100' },
-            { value: 'medium', label: '⚖️ 어느 정도의 훈련과 관리는 자신 있어요', color: 'from-yellow-100 to-orange-100' },
-            { value: 'hard', label: '💪 털 관리나 훈련에 시간과 노력을 투자할 준비 완료!', color: 'from-red-100 to-pink-100' }
-        ] 
-    },
+  { id: 'environment', title: '어떤 환경에서 함께하게 되나요?', options: [ { value: 'apartment', label: '아파트/빌라 (소음과 공간 중요)' }, { value: 'houseWithYard', label: '마당이 있는 집 (자유로운 활동)' } ] },
+  { id: 'activity', title: '강아지와 어떤 활동을 즐기고 싶으신가요?', options: [ { value: 'calm', label: '주로 실내에서, 차분한 시간을' }, { value: 'moderate', label: '가벼운 산책과 동네 친구 만나기' }, { value: 'active', label: '등산, 달리기 등 역동적인 활동을 함께!' } ] },
+  { id: 'social', title: '주로 누구와 함께 시간을 보내게 될까요?', options: [ { value: 'alone', label: '저와 조용히, 또는 혼자서도 잘 지내요' }, { value: 'family', label: '온 가족, 그리고 가끔 오는 손님들과 함께' }, { value: 'socialButterfly', label: '새로운 사람과 다른 강아지를 만나는 걸 즐겨요' } ] },
+  { id: 'care', title: '강아지를 돌보는 데 얼마나 신경 쓸 수 있나요?', options: [ { value: 'easy', label: '처음이라, 훈련이 쉽고 관리가 편했으면 해요' }, { value: 'medium', label: '어느 정도의 훈련과 관리는 자신 있어요' }, { value: 'hard', label: '털 관리나 훈련에 시간과 노력을 투자할 준비 완료!' } ] },
+  { id: 'playfulness', title: '강아지와 얼마나 활동적으로 놀아주고 싶으신가요?', options: [ { value: 'low', label: '장난감을 가지고 조용히 노는 편' }, { value: 'medium', label: '공놀이 등 가벼운 놀이를 즐겨요' }, { value: 'high', label: '항상 에너지가 넘치고, 활동적인 놀이가 필요해요' } ] },
+  { id: 'affection', title: '강아지와의 스킨십, 얼마나 원하시나요?', options: [ { value: 'low', label: '독립적이며, 혼자 있는 시간을 존중해주는 게 좋아요' }, { value: 'medium', label: '가끔 다가와 애교를 부리는 정도가 딱 좋아요' }, { value: 'high', label: '껌딱지처럼 항상 곁에 있고 싶어해요' } ] },
+  { id: 'exercise', title: '하루에 산책이나 운동에 얼마나 시간을 쓸 수 있나요?', options: [ { value: 'low', label: '30분 미만의 가벼운 산책' }, { value: 'medium', label: '1시간 내외의 규칙적인 산책' }, { value: 'high', label: '1시간 이상의 긴 산책이나 운동' } ] },
 ];
 
-const BreedCard = ({ breed }: { breed: any }) => (
-    <Link to={`/blog/${breed.id}`} className="group">
-      <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-white to-pink-50/30 border-2 border-pink-100 hover:border-pink-300 rounded-3xl">
-        <CardHeader className="p-0 relative">
-          <div className="absolute top-3 right-3 z-10 bg-white/80 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <Heart className="h-4 w-4 text-pink-500" />
-          </div>
-          <img src={breed.thumbnail_url || 'https://via.placeholder.com/300'} alt={breed.name_ko} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent h-16" />
-        </CardHeader>
-        <CardContent className="p-4 relative">
-          <div className="absolute -top-6 left-4 bg-white rounded-full p-2 shadow-lg border-2 border-pink-200">
-            <PawPrint className="h-4 w-4 text-pink-500" />
-          </div>
-          <CardTitle className="text-lg font-bold text-gray-800 mt-2 group-hover:text-pink-600 transition-colors">{breed.name_ko}</CardTitle>
-          <p className="text-sm text-gray-500 font-medium">{breed.name_en}</p>
-        </CardContent>
-        <CardFooter className="p-4 pt-0">
-          <span className="text-xs bg-gradient-to-r from-pink-100 to-purple-100 text-pink-700 px-3 py-1.5 rounded-full font-semibold border border-pink-200">{breed.size_type || '정보 없음'}</span>
-        </CardFooter>
-      </Card>
-    </Link>
-);
+// PawgressBar 컴포넌트 추가
+const PawgressBar = ({ current, total }: { current: number, total: number }) => {
+  const progressPercentage = (current / total) * 100;
+  return (
+    <div className="w-full bg-gradient-to-r from-orange-100 to-pink-100 rounded-full h-6 my-8 relative shadow-inner border border-orange-200">
+      <div 
+        className="bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 h-6 rounded-full transition-all duration-700 ease-out shadow-lg" 
+        style={{ width: `${progressPercentage}%` }}
+      />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-xs font-bold text-purple-800 drop-shadow-md">
+          {current} / {total}
+        </span>
+      </div>
+      <PawPrint 
+        className="absolute top-1/2 -translate-y-1/2 h-10 w-10 text-purple-600 transition-all duration-700 ease-out drop-shadow-lg animate-bounce"
+        style={{ left: `calc(${progressPercentage}% - 20px)` }}
+      />
+    </div>
+  );
+};
 
 const FilterWizardPage: React.FC = () => {
-    const { currentStep, answers, setAnswer, setCurrentStep, reset } = useWizardStore();
+  const [currentStep, setCurrentStep] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [results, setResults] = useState<Breed[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const nodeRef = useRef(null);
+
+  const handleAnswerSelect = (questionId: string, answerValue: string) => {
+    const newAnswers = { ...answers, [questionId]: answerValue };
+    setAnswers(newAnswers);
     
-    const mutation = useMutation({
-        mutationFn: async (newAnswers: Record<string, string>) => {
-            const response = await woofpediaClient.rpc('get_filtered_breeds', { p_answers: newAnswers });
-            return response.data;
-        },
-    });
-
-    const handleAnswerSelect = (questionId: string, answerValue: string) => {
-        const newAnswers = { ...answers, [questionId]: answerValue };
-        setAnswer(questionId, answerValue);
-        
-        if (currentStep === questions.length - 1) {
-            mutation.mutate(newAnswers);
-        }
-        handleNext();
-    };
-
-    const handleNext = () => {
-        if (currentStep < questions.length) {
-            setCurrentStep(currentStep + 1);
-        }
-    };
-
-    const handlePrev = () => {
-        if (currentStep > 0) {
-            setCurrentStep(currentStep - 1);
-            mutation.reset();
-        }
-    };
-    
-    const handleReset = () => {
-        reset();
-        mutation.reset();
+    if (currentStep === questions.length - 1) {
+      console.log('Submitting answers:', newAnswers);
+      supabase.rpc('get_filtered_breeds_v5', { p_answers: newAnswers })
+        .then(({ data, error }) => {
+          console.log('Supabase response data:', data);
+          console.log('Supabase response error:', error);
+          startTransition(() => {
+            if (error) {
+              setError(error.message);
+            } else if (data) {
+              setResults(data as Breed[]);
+            }
+          });
+        });
     }
+    handleNext();
+  };
 
-    const progressValue = (currentStep / questions.length) * 100;
-    const currentQuestion = questions[currentStep];
+  const handleNext = () => {
+    if (currentStep < questions.length) {
+      setCurrentStep((prev) => prev + 1);
+    }
+  };
 
-    return (
-        <>
-            <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
-                <div className="container mx-auto px-4 py-12">
-                    <Link to="/" className="inline-flex items-center text-pink-600 hover:text-pink-700 font-semibold mb-8 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full border-2 border-pink-200 hover:border-pink-300 transition-all duration-200 hover:shadow-md">
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        메인으로 돌아가기
-                    </Link>
-                    
-                    <div className="text-center mb-12 relative">
-                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4">
-                            <Wand2 className="h-8 w-8 text-purple-400 animate-bounce" />
-                        </div>
-                        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-4">
-                            <span className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
-                                나에게 꼭 맞는 견종 찾기
-                            </span>
-                        </h1>
-                        <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600 font-light leading-relaxed">
-                            🪄 네 가지 마법 같은 질문에 답하고, 당신의 라이프스타일에 완벽한 반려견을 만나보세요!
-                        </p>
-                    </div>
+  const handlePrev = () => {
+    if (currentStep > 0) {
+      setCurrentStep((prev) => prev - 1);
+      setResults([]);
+      setError(null);
+    }
+  };
+  
+  const handleReset = () => {
+    setCurrentStep(0);
+    setAnswers({});
+    setResults([]);
+    setError(null);
+  }
 
-                    <Card className="w-full max-w-4xl mx-auto mb-12 bg-white/90 backdrop-blur-sm border-2 border-pink-100 rounded-3xl shadow-2xl overflow-hidden">
-                        <CardHeader className="text-center bg-gradient-to-r from-pink-50 to-purple-50 border-b border-pink-100">
-                            {currentStep < questions.length ? (
-                                <>
-                                    <div className="flex justify-center mb-4">
-                                        <div className="bg-white rounded-full p-4 shadow-lg border-2 border-pink-200">
-                                            <span className="text-3xl">{currentQuestion.emoji}</span>
-                                        </div>
-                                    </div>
-                                    <CardTitle className="text-2xl md:text-3xl font-bold text-gray-800">
-                                        맞춤 견종 찾기 ({currentStep + 1}/{questions.length})
-                                    </CardTitle>
-                                    <CardDescription className="text-lg text-gray-600 mt-2 font-medium">
-                                        {currentQuestion.title}
-                                    </CardDescription>
-                                </>
-                            ) : (
-                                <>
-                                    <div className="flex justify-center mb-4">
-                                        <div className="bg-white rounded-full p-4 shadow-lg border-2 border-pink-200">
-                                            <Sparkles className="h-8 w-8 text-purple-500" />
-                                        </div>
-                                    </div>
-                                    <CardTitle className="text-2xl md:text-3xl font-bold">
-                                        <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-                                            결과 확인
-                                        </span>
-                                    </CardTitle>
-                                    <CardDescription className="text-lg text-gray-600 mt-2 font-medium">
-                                        당신에게 꼭 맞는 견종들을 찾아냈어요! 🐾✨
-                                    </CardDescription>
-                                </>
-                            )}
-                        </CardHeader>
-                        
-                        <CardContent className="p-8">
-                            {/* 진행률 바 */}
-                            <div className="mb-8">
-                                <div className="flex justify-between items-center mb-2">
-                                    <span className="text-sm font-semibold text-gray-600">진행률</span>
-                                    <span className="text-sm font-bold text-pink-600">{Math.round(progressValue)}%</span>
-                                </div>
-                                <Progress 
-                                    value={progressValue} 
-                                    className="h-4 bg-gray-100 [&>*]:bg-gradient-to-r [&>*]:from-pink-400 [&>*]:via-purple-400 [&>*]:to-blue-400 rounded-full" 
-                                />
-                            </div>
-                            
-                            {currentStep < questions.length && (
-                                <div className="grid grid-cols-1 gap-4">
-                                    {questions[currentStep].options.map((option, index) => (
-                                        <Button 
-                                            key={option.value} 
-                                            variant="outline" 
-                                            size="lg" 
-                                            className={`justify-start p-6 text-left h-auto text-base border-2 rounded-2xl transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 bg-gradient-to-r ${option.color} border-pink-200 hover:border-pink-300 text-gray-700 hover:text-gray-800`}
-                                            onClick={() => handleAnswerSelect(questions[currentStep].id, option.value)}
-                                            style={{ animationDelay: `${index * 0.1}s` }}
-                                        >
-                                            <div className="flex items-center space-x-3">
-                                                <div className="bg-white rounded-full p-2 shadow-sm">
-                                                    <PawPrint className="h-4 w-4 text-pink-500" />
-                                                </div>
-                                                <span className="font-medium">{option.label}</span>
-                                            </div>
-                                        </Button>
-                                    ))}
-                                </div>
-                            )}
-                        </CardContent>
-                        
-                        <CardFooter className="flex justify-between bg-gradient-to-r from-gray-50 to-pink-50 p-6 border-t border-pink-100">
-                            {currentStep > 0 ? (
-                                <Button 
-                                    variant="ghost" 
-                                    onClick={handlePrev} 
-                                    className="text-gray-600 hover:text-pink-600 hover:bg-pink-50 rounded-full px-6"
-                                >
-                                    <ArrowLeft className="mr-2 h-4 w-4" />
-                                    이전
-                                </Button>
-                            ) : <div />}
-                            
-                            {currentStep === questions.length && (
-                                <Button 
-                                    onClick={handleReset} 
-                                    className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white rounded-full px-6 shadow-lg"
-                                >
-                                    <RefreshCw className="mr-2 h-4 w-4" />
-                                    다시하기
-                                </Button>
-                            )}
-                        </CardFooter>
-                    </Card>
+  const progressValue = (currentStep / questions.length) * 100;
+  const currentQuestion = questions[currentStep];
+  const displayStep = currentStep <= questions.length ? currentStep : 'results';
 
-                    {/* 로딩 상태 */}
-                    {mutation.isPending && (
-                        <div className="text-center py-16">
-                            <div className="relative inline-block">
-                                <Loader2 className="h-16 w-16 animate-spin text-pink-500" />
-                                <Wand2 className="h-8 w-8 text-purple-400 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
-                            </div>
-                            <p className="mt-6 text-xl text-gray-600 font-medium">🔮 마법을 부리는 중... 최적의 견종을 찾고 있어요!</p>
-                        </div>
-                    )}
-                    
-                    {/* 에러 상태 */}
-                    {mutation.isError && (
-                        <div className="text-center py-16">
-                            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border-2 border-red-200 max-w-md mx-auto">
-                                <p className="text-red-500 text-lg font-semibold">앗! 마법이 실패했어요 😢</p>
-                                <p className="text-red-400 text-sm mt-2">{mutation.error?.message}</p>
-                            </div>
-                        </div>
-                    )}
-                    
-                    {/* 성공 결과 */}
-                    {mutation.isSuccess && mutation.data?.data && (
-                        <div className="animate-in fade-in-50 duration-500">
-                            <div className="text-center mb-8">
-                                <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 border-2 border-green-200 max-w-2xl mx-auto">
-                                    <Sparkles className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-                                    <p className="text-xl text-gray-700 font-semibold">
-                                        🎉 총 <span className="font-bold text-pink-600 text-2xl">{mutation.data.data.length}</span>마리의 
-                                        <span className="font-bold text-purple-600">완벽한 짝꿍</span>을 찾았어요!
-                                    </p>
-                                    <p className="text-sm text-gray-500 mt-2">(인지도 순으로 정렬)</p>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
-                                {mutation.data.data.map((breed: any) => (
-                                    <BreedCard key={breed.id} breed={breed} />
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                    
-                    {/* 빈 결과 */}
-                    {mutation.isSuccess && (!mutation.data?.data || mutation.data.data.length === 0) && (
-                        <div className="text-center py-16">
-                            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 border-2 border-gray-200 max-w-md mx-auto">
-                                <PawPrint className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                                <p className="text-lg text-gray-600 font-semibold mb-2">아쉽지만, 모든 조건에 맞는 견종을 찾지 못했어요 😢</p>
-                                <p className="text-sm text-gray-500">조건을 변경하여 다시 시도해 보세요!</p>
-                            </div>
-                        </div>
-                    )}
-                </div>
+  const renderContent = () => {
+    if (currentStep < questions.length) {
+      return (
+        <div key={currentStep} ref={nodeRef}>
+          <PawgressBar current={currentStep + 1} total={questions.length} />
+          <div className="bg-white/90 backdrop-blur-md border-2 border-orange-200 rounded-3xl shadow-2xl p-8 w-full max-w-2xl mx-auto transform hover:scale-[1.02] transition-all duration-300">
+            <div className="flex items-center justify-center mb-6">
+              <Sparkles className="h-6 w-6 text-orange-400 mr-2" />
+              <h2 className="text-center text-xl md:text-2xl font-bold text-gray-800">
+                Q{currentStep + 1}. {currentQuestion.title}
+              </h2>
+              <Sparkles className="h-6 w-6 text-orange-400 ml-2" />
             </div>
-            <Footer />
-        </>
-    );
-}
+            <div className="grid grid-cols-1 gap-4">
+              {currentQuestion.options.map((option) => (
+                <Button
+                  key={option.value}
+                  size="lg"
+                  className="justify-center p-6 text-center h-auto text-base rounded-2xl bg-gradient-to-r from-orange-100 to-pink-100 text-orange-800 hover:from-orange-200 hover:to-pink-200 border-2 border-orange-300 hover:border-orange-400 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                  onClick={() => handleAnswerSelect(currentQuestion.id, option.value)}
+                >
+                  <Heart className="h-5 w-5 mr-2 text-pink-500" />
+                  {option.label}
+                </Button>
+              ))}
+            </div>
+            {currentStep > 0 && (
+              <div className="mt-6 flex justify-center">
+                <Button 
+                  variant="ghost" 
+                  onClick={handlePrev} 
+                  className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                >
+                  이전 질문으로
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div ref={nodeRef}>
+          <div className="text-center bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-2xl border-2 border-orange-200 mb-8 transform hover:scale-[1.02] transition-all duration-300">
+            <div className="flex items-center justify-center mb-6">
+              <PawPrint className="h-10 w-10 text-purple-500 mr-4 animate-pulse" />
+              <h1 className="text-3xl md:text-4xl font-extrabold">
+                <span className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
+                  결과 확인
+                </span>
+              </h1>
+              <PawPrint className="h-10 w-10 text-purple-500 ml-4 animate-pulse" />
+            </div>
+            <p className="text-gray-600 text-lg mb-6 leading-relaxed">
+              🐾 당신에게 꼭 맞는 견종들을 찾아냈어요! 🐾
+            </p>
+            <Button 
+              onClick={handleReset} 
+              className="bg-gradient-to-r from-orange-400 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            >
+              <RefreshCw className="mr-2 h-4 w-4" />
+              다시하기
+            </Button>
+          </div>
+        </div>
+      );
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-purple-50">
+      <div className="container mx-auto max-w-4xl py-8 px-4">
+        <Link to="/" className="inline-flex items-center text-orange-600 hover:text-orange-700 hover:underline mb-6 font-medium transition-colors duration-200">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          메인으로 돌아가기
+        </Link>
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center mb-4">
+            <PawPrint className="h-8 w-8 text-purple-500 mr-3" />
+            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">
+              <span className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
+                맞춤 견종 찾기
+              </span>
+            </h1>
+            <PawPrint className="h-8 w-8 text-purple-500 ml-3" />
+          </div>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600 font-light leading-relaxed">
+            🌟 간단한 질문으로 당신에게 딱 맞는 반려견을 찾아보세요. 🌟
+          </p>
+        </div>
+
+        <SwitchTransition>
+          <CSSTransition
+            key={displayStep}
+            nodeRef={nodeRef}
+            timeout={300}
+            classNames="fade"
+          >
+            {renderContent()}
+          </CSSTransition>
+        </SwitchTransition>
+
+        {isPending && (
+          <div className="text-center py-10">
+            <Loader2 className="mx-auto h-12 w-12 animate-spin text-orange-500" />
+            <p className="mt-4 text-lg text-gray-600">최적의 견종을 찾고 있어요...</p>
+          </div>
+        )}
+        {error && <p className="text-center text-red-500 py-10">{error}</p>}
+        {!isPending && results.length > 0 && (
+          <div 
+            style={{
+              animation: "fadeIn 0.5s ease-out",
+              background: "rgba(255, 255, 255, 0.9)",
+              backdropFilter: "blur(8px)",
+              padding: "2rem",
+              borderRadius: "1.5rem",
+              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+              border: "2px solid #FED7AA",
+              marginBottom: "2rem"
+            }}
+          >
+            <p style={{
+              textAlign: "center",
+              fontSize: "1.125rem",
+              color: "#4B5563",
+              marginBottom: "2rem"
+            }}>
+              총 <span style={{
+                fontWeight: "bold",
+                background: "linear-gradient(to right, #F97316, #EC4899, #A855F7)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent"
+              }}>{results.length}</span>개의 견종을 찾았습니다. (인지도 순)
+            </p>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+              gap: "1.5rem"
+            }}>
+              {results.map((breed) => (
+                <BreedCard key={breed.id} breed={breed} />
+              ))}
+            </div>
+          </div>
+        )}
+        {!isPending && currentStep === questions.length && results.length === 0 && !error && (
+          <p style={{
+            textAlign: "center",
+            color: "#4B5563",
+            padding: "2.5rem",
+            background: "rgba(255, 255, 255, 0.9)",
+            backdropFilter: "blur(8px)",
+            borderRadius: "1.5rem",
+            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+            border: "2px solid #FED7AA"
+          }}>
+            아쉽지만, 모든 조건에 맞는 견종을 찾지 못했어요. <br/> 조건을 변경하여 다시 시도해 보세요!
+          </p>
+        )}
+      </div>
+      <Footer />
+      
+      <style>{`
+        .fade-enter {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        .fade-enter-active {
+          opacity: 1;
+          transform: translateY(0);
+          transition: opacity 300ms ease-out, transform 300ms ease-out;
+        }
+        .fade-exit {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .fade-exit-active {
+          opacity: 0;
+          transform: translateY(-20px);
+          transition: opacity 300ms ease-out, transform 300ms ease-out;
+        }
+      `}</style>
+    </div>
+  );
+};
 
 export default FilterWizardPage;

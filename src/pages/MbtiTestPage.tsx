@@ -83,12 +83,12 @@ const PawgressBar = ({ current, total }: { current: number, total: number }) => 
         style={{ width: `${progressPercentage}%` }}
       />
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-xs font-bold text-white drop-shadow-lg">
+        <span className="text-xs font-bold text-purple-800 drop-shadow-md">
           {current} / {total}
         </span>
       </div>
       <PawPrint 
-        className="absolute top-1/2 -translate-y-1/2 h-10 w-10 text-orange-600 transition-all duration-700 ease-out drop-shadow-lg animate-bounce"
+        className="absolute top-1/2 -translate-y-1/2 h-10 w-10 text-purple-600 transition-all duration-700 ease-out drop-shadow-lg animate-bounce"
         style={{ left: `calc(${progressPercentage}% - 20px)` }}
       />
     </div>
@@ -110,7 +110,7 @@ const QuestionCard = ({ question, onAnswer, index }: { question: any, onAnswer: 
         className="justify-center p-6 text-center h-auto text-base rounded-2xl bg-gradient-to-r from-orange-100 to-pink-100 text-orange-800 hover:from-orange-200 hover:to-pink-200 border-2 border-orange-300 hover:border-orange-400 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
         onClick={() => onAnswer(question.choiceA.type)}
       >
-        <Heart className="h-5 w-5 mr-2 text-orange-500" />
+        <Heart className="h-5 w-5 mr-2 text-pink-500" />
         {question.choiceA.text}
       </Button>
       <Button
@@ -149,7 +149,7 @@ const MbtiTestPage: React.FC = () => {
             <div className="flex items-center justify-center mb-6">
               <PawPrint className="h-12 w-12 text-orange-500 mr-4 animate-pulse" />
               <h1 className="text-3xl md:text-4xl font-extrabold">
-                <span className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
                   나의 강아지 소울메이트 찾기
                 </span>
               </h1>
@@ -162,11 +162,11 @@ const MbtiTestPage: React.FC = () => {
             <Button 
               size="lg" 
               onClick={() => dispatch({ type: 'START_TEST' })} 
-              className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+              className="bg-gradient-to-r from-orange-400 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
             >
               <Sparkles className="h-5 w-5 mr-2" />
               테스트 시작하기
-              <Heart className="h-5 w-5 ml-2" />
+              <Heart className="h-5 w-5 ml-2 text-white" />
             </Button>
           </div>
         );
@@ -184,9 +184,9 @@ const MbtiTestPage: React.FC = () => {
         </Link>
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
-            <PawPrint className="h-8 w-8 text-orange-500 mr-3" />
+            <PawPrint className="h-8 w-8 text-purple-500 mr-3" />
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">
-              <span className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
                 견종 성향 테스트 (MBTI)
               </span>
             </h1>

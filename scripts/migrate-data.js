@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -38,10 +39,8 @@ async function migrateTable(tableName, fromClient, toClient, primaryKey) {
 
   console.log(`Fetched ${data.length} rows. Inserting into destination...`);
 
-  // upsert: true -> 데이터가 있으면 업데이트, 없으면 삽입
   const { error: insertError } = await toClient.from(tableName).upsert(data, {
-    onConflict: primaryKey, // 각 테이블에 맞는 기본 키를 사용
-    ignoreDuplicates: false,
+    onConflict: primaryKey,
   });
 
   if (insertError) {
@@ -52,13 +51,10 @@ async function migrateTable(tableName, fromClient, toClient, primaryKey) {
 }
 
 async function main() {
-  console.log('Starting data migration (v2)...');
+  console.log('Starting data migration for breed_details only...');
 
-  // 순서와 각 테이블의 기본 키(PK)를 정확히 지정합니다.
-  await migrateTable('mbti_descriptions', sourceClient, destinationClient, 'mbti_type');
-  await migrateTable('breeds', sourceClient, destinationClient, 'id');
+  // breed_details 테이블만 다시 이전하여 누락된 컬럼 데이터를 채웁니다.
   await migrateTable('breed_details', sourceClient, destinationClient, 'breed_id');
-  await migrateTable('breed_diseases', sourceClient, destinationClient, 'id');
 
   console.log('Data migration finished.');
 }

@@ -7,38 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Search, Heart, PawPrint } from 'lucide-react';
 import Footer from '@/components/Footer';
-
-const BreedCard = ({ breed }: { breed: any }) => (
-  <Link to={`/blog/${breed.id}`} className="group">
-    <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-white to-pink-50/30 border-2 border-pink-100 hover:border-pink-300 rounded-3xl">
-      <CardHeader className="p-0 relative">
-        <div className="absolute top-3 right-3 z-10 bg-white/80 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <Heart className="h-4 w-4 text-pink-500" />
-        </div>
-        <img 
-          src={breed.thumbnail_url || 'https://via.placeholder.com/300'} 
-          alt={breed.name_ko}
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-        />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent h-16" />
-      </CardHeader>
-      <CardContent className="p-4 relative">
-        <div className="absolute -top-6 left-4 bg-white rounded-full p-2 shadow-lg border-2 border-pink-200">
-          <PawPrint className="h-4 w-4 text-pink-500" />
-        </div>
-        <CardTitle className="text-lg font-bold text-gray-800 mt-2 group-hover:text-pink-600 transition-colors">
-          {breed.name_ko}
-        </CardTitle>
-        <p className="text-sm text-gray-500 font-medium">{breed.name_en}</p>
-      </CardContent>
-      <CardFooter className="p-4 pt-0">
-        <span className="text-xs bg-gradient-to-r from-pink-100 to-purple-100 text-pink-700 px-3 py-1.5 rounded-full font-semibold border border-pink-200">
-          {breed.size_type || '정보 없음'}
-        </span>
-      </CardFooter>
-    </Card>
-  </Link>
-);
+import BreedCard from '@/components/BreedCard';
 
 const BlogPage: React.FC = () => {
   const { data: breeds, isLoading, error } = useBreeds();
@@ -55,7 +24,7 @@ const BlogPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex justify-center items-center">
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-rose-50 flex justify-center items-center">
         <div className="text-center">
           <div className="relative">
             <Loader2 className="h-16 w-16 animate-spin text-pink-500 mx-auto" />
@@ -69,7 +38,7 @@ const BlogPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex justify-center items-center">
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-rose-50 flex justify-center items-center">
         <div className="text-center py-20 text-red-500 bg-white/80 backdrop-blur-sm rounded-3xl p-8 border-2 border-red-200">
           <p className="text-lg font-semibold">앗! 오류가 발생했어요 😢</p>
           <p className="text-sm mt-2">{error.message}</p>
@@ -80,7 +49,7 @@ const BlogPage: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-rose-50">
         <div className="container mx-auto px-4 py-12">
           {/* 헤더 섹션 */}
           <div className="text-center mb-12 relative">
@@ -88,11 +57,11 @@ const BlogPage: React.FC = () => {
               <div className="flex space-x-2">
                 <PawPrint className="h-6 w-6 text-pink-300 animate-bounce" style={{animationDelay: '0s'}} />
                 <PawPrint className="h-6 w-6 text-purple-300 animate-bounce" style={{animationDelay: '0.2s'}} />
-                <PawPrint className="h-6 w-6 text-blue-300 animate-bounce" style={{animationDelay: '0.4s'}} />
+                <PawPrint className="h-6 w-6 text-rose-300 animate-bounce" style={{animationDelay: '0.4s'}} />
               </div>
             </div>
             <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-4">
-              <span className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-pink-500 via-purple-500 to-rose-500 bg-clip-text text-transparent">
                 견종 탐색
               </span>
             </h1>
@@ -110,18 +79,18 @@ const BlogPage: React.FC = () => {
                   placeholder="견종 이름으로 검색 (한글 또는 영문) 🔍"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 h-12 rounded-2xl border-2 border-pink-200 focus:border-pink-400 bg-white/80 backdrop-blur-sm text-gray-700 placeholder:text-gray-400"
+                  className="pl-10 h-12 rounded-2xl border-2 border-pink-200 focus:border-pink-400 bg-white/80 backdrop-blur-sm text-gray-800 placeholder:text-gray-600 font-medium"
                 />
               </div>
               <Select value={selectedSize} onValueChange={setSelectedSize}>
-                <SelectTrigger className="h-12 rounded-2xl border-2 border-purple-200 focus:border-purple-400 bg-white/80 backdrop-blur-sm">
+                <SelectTrigger className="h-12 rounded-2xl border-2 border-indigo-200 focus:border-indigo-400 bg-white/80 backdrop-blur-sm text-gray-800 font-medium">
                   <SelectValue placeholder="크기 선택 📏" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl border-2 border-purple-200">
-                  <SelectItem value="all">🐕 모든 크기</SelectItem>
-                  <SelectItem value="소형">🐕‍🦺 소형견</SelectItem>
-                  <SelectItem value="중형">🐕 중형견</SelectItem>
-                  <SelectItem value="대형">🐕‍🦮 대형견</SelectItem>
+                <SelectContent className="rounded-xl border-2 border-indigo-200 bg-white/95 backdrop-blur-sm">
+                  <SelectItem value="all" className="hover:bg-indigo-50 focus:bg-indigo-50 text-gray-800 font-medium">🐕 모든 크기</SelectItem>
+                  <SelectItem value="소형" className="hover:bg-indigo-50 focus:bg-indigo-50 text-gray-800 font-medium">🐕‍🦺 소형견</SelectItem>
+                  <SelectItem value="중형" className="hover:bg-indigo-50 focus:bg-indigo-50 text-gray-800 font-medium">🐕 중형견</SelectItem>
+                  <SelectItem value="대형" className="hover:bg-indigo-50 focus:bg-indigo-50 text-gray-800 font-medium">🐕‍🦮 대형견</SelectItem>
                 </SelectContent>
               </Select>
             </div>
