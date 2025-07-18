@@ -1,13 +1,13 @@
-// AI/src/components/MainLayout.tsx
+// AI/src/components/MainLayoutV2.tsx
 import React from 'react';
-import Header from './Header';
+import HeaderV2 from './HeaderV2'; // Header 대신 HeaderV2를 가져옵니다.
 import Footer from './Footer';
 
 interface MainLayoutProps {
   children: React.ReactNode;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+const MainLayoutV2: React.FC<MainLayoutProps> = ({ children }) => {
   const layoutStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
@@ -20,7 +20,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   return (
     <div style={layoutStyle}>
-      <Header />
+      <HeaderV2 /> {/* Header 대신 HeaderV2를 사용합니다. */}
       <main style={mainStyle}>
         {children}
       </main>
@@ -29,4 +29,4 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   );
 };
 
-export default MainLayout;
+export default MainLayoutV2;

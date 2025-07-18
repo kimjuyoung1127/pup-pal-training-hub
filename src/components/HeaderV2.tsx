@@ -1,10 +1,26 @@
-// AI/src/components/Header.tsx
-import React, { useState } from 'react';
+// AI/src/components/HeaderV2.tsx
+import React, { useState, useEffect, useRef } from 'react';
 
-const Header = () => {
+const HeaderV2 = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 임시 스타일입니다. 실제 구현 시에는 tailwind-css 등을 사용합니다.
+  // 메뉴 바깥 영역 클릭 시 메뉴를 닫는 로직
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+    // 이벤트 리스너 추가
+    document.addEventListener('mousedown', handleClickOutside);
+    // 클린업 함수에서 이벤트 리스너 제거
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownRef]);
+
+  // --- 스타일 정의 (이전과 동일) ---
   const navStyle: React.CSSProperties = {
     display: 'flex',
     justifyContent: 'space-between',
@@ -33,6 +49,7 @@ const Header = () => {
     fontWeight: 600,
     fontSize: '1rem',
     transition: 'color 0.2s',
+    cursor: 'pointer',
   };
 
   const dropdownContainerStyle: React.CSSProperties = {
@@ -73,10 +90,12 @@ const Header = () => {
         <a href="/nutrition" style={linkStyle}>영양/식단</a>
         <div 
           style={dropdownContainerStyle}
-          onMouseEnter={() => setIsMenuOpen(true)}
-          onMouseLeave={() => setIsMenuOpen(false)}
+          ref={dropdownRef} // ref를 div에 연결
         >
-          <a href="#" style={linkStyle} onClick={(e) => e.preventDefault()}>
+          <a 
+            style={linkStyle} 
+            onClick={() => setIsMenuOpen(!isMenuOpen)} // 클릭으로 메뉴 토글
+          >
             AI 솔루션 ▼
           </a>
           <div style={dropdownMenuStyle}>
@@ -95,4 +114,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default HeaderV2;

@@ -11,11 +11,14 @@ import AboutUsPage from './pages/AboutUsPage';
 import PricingPage from './pages/PricingPage';
 import SuccessPage from './pages/SuccessPage';
 import FailPage from './pages/FailPage';
+import HomePage from './pages/HomePage';
 import BlogPage from './pages/BlogPage';
 import BlogDetailPage from './pages/BlogDetailPage';
 import MbtiTestPage from './pages/MbtiTestPage';
 import FilterWizardPage from './pages/FilterWizardPage';
-import WoofpediaLayout from './pages/WoofpediaLayout';
+import ArticlePage from './pages/ArticlePage';
+import MainLayoutV2 from './components/MainLayoutV2';
+// BreedDirectoryPage는 더 이상 사용하지 않으므로 임포트 제거
 
 const queryClient = new QueryClient();
 
@@ -25,29 +28,34 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          {/* Woofpedia 기능 그룹 (공통 헤더/푸터 적용) */}
-          <Route element={<WoofpediaLayout />}>
-            <Route path="/" element={<BlogPage />} />
-            <Route path="/blog/:id" element={<BlogDetailPage />} />
+        <MainLayoutV2>
+          <Routes>
+            {/* Pet-Life Magazine & Woofpedia 기능 */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/column" element={<BlogPage />} />
+            <Route path="/column/:id" element={<BlogDetailPage />} />
+            <Route path="/articles/:slug" element={<ArticlePage />} />
             <Route path="/mbti-test" element={<MbtiTestPage />} />
             <Route path="/filter-wizard" element={<FilterWizardPage />} />
-          </Route>
+            <Route path="/ai/breed-recommender" element={<FilterWizardPage />} />
+            <Route path="/ai/mbti-test" element={<MbtiTestPage />} />
+            <Route path="/breeds" element={<BlogPage />} /> {/* 견종 백과 경로를 BlogPage로 연결 */}
+            
+            {/* Mungai 핵심 기능은 /app 경로 하위에 위치 */}
+            <Route path="/app/*" element={<Index />} />
 
-          {/* Mungai 핵심 기능은 /app 경로 하위에 위치 */}
-          <Route path="/app/*" element={<Index />} />
-
-          {/* 기타 독립적인 페이지들 */}
-          <Route path="/PrivacyPolicyPage" element={<PrivacyPolicyPage />} />
-          <Route path="/TermsOfServicePage" element={<TermsOfServicePage />} />
-          <Route path="/AboutUsPage" element={<AboutUsPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/success" element={<SuccessPage />} />
-          <Route path="/fail" element={<FailPage />} />
-          
-          {/* 404 Not Found */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            {/* 기타 독립적인 페이지들 */}
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsOfServicePage />} />
+            <Route path="/about" element={<AboutUsPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/success" element={<SuccessPage />} />
+            <Route path="/fail" element={<FailPage />} />
+            
+            {/* 404 Not Found */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </MainLayoutV2>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
