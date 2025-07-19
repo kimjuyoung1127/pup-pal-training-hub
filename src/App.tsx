@@ -18,6 +18,7 @@ import MbtiTestPage from './pages/MbtiTestPage';
 import FilterWizardPage from './pages/FilterWizardPage';
 import ArticlePage from './pages/ArticlePage';
 import MainLayoutV2 from './components/MainLayoutV2';
+import GeminiChatPage from './components/GeminiChatPage'; // GeminiChatPage 컴포넌트 임포트 추가
 // BreedDirectoryPage는 더 이상 사용하지 않으므로 임포트 제거
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/ai/breed-recommender" element={<FilterWizardPage />} />
             <Route path="/ai/mbti-test" element={<MbtiTestPage />} />
             <Route path="/breeds" element={<BlogPage />} /> {/* 견종 백과 경로를 BlogPage로 연결 */}
+            <Route path="/chat" element={<GeminiChatPage />} /> {/* 추가: GeminiChatPage 경로 */}
             
             {/* Mungai 핵심 기능은 /app 경로 하위에 위치 */}
             <Route path="/app/*" element={<Index />} />
