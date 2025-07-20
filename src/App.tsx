@@ -35,6 +35,7 @@ const App = () => (
             <Route path="/" element={<HomePage />} />
             <Route path="/column" element={<BlogPage />} />
             <Route path="/column/:id" element={<BlogDetailPage />} />
+            <Route path="/blog/:id" element={<BlogDetailPage />} /> {/* 추가: /blog/:id 경로 */}
             <Route path="/articles/:slug" element={<ArticlePage />} />
             <Route path="/mbti-test" element={<MbtiTestPage />} />
             <Route path="/filter-wizard" element={<FilterWizardPage />} />

@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Heart, PawPrint } from 'lucide-react';
 
 const BreedCard = ({ breed }: { breed: any }) => (
-  <Link to={`/blog/${breed.id}`} className="group">
+  <Link to={`/column/${breed.id}`} className="group">
     <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 bg-white border-2 border-[#e2e8f0] hover:border-[#a78bfa] rounded-3xl" style={{ backgroundColor: '#ffffff' }}>
       <CardHeader className="p-0 relative">
         <div className="absolute top-3 right-3 z-10 bg-white/90 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
