@@ -1,0 +1,50 @@
+
+# .github/workflows/crawler-fix.yml
+
+name: 'PetMD Scraper Workflow (Fix)'
+
+on:
+  # main 브랜치에 push 이벤트가 발생했을 때 워크플로우를 실행합니다.
+  push:
+    branches:
+      - main
+      - master
+  # 수동으로 워크플로우를 실행할 수 있도록 workflow_dispatch를 추가합니다.
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    name: 'Run PetMD Scraper (Fix)'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      # ==================================================
+      # 여기가 핵심 수정사항입니다.
+      - name: Force install Playwright Test package
+        run: npm install --save-dev @playwright/test
+      # ==================================================
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: npx playwright test scripts/crawler.spec.ts
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
