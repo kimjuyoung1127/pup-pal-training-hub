@@ -1,4 +1,3 @@
-
 # .github/workflows/content-pipeline.yml
 
 name: 'AI Content Pipeline'
@@ -36,4 +35,5 @@ jobs:
           NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          # anon_key 대신 service_role_key를 사용합니다.
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
