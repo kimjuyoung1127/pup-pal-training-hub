@@ -1,4 +1,3 @@
-
 // scripts/fetch-articles.ts
 
 import axios from 'axios';
@@ -61,7 +60,8 @@ async function fetchArticlesForCategory(categoryName: string, query: string): Pr
   }
 }
 
-async function fetchAllCategorizedArticles(): Promise<Article[]> {
+// 'export' 키워드를 추가하여 다른 파일에서 이 함수를 불러올 수 있도록 합니다.
+export async function fetchAllCategorizedArticles(): Promise<Article[]> {
   if (!API_KEY) {
     throw new Error('NEWS_API_KEY 환경 변수가 설정되지 않았습니다.');
   }
@@ -75,13 +75,17 @@ async function fetchAllCategorizedArticles(): Promise<Article[]> {
   return allArticles;
 }
 
-(async () => {
-  const fetchedArticles = await fetchAllCategorizedArticles();
-  if (fetchedArticles.length > 0) {
-    console.log('--- 수집된 아티클 목록 (카테고리 분류 완료) ---');
-    console.log(JSON.stringify(fetchedArticles, null, 2));
-    console.log('-------------------------------------------');
-  } else {
-    console.log('수집된 아티클이 없습니다.');
-  }
-})();
+// 이 파일이 직접 실행될 때만 아래 코드가 작동하도록 수정합니다.
+// 이렇게 하면 다른 파일에서 import할 때 이 부분이 실행되지 않습니다.
+if (import.meta.url === `file://${process.argv[1]}`) {
+  (async () => {
+    const fetchedArticles = await fetchAllCategorizedArticles();
+    if (fetchedArticles.length > 0) {
+      console.log('--- 수집된 아티클 목록 (카테고리 분류 완료) ---');
+      console.log(JSON.stringify(fetchedArticles, null, 2));
+      console.log('-------------------------------------------');
+    } else {
+      console.log('수집된 아티클이 없습니다.');
+    }
+  })();
+}
