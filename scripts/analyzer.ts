@@ -17,6 +17,7 @@ interface InputArticle {
 interface AnalyzedArticle extends InputArticle {
   suggested_title_ko: string;
   summary_ko: string;
+  initial_draft_markdown: string; // 상세 초안을 저장할 필드 추가
 }
 
 /**
@@ -33,7 +34,7 @@ export class ArticleAnalyzer {
   }
 
   /**
-   * 단일 아티클을 분석하여 한글 제목과 요약을 생성합니다.
+   * 단일 아티클을 분석하여 한글 제목, 요약, 그리고 상세 초안을 생성합니다.
    * @param article - 분석할 원본 아티클 객체
    */
   private async analyzeSingleArticle(article: InputArticle): Promise<AnalyzedArticle | null> {
@@ -44,10 +45,11 @@ export class ArticleAnalyzer {
         You are an expert assistant for 'Juyoung Kim', a professional dog trainer in Korea.
         Analyze the following article and generate a blog post idea for her.
         The article category is '${article.category}'.
-        Please respond ONLY in JSON format with two keys: "suggested_title_ko" and "summary_ko".
+        Please respond ONLY in JSON format with three keys: "suggested_title_ko", "summary_ko", and "initial_draft_markdown".
 
         - suggested_title_ko: Create a compelling, professional blog title in Korean.
-        - summary_ko: Summarize the key points of the article in three concise bullet points in Korean.
+        - summary_ko: Summarize the key points of the article in three concise bullet points in Korean. This will be used for a brief overview.
+        - initial_draft_markdown: Create a detailed blog post draft in Korean Markdown format. It must have a clear structure with an introduction, a body with 3-4 subheadings, and a conclusion. This will be the starting point for the actual article.
 
         Article Title: ${article.title}
         Article URL: ${article.url}
@@ -63,6 +65,7 @@ export class ArticleAnalyzer {
         ...article,
         suggested_title_ko: parsed.suggested_title_ko,
         summary_ko: parsed.summary_ko,
+        initial_draft_markdown: parsed.initial_draft_markdown, // 파싱된 초안 추가
       };
 
     } catch (error) {

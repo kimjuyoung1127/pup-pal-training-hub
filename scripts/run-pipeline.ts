@@ -1,4 +1,3 @@
-
 // scripts/run-pipeline.ts
 
 import { fetchAllCategorizedArticles } from './fetch-articles';
@@ -28,7 +27,7 @@ async function main() {
   const analyzer = new ArticleAnalyzer();
   const analyzedArticles = await analyzer.analyzeArticles(rawArticles);
   if (!analyzedArticles || analyzedArticles.length === 0) {
-    console.log('AI 분석 결과가 없어 파이프라인을 ���료합니다.');
+    console.log('AI 분석 결과가 없어 파이프라인을 종료합니다.');
     return;
   }
   console.log(`[2/3] AI 분석 완료: ${analyzedArticles.length}개`);
@@ -46,6 +45,7 @@ async function main() {
   const dataToInsert = analyzedArticles.map(article => ({
     suggested_title_ko: article.suggested_title_ko,
     summary_ko: article.summary_ko,
+    initial_draft_markdown: article.initial_draft_markdown, // 상세 초안 필드 추가
     original_url: article.url,
     image_url: article.imageUrl,
     category: article.category,
@@ -64,7 +64,7 @@ async function main() {
   }
 
   console.log(`[3/3] DB 저장 완료: ${data.length}개 행 삽입`);
-  console.log('======= 데이터 파이프라인 성공적으로 종료 =======');
+  console.log('======= 데이터 파��프라인 성공적으로 종료 =======');
 }
 
 main().catch(error => {
