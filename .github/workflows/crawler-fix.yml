@@ -1,18 +1,20 @@
-
 # .github/workflows/crawler-fix.yml
 
-name: 'Article Fetcher Workflow'
+name: 'AI Content Pipeline Workflow'
 
 on:
   push:
     branches:
       - main
       - master
-  workflow_dispatch:
+  workflow_dispatch: # 수동 실행을 위해 유지
+  schedule:
+    # 매일 오전 9시 (UTC 기준 0시)에 자동으로 실행
+    - cron: '0 0 * * *'
 
 jobs:
-  fetch:
-    name: 'Fetch Pet Articles'
+  run-pipeline:
+    name: 'Run AI Content Pipeline'
     runs-on: ubuntu-latest
 
     steps:
@@ -28,10 +30,13 @@ jobs:
         run: npm install
 
       # ==================================================
-      # 여기가 최종 수정사항입니다.
-      # tsx를 사용하여 TypeScript 파일을 직접, 안정적으로 실행합니다.
-      - name: Fetch articles using tsx
-        run: npx tsx scripts/fetch-articles.ts
+      # 여기가 최종 실행 단계입니다.
+      - name: Run the entire pipeline
+        run: npx tsx scripts/run-pipeline.ts
         env:
+          # GitHub 저장소의 Secrets에서 모든 키를 가져옵니다.
           NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       # ==================================================
