@@ -45,26 +45,35 @@ async function main() {
   const dataToInsert = analyzedArticles.map(article => ({
     suggested_title_ko: article.suggested_title_ko,
     summary_ko: article.summary_ko,
-    initial_draft_markdown: article.initial_draft_markdown, // 상세 초안 필드 추가
+    initial_draft_markdown: article.initial_draft_markdown,
     original_url: article.url,
     image_url: article.imageUrl,
     category: article.category,
     source_name: article.source,
   }));
 
-  console.log(`${dataToInsert.length}개의 데이터를 Supabase에 저장합니다...`);
+  console.log(`${dataToInsert.length}개의 데이터를 Supabase에 저장 시도...`);
+  
+  // .onConflict와 .ignore()를 사용하여 중복 데이터 삽입을 방지합니다.
   const { data, error } = await supabase
     .from('suggested_topics')
-    .insert(dataToInsert)
+    .insert(dataToInsert, {
+      onConflict: 'original_url', // 충돌을 감지할 컬럼
+    })
     .select();
 
   if (error) {
-    console.error('DB 저장 중 오류 발생:', error);
-    return;
+    // '23505'는 unique_violation 오류 코드입���다. onConflict를 사용하면 이 오류는
+    // 정상적으로 처리되므로, 실제 다른 오류가 발생했을 때만 로그를 남깁니다.
+    if (error.code !== '23505') {
+       console.error('DB 저장 중 오류 발생:', error);
+       return;
+    }
   }
 
-  console.log(`[3/3] DB 저장 완료: ${data.length}개 행 삽입`);
-  console.log('======= 데이터 파��프라인 성공적으로 종료 =======');
+  const insertedRowCount = data ? data.length : 0;
+  console.log(`[3/3] DB 저장 완료: ${insertedRowCount}개의 새로운 행 삽입`);
+  console.log('======= 데이터 파이프라인 성공적으로 종료 =======');
 }
 
 main().catch(error => {
