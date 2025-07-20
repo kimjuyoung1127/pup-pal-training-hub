@@ -1,3 +1,4 @@
+
 # .github/workflows/crawler-fix.yml
 
 name: 'Article Fetcher Workflow'
@@ -27,15 +28,10 @@ jobs:
         run: npm install
 
       # ==================================================
-      # 여기가 핵심 수정사항입니다.
-      # 1. TypeScript 컴파일: .ts 파일을 .js 파일로 변환합니다.
-      #    프로젝트의 tsconfig.json 설정을 사용합니다.
-      - name: Compile TypeScript script
-        run: npx tsc scripts/fetch-articles.ts
-
-      # 2. JavaScript 실행: 변환된 .js 파일을 node로 실행합니다.
-      - name: Run the compiled script
-        run: node scripts/fetch-articles.js
+      # 여기가 최종 수정사항입니다.
+      # tsx를 사용하여 TypeScript 파일을 직접, 안정적으로 실행합니다.
+      - name: Fetch articles using tsx
+        run: npx tsx scripts/fetch-articles.ts
         env:
           NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
       # ==================================================
