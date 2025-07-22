@@ -1,6 +1,6 @@
 // AI/src/components/MainLayoutV2.tsx
 import React from 'react';
-import HeaderV2 from './HeaderV2'; // Header 대신 HeaderV2를 가져옵니다.
+import Header from './Header'; // Header 대신 HeaderV2를 가져옵니다.
 import Footer from './Footer';
 
 interface MainLayoutProps {
@@ -20,7 +20,7 @@ const MainLayoutV2: React.FC<MainLayoutProps> = ({ children }) => {
 
   return (
     <div style={layoutStyle}>
-      <HeaderV2 /> {/* Header 대신 HeaderV2를 사용합니다. */}
+      <Header /> {/* Header 대신 HeaderV2를 사용합니다. */}
       <main style={mainStyle}>
         {children}
       </main>

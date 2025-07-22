@@ -1,84 +1,55 @@
-// AI/src/components/Footer.tsx
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
-  // 임시 스타일입니다. 실제 구현 시에는 tailwind-css 등을 사용합니다.
-  const footerStyle: React.CSSProperties = {
-    backgroundColor: '#1f2937',
-    color: '#d1d5db',
-    padding: '3rem 2rem',
-    marginTop: '4rem',
-  };
-
-  const containerStyle: React.CSSProperties = {
-    maxWidth: '1280px',
-    margin: '0 auto',
-    display: 'flex',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-    gap: '2rem',
-  };
-
-  const sectionStyle: React.CSSProperties = {
-    flex: '1 1 200px',
-  };
-
-  const titleStyle: React.CSSProperties = {
-    fontSize: '1.125rem',
-    fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: '1rem',
-  };
-
-  const linkStyle: React.CSSProperties = {
-    display: 'block',
-    textDecoration: 'none',
-    color: '#9ca3af',
-    marginBottom: '0.5rem',
-    transition: 'color 0.2s',
-  };
-
-  const bottomTextStyle: React.CSSProperties = {
-    marginTop: '3rem',
-    paddingTop: '2rem',
-    borderTop: '1px solid #374151',
-    textAlign: 'center',
-    fontSize: '0.875rem',
-    color: '#9ca3af',
-  };
-
   return (
-    <footer style={footerStyle}>
-      <div style={containerStyle}>
-        <div style={sectionStyle}>
-          <h3 style={titleStyle}>Pet-Life Magazine</h3>
-          <p style={{fontSize: '0.9rem', color: '#9ca3af'}}>
-            반려동물의 행복한 삶을 위한 모든 정보. Pet-Life가 함께합니다.
-          </p>
+    <footer className="bg-gray-800 text-gray-400 pt-12 sm:pt-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* About Section */}
+          <div className="md:col-span-1">
+            <h3 className="text-xl font-bold text-white mb-4">Mung-AI</h3>
+            <p className="text-sm">
+              반려동물의 행복한 삶을 위한 모든 정보. Mung-AI가 함께합니다.
+            </p>
+          </div>
+          
+          {/* Content Section */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">콘텐츠</h3>
+            <ul className="space-y-2">
+              <li><Link to="/health" className="hover:text-white transition-colors">건강 정보</Link></li>
+              <li><Link to="/training" className="hover:text-white transition-colors">훈련/행동</Link></li>
+              <li><Link to="/nutrition" className="hover:text-white transition-colors">영양/식단</Link></li>
+            </ul>
+          </div>
+
+          {/* AI Solutions Section */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">AI 솔루션</h3>
+            <ul className="space-y-2">
+              <li><Link to="/ai/breed-recommender" className="hover:text-white transition-colors">AI 견종 추천</Link></li>
+              <li><Link to="/ai/mbti-test" className="hover:text-white transition-colors">견종 MBTI 테스트</Link></li>
+              <li><Link to="/breeds" className="hover:text-white transition-colors">견종 백과</Link></li>
+              <li><Link to="/app" className="hover:text-white transition-colors">AI 행동 분석</Link></li>
+            </ul>
+          </div>
+
+          {/* Company Section */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">회사</h3>
+            <ul className="space-y-2">
+              <li><Link to="/about" className="hover:text-white transition-colors">About Us</Link></li>
+              <li><Link to="/contact" className="hover:text-white transition-colors">Contact</Link></li>
+              <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
+            </ul>
+          </div>
         </div>
-        <div style={sectionStyle}>
-          <h3 style={titleStyle}>콘텐츠</h3>
-          <a href="/health" style={linkStyle}>건강 정보</a>
-          <a href="/training" style={linkStyle}>훈련/행동</a>
-          <a href="/nutrition" style={linkStyle}>영양/식단</a>
+
+        <div className="mt-12 pt-8 border-t border-gray-700 text-center">
+          <p className="text-sm">&copy; {new Date().getFullYear()} Mung-AI. All rights reserved.</p>
         </div>
-        <div style={sectionStyle}>
-          <h3 style={titleStyle}>AI 솔루션</h3>
-          <a href="/ai/breed-recommender" style={linkStyle}>AI 견종 추천</a>
-          <a href="/ai/mbti-test" style={linkStyle}>견종 MBTI 테스트</a>
-          <a href="/breeds" style={linkStyle}>견종 백과</a>
-          <a href="/app" style={linkStyle}>AI 행동 분석</a>
-        </div>
-        <div style={sectionStyle}>
-          <h3 style={titleStyle}>회사</h3>
-          <a href="/about" style={linkStyle}>About Us</a>
-          <a href="/contact" style={linkStyle}>Contact</a>
-          <a href="/privacy" style={linkStyle}>Privacy Policy</a>
-          <a href="/terms" style={linkStyle}>Terms of Service</a>
-        </div>
-      </div>
-      <div style={bottomTextStyle}>
-        <p>&copy; {new Date().getFullYear()} Pet-Life. All rights reserved.</p>
       </div>
     </footer>
   );

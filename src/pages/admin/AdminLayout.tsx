@@ -13,7 +13,7 @@ const AdminLayout = () => {
   return (
     <div className="flex h-screen bg-gray-50">
       <aside className="w-64 flex-shrink-0 bg-gray-800 text-white p-5">
-        <div className="font-bold text-xl mb-10">Pet-Life CMS</div>
+        <div className="font-bold text-xl mb-10">Mung-AI CMS</div>
         <nav className="flex flex-col gap-4">
           <a href="/admin" className="text-lg hover:text-gray-300">대시보드</a>
           <a href="/admin/suggestions" className="text-lg hover:text-gray-300">콘텐츠 아이디어</a>

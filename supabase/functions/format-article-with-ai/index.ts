@@ -38,7 +38,7 @@ serve(async (req) => {
       : "No existing articles provided.";
 
     const prompt = `
-      You are a meticulous senior content editor for "Pet-Life Magazine".
+      You are a meticulous senior content editor for "Mung-AI Magazine".
       Your task is to convert the raw text into a complete, well-structured Markdown article, and create a clear to-do list for fact-checking based on specific, verifiable claims.
 
       Follow these instructions precisely:

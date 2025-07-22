@@ -30,11 +30,11 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ data, type }) => {
         />
         <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-10 transition-all duration-300"></div>
       </div>
-      <div className="p-6 flex flex-col flex-grow">
+      <div className="p-4 md:p-6 flex flex-col flex-grow">
         {data.category && (
           <span className="text-indigo-600 font-semibold text-sm mb-2">{data.category}</span>
         )}
-        <h3 className="text-xl font-bold text-gray-800 mb-3 flex-grow group-hover:text-indigo-700 transition-colors">
+        <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-3 flex-grow group-hover:text-indigo-700 transition-colors">
           {data.title}
         </h3>
         {data.summary && (

@@ -19,6 +19,8 @@ import FilterWizardPage from './pages/FilterWizardPage';
 import ArticlePage from './pages/ArticlePage';
 import MainLayoutV2 from './components/MainLayoutV2';
 import GeminiChatPage from './components/GeminiChatPage'; // GeminiChatPage 컴포넌트 임포트 추가
+import { StagewiseToolbar } from '@stagewise/toolbar-react';
+import ReactPlugin from '@stagewise-plugins/react';
 
 // 관리자 페이지 컴포넌트 임포트
 import AdminLayout from './pages/admin/AdminLayout';
@@ -33,6 +35,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <StagewiseToolbar config={{ plugins: [ReactPlugin] }} />
     <TooltipProvider>
       <Toaster />
       <Sonner />
