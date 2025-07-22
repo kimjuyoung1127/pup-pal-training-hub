@@ -21,8 +21,20 @@ export const AIFormatterModal: React.FC<AIFormatterModalProps> = ({ isOpen, onCl
     setError(null);
 
     try {
+      // 1. 내부 링크 생성을 위해 현재 발행된 모든 아티클 목록을 가져옵니다.
+      const { data: articles, error: articlesError } = await supabase
+        .from('articles')
+        .select('title, slug')
+        .eq('is_published', true);
+
+      if (articlesError) throw articlesError;
+
+      // 2. 원문과 아티클 목록을 함께 AI 함수로 보냅니다.
       const { data, error: invokeError } = await supabase.functions.invoke('format-article-with-ai', {
-        body: { rawText },
+        body: { 
+          rawText,
+          articleList: articles || [] 
+        },
       });
 
       if (invokeError) throw invokeError;

@@ -12,13 +12,12 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const { rawText } = await req.json()
+    const { rawText, articleList } = await req.json()
     if (!rawText) {
       return new Response(JSON.stringify({ error: 'rawText is required' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -32,18 +31,42 @@ serve(async (req) => {
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 
-    const prompt = `
-      You are a professional content editor for a pet-focused web magazine.
-      Your task is to convert the following raw text into a well-structured Markdown format suitable for a blog post.
-      - Identify the main title and format it as a Level 1 Heading (#).
-      - Identify subtitles and format them as Level 2 or 3 Headings (## or ###).
-      - Use bold (**) for emphasis on important keywords or phrases.
-      - Format lists as bullet points (-).
-      - Ensure the output is clean, readable, and strictly in Markdown format.
-      - Do not add any comments or text outside of the Markdown content.
+    const articleListMarkdown = (articleList && articleList.length > 0)
+      ? articleList
+          .map((article: { title: string, slug: string }) => `- [${article.title}](https://mungai.co.kr/articles/${article.slug})`)
+          .join('\n')
+      : "No existing articles provided.";
 
-      Here is the raw text:
+    const prompt = `
+      You are a senior content editor for "Pet-Life Magazine".
+      Your task is to convert the raw text into a complete, well-structured Markdown article, and flag sections that need fact-checking.
+
+      Follow these instructions precisely:
+      1.  **Format Structure:** Format titles, subtitles, bold text, and lists into clean Markdown.
+      
+      2.  **Flag for Fact-Checking with Search Query (Crucial):**
+          - Analyze the claims made in the "Raw Text to Process".
+          - If you encounter a specific statistic, number, or claim that should be backed by a source (e.g., "according to a study", "statistics show"), do NOT invent a source.
+          - Instead, insert a clear flag immediately after the claim in the format: **[출처 필요: Google 검색어: "effective English search query"]**.
+          - The search query should be in English and specific enough to find the original source easily.
+          - For example: "매년 10만 마리의 동물이 버려집니다 [출처 필요: Google 검색어: "South Korea abandoned animal statistics 100,000"]".
+
+      3.  **Add Internal Links:**
+          - Refer to the "Existing Article List" and naturally link 1-3 relevant keywords in the text to existing articles on our site.
+
+      4.  **Add "Related Articles" Section:**
+          - At the end, create a "📚 함께 읽으면 좋은 글" section. Select the 2-3 most relevant articles from the "Existing Article List" and list them.
+
+      5.  **Add Author Byline:**
+          - At the very end, add the byline: "✍️ By [전문가 김주영](https://puppyvill.com/jason) of [Pet-Life Magazine](https://mungai.co.kr/about)"
+
+      6.  **Final Output:** The output must be strictly in Markdown format. Do not add any other comments or explanations.
+
       ---
+      **Existing Article List (for internal linking):**
+      ${articleListMarkdown}
+      ---
+      **Raw Text to Process:**
       ${rawText}
     `
 
