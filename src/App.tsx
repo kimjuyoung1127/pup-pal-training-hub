@@ -3,33 +3,37 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
-import TermsOfServicePage from './pages/TermsOfServicePage';
-import AboutUsPage from './pages/AboutUsPage';
-import PricingPage from './pages/PricingPage';
-import SuccessPage from './pages/SuccessPage';
-import FailPage from './pages/FailPage';
-import HomePage from './pages/HomePage';
-import BlogPage from './pages/BlogPage';
-import BlogDetailPage from './pages/BlogDetailPage';
-import MbtiTestPage from './pages/MbtiTestPage';
-import FilterWizardPage from './pages/FilterWizardPage';
-import ArticlePage from './pages/ArticlePage';
 import MainLayoutV2 from './components/MainLayoutV2';
-import GeminiChatPage from './components/GeminiChatPage'; // GeminiChatPage 컴포넌트 임포트 추가
+import GeminiChatPage from './components/GeminiChatPage';
 import { StagewiseToolbar } from '@stagewise/toolbar-react';
 import ReactPlugin from '@stagewise-plugins/react';
 
-// 관리자 페이지 컴포넌트 임포트
-import AdminLayout from './pages/admin/AdminLayout';
-import DashboardPage from './pages/admin/DashboardPage';
-import SuggestionsPage from './pages/admin/SuggestionsPage';
-import ArticlesListPage from './pages/admin/ArticlesListPage';
-import ArticleEditorPage from './pages/admin/ArticleEditorPage'; // 에디터 페이지 임포트
+// main_features
+import HomePage from './pages/main_features/HomePage';
+import ArticlePage from './pages/main_features/ArticlePage';
+import BlogPage from './pages/main_features/BlogPage';
+import BlogDetailPage from './pages/main_features/BlogDetailPage';
+import MbtiTestPage from './pages/main_features/MbtiTestPage';
+import FilterWizardPage from './pages/main_features/FilterWizardPage';
 
-// BreedDirectoryPage는 더 이상 사용하지 않으므로 임포트 제거
+// app_core
+import Index from "./pages/app_core/Index";
+
+// admin_panel
+import AdminLayout from './pages/admin_panel/AdminLayout';
+import DashboardPage from './pages/admin_panel/DashboardPage';
+import SuggestionsPage from './pages/admin_panel/SuggestionsPage';
+import ArticlesListPage from './pages/admin_panel/ArticlesListPage';
+import ArticleEditorPage from './pages/admin_panel/ArticleEditorPage';
+
+// legal_and_info
+import NotFound from "./pages/legal_and_info/NotFound";
+import PrivacyPolicyPage from './pages/legal_and_info/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/legal_and_info/TermsOfServicePage';
+import AboutUsPage from './pages/legal_and_info/AboutUsPage';
+import PricingPage from './pages/legal_and_info/PricingPage';
+import SuccessPage from './pages/legal_and_info/SuccessPage';
+import FailPage from './pages/legal_and_info/FailPage';
 
 const queryClient = new QueryClient();
 

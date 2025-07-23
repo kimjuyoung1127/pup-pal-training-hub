@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import { useSuggestions } from './hooks/useSuggestions';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 

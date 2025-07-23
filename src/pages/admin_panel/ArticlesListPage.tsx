@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import { useArticles } from './hooks/useArticles'; // useArticles 훅 임포트
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 

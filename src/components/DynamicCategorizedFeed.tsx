@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import ArticleCard from './ArticleCard';
 
 // articles 테이블의 스키마와 일치하는 타입

@@ -1,10 +1,9 @@
 // AI/src/pages/HomePage.tsx
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import DynamicCategorizedFeed from '../components/DynamicCategorizedFeed';
-import AIGateway from '../components/AIGateway';
-import HeroSection from '../components/HeroSection';
-import FullArticleFeed from '../components/FullArticleFeed';
+import { supabase } from '@/lib/supabaseClient';
+import DynamicCategorizedFeed from '@/components/DynamicCategorizedFeed';
+import HeroSection from '@/components/HeroSection';
+import FullArticleFeed from '@/components/FullArticleFeed';
 
 const HomePage: React.FC = () => {
   const [categories, setCategories] = useState<string[]>([]);
@@ -45,7 +44,7 @@ const HomePage: React.FC = () => {
         ))}
       </div>
       
-      <AIGateway />
+      
 
       {/* 전체 아티클 피드 (스스로 데이터 로딩) */}
       <FullArticleFeed />
