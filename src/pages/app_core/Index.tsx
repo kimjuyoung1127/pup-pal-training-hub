@@ -14,7 +14,6 @@ import TrainingProgressPage from '@/components/TrainingProgressPage';
 import TrainingReplayPage from '@/components/TrainingReplayPage';
 import { TrainingProgram } from '@/lib/trainingData';
 import { TrainingLog } from '@/hooks/useTrainingHistory';
-import AppSwitcher from '@/components/AppSwitcher';
 import Joyride, { Step, CallBackProps } from 'react-joyride';
 import { useDogProfile } from '@/hooks/useDogProfile';
 
@@ -307,13 +306,10 @@ const Index = () => {
       />
       {renderPage()}
       {showBottomNav && (
-        <>
-          <BottomNavigation 
-            currentPage={currentPage}
-            onNavigate={handleNavigate}
-          />
-          <AppSwitcher />
-        </>
+        <BottomNavigation 
+          currentPage={currentPage}
+          onNavigate={handleNavigate}
+        />
       )}
     </div>
   );

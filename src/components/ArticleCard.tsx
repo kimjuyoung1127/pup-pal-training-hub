@@ -1,11 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 
-// 두 테이블의 데이터를 모두 포괄할 수 있는 유연한 타입 정의
-// ArticleCard가 필요로 하는 최소한의 필드를 정의합니다.
 interface CardData {
   id: string;
-  slug?: string; // articles 테이블에만 존재 (optional)
+  slug?: string;
   cover_image_url?: string;
   title: string;
   category?: string;
@@ -13,40 +12,42 @@ interface CardData {
 }
 
 interface ArticleCardProps {
-  // article 대신 data 라는 이름으로 변경하여 범용성을 높임
   data: CardData;
-  // 데이터의 출처를 나타내는 타입을 추가 (링크를 다르게 처리하기 위함)
   type: 'article' | 'suggestion';
 }
 
 const ArticleCard: React.FC<ArticleCardProps> = ({ data, type }) => {
   const cardContent = (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden h-full flex flex-col group">
-      <div className="relative">
+    <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden h-full flex flex-col group transform hover:-translate-y-1">
+      <div className="relative overflow-hidden">
         <img 
-          src={data.cover_image_url || 'https://via.placeholder.com/600x400'} 
+          src={data.cover_image_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=1974&auto=format&fit=crop'} 
           alt={data.title} 
-          className="w-full h-48 object-cover"
+          className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out"
         />
-        <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-10 transition-all duration-300"></div>
       </div>
-      <div className="p-4 md:p-6 flex flex-col flex-grow">
+      <div className="p-6 flex flex-col flex-grow">
         {data.category && (
-          <span className="text-indigo-600 font-semibold text-sm mb-2">{data.category}</span>
+          <span className="text-amber-600 font-semibold text-sm mb-2">{data.category}</span>
         )}
-        <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-3 flex-grow group-hover:text-indigo-700 transition-colors">
+        <h3 className="text-xl font-bold text-slate-800 mb-3 flex-grow">
           {data.title}
         </h3>
         {data.summary && (
-          <p className="text-gray-600 text-sm line-clamp-3">
+          <p className="text-slate-600 text-sm line-clamp-3 mb-4">
             {data.summary}
           </p>
         )}
+        <div className="mt-auto">
+          <div className="text-slate-700 font-semibold text-sm inline-flex items-center group-hover:text-amber-700 transition-colors">
+            자세히 보기
+            <ArrowRight className="ml-1 h-4 w-4 transform transition-transform duration-300 group-hover:translate-x-1" />
+          </div>
+        </div>
       </div>
     </div>
   );
 
-  // 'article' 타입일 경우에만 Link로 감싸서 클릭 가능하게 만듭니다.
   if (type === 'article' && data.slug) {
     return (
       <Link to={`/articles/${data.slug}`} className="block h-full">
@@ -55,7 +56,6 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ data, type }) => {
     );
   }
 
-  // 'suggestion' 타입이거나 slug가 없으면 링크 없이 내용만 보여줍니다.
   return cardContent;
 };
 
