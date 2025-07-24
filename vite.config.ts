@@ -21,6 +21,8 @@ export default defineConfig({
       ],
       // sitemap에서 제외할 경로 목록
       exclude: ['/success', '/fail', '/*.html'],
+      // robots.txt 자동 생성 비활성화
+      generateRobotsTxt: false,
     }),
   ],
   resolve: {
