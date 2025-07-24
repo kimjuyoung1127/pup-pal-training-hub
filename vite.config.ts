@@ -21,16 +21,6 @@ export default defineConfig({
       ],
       // sitemap에서 제외할 경로 목록
       exclude: ['/success', '/fail', '/*.html'],
-      robots: [
-        {
-          userAgent: '*',
-          allow: '/',
-        },
-        {
-          userAgent: 'Yeti',
-          allow: '/',
-        },
-      ],
     }),
   ],
   resolve: {
@@ -39,3 +29,4 @@ export default defineConfig({
     },
   },
 });
+ㅎㅎ
