@@ -16,6 +16,10 @@ export interface Breed {
 }
 
 export interface BreedDetail extends Breed {
+  description: string;
+  english_name: ReactNode;
+  name: string;
+  image_url: string;
   // breeds 테이블의 모든 정보를 포함하고, 추가로 details 정보까지 가집니다.
   details: {
     adaptability: number | null;

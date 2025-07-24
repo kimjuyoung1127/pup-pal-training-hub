@@ -101,13 +101,13 @@ const BreedCard = ({ breed }: { breed: Breed }) => {
 };
 
 const questions = [
-  { id: 'environment', title: '어떤 환경에서 함께하게 되나요?', options: [ { value: 'apartment', label: '아파트/빌라 (소음과 공간 중요)' }, { value: 'houseWithYard', label: '마당이 있는 집 (자유로운 활동)' } ] },
+  { id: 'size', title: '어떤 크기의 강아지를 선호하시나요?', options: [ { value: '소형', label: '소형견' }, { value: '중형', label: '중형견' }, { value: '대형', label: '대형견' } ] },
   { id: 'activity', title: '강아지와 어떤 활동을 즐기고 싶으신가요?', options: [ { value: 'calm', label: '주로 실내에서, 차분한 시간을' }, { value: 'moderate', label: '가벼운 산책과 동네 친구 만나기' }, { value: 'active', label: '등산, 달리기 등 역동적인 활동을 함께!' } ] },
-  { id: 'social', title: '주로 누구와 함께 시간을 보내게 될까요?', options: [ { value: 'alone', label: '저와 조용히, 또는 혼자서도 잘 지내요' }, { value: 'family', label: '온 가족, 그리고 가끔 오는 손님들과 함께' }, { value: 'socialButterfly', label: '새로운 사람과 다른 강아지를 만나는 걸 즐겨요' } ] },
-  { id: 'care', title: '강아지를 돌보는 데 얼마나 신경 쓸 수 있나요?', options: [ { value: 'easy', label: '처음이라, 훈련이 쉽고 관리가 편했으면 해요' }, { value: 'medium', label: '어느 정도의 훈련과 관리는 자신 있어요' }, { value: 'hard', label: '털 관리나 훈련에 시간과 노력을 투자할 준비 완료!' } ] },
-  { id: 'playfulness', title: '강아지와 얼마나 활동적으로 놀아주고 싶으신가요?', options: [ { value: 'low', label: '장난감을 가지고 조용히 노는 편' }, { value: 'medium', label: '공놀이 등 가벼운 놀이를 즐겨요' }, { value: 'high', label: '항상 에너지가 넘치고, 활동적인 놀이가 필요해요' } ] },
+  { id: 'social', title: '주로 누구와 함께 시간을 보내게 될까요?', options: [ { value: 'alone', label: '저와 조용히, 또는 혼자서도 잘 지내요' }, { value: 'socialButterfly', label: '새로운 사람과 다른 강아지를 만나는 걸 즐겨요' } ] },
+  { id: 'trainability', title: '강아지를 돌보는 데 얼마나 신경 쓸 수 있나요?', options: [ { value: 'easy', label: '처음이라, 훈련이 쉽고 관리가 편했으면 해요' }, { value: 'moderate', label: '어느 정도의 훈련과 관리는 자신 있어요' } ] },
+  { id: 'shedding', title: '털빠짐에 대해 얼마나 신경 쓰시나요?', options: [ { value: 'low', label: '털이 거의 빠지지 않았으면 해요' }, { value: 'moderate', label: '보통 수준의 털빠짐은 괜찮아요' }, { value: 'high', label: '털빠짐은 크게 신경쓰지 않아요' } ] },
   { id: 'affection', title: '강아지와의 스킨십, 얼마나 원하시나요?', options: [ { value: 'low', label: '독립적이며, 혼자 있는 시간을 존중해주는 게 좋아요' }, { value: 'medium', label: '가끔 다가와 애교를 부리는 정도가 딱 좋아요' }, { value: 'high', label: '껌딱지처럼 항상 곁에 있고 싶어해요' } ] },
-  { id: 'exercise', title: '하루에 산책이나 운동에 얼마나 시간을 쓸 수 있나요?', options: [ { value: 'low', label: '30분 미만의 가벼운 산책' }, { value: 'medium', label: '1시간 내외의 규칙적인 산책' }, { value: 'high', label: '1시간 이상의 긴 산책이나 운동' } ] },
+  { id: 'barking', title: '짖음 수준에 대해 어떻게 생각하시나요?', options: [ { value: 'quiet', label: '거의 짖지 않는 조용한 강아지' }, { value: 'moderate', label: '상황에 따라 짖는 보통 수준' }, { value: 'vocal', label: '자주 짖는 편, 경비견으로도 좋아요' } ] },
 ];
 
 // PawgressBar 컴포넌트 추가
@@ -145,19 +145,21 @@ const FilterWizardPage: React.FC = () => {
     setAnswers(newAnswers);
     
     if (currentStep === questions.length - 1) {
-      console.log('Submitting answers:', newAnswers);
-      supabase.rpc('get_filtered_breeds_v5', { p_answers: newAnswers })
+      console.log('Submitting answers to Edge Function:', newAnswers);
+      startTransition(() => {
+        supabase.functions.invoke('breed-recommender', {
+          body: { answers: newAnswers },
+        })
         .then(({ data, error }) => {
-          console.log('Supabase response data:', data);
-          console.log('Supabase response error:', error);
-          startTransition(() => {
-            if (error) {
-              setError(error.message);
-            } else if (data) {
-              setResults(data as Breed[]);
-            }
-          });
+          console.log('Edge Function response data:', data);
+          console.log('Edge Function response error:', error);
+          if (error) {
+            setError(error.message);
+          } else if (data) {
+            setResults(data as Breed[]);
+          }
         });
+      });
     }
     handleNext();
   };
@@ -290,9 +292,14 @@ const FilterWizardPage: React.FC = () => {
         </SwitchTransition>
 
         {isPending && (
-          <div className="text-center py-10">
-            <Loader2 className="mx-auto h-12 w-12 animate-spin text-orange-500" />
-            <p className="mt-4 text-lg text-gray-600">최적의 견종을 찾고 있어요...</p>
+          <div className="text-center py-10 bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl border-2 border-orange-200 p-8">
+            <div className="flex justify-center items-center mb-6">
+                <PawPrint className="h-8 w-8 text-orange-400 animate-bounce" />
+                <PawPrint className="h-8 w-8 text-pink-400 animate-bounce" style={{animationDelay: '0.2s'}} />
+                <PawPrint className="h-8 w-8 text-purple-400 animate-bounce" style={{animationDelay: '0.4s'}}/>
+            </div>
+            <p className="mt-4 text-xl font-bold text-gray-700">AI가 열심히 당신에게 맞는 친구를 찾고 있어요!</p>
+            <p className="mt-2 text-md text-gray-500">잠시만 기다려주시면, 운명의 파트너를 소개해드릴게요. 멍멍!</p>
           </div>
         )}
         {error && <p className="text-center text-red-500 py-10">{error}</p>}

@@ -9,3 +9,25 @@ entrypoint = "./functions/toss-payments-webhook/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/toss-payments-webhook/*.html" ]
+
+[functions.breed-recommender]
+enabled = true
+verify_jwt = true
+import_map = "./functions/breed-recommender/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/breed-recommender/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/breed-recommender/*.html" ]
+
+[functions.upload-mbti-card]
+enabled = true
+verify_jwt = true
+import_map = "./functions/upload-mbti-card/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/upload-mbti-card/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/upload-mbti-card/*.html" ]

@@ -13,6 +13,8 @@ import HomePage from './pages/main_features/HomePage';
 import ArticlePage from './pages/main_features/ArticlePage';
 import BlogPage from './pages/main_features/BlogPage';
 import BlogDetailPage from './pages/main_features/BlogDetailPage';
+import MbtiHubPage from './pages/main_features/MbtiHubPage';
+import FindMyMatchPage from './pages/main_features/FindMyMatchPage';
 import MbtiTestPage from './pages/main_features/MbtiTestPage';
 import FilterWizardPage from './pages/main_features/FilterWizardPage';
 
@@ -62,11 +64,11 @@ const App = () => (
                 <Route path="/column" element={<BlogPage />} />
                 <Route path="/column/:id" element={<BlogDetailPage />} />
                 <Route path="/blog/:id" element={<BlogDetailPage />} /> {/* 추가: /blog/:id 경로 */}
-                <Route path="/articles/:slug" element={<ArticlePage />} />
-                <Route path="/mbti-test" element={<MbtiTestPage />} />
+                <Route path="/mbti-test" element={<MbtiHubPage />} />
+                <Route path="/mbti-test/my-dog" element={<MbtiTestPage />} />
+                <Route path="/mbti-test/find-match" element={<FindMyMatchPage />} />
                 <Route path="/filter-wizard" element={<FilterWizardPage />} />
                 <Route path="/ai/breed-recommender" element={<FilterWizardPage />} />
-                <Route path="/ai/mbti-test" element={<MbtiTestPage />} />
                 <Route path="/breeds" element={<BlogPage />} /> {/* 견종 백과 경로를 BlogPage로 연결 */}
                 <Route path="/chat" element={<GeminiChatPage />} /> {/* 추가: GeminiChatPage 경로 */}
                 

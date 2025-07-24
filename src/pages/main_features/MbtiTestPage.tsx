@@ -12,19 +12,23 @@ import { ArrowLeft } from 'lucide-react';
 
 type MbtiDimension = 'E' | 'I' | 'S' | 'N' | 'T' | 'F' | 'J' | 'P';
 
-const mbtiQuestions = [
-  { question: "산책 중 다른 강아지를 만나면, 먼저 다가가서 냄새를 맡나요?", choiceA: { text: "네, 완전 인싸에요! 🐕", type: 'E' }, choiceB: { text: "아니요, 힐끔 보고 지나가요. 😳", type: 'I' } },
-  { question: "새로운 장난감보다, 늘 가지고 놀던 익숙한 장난감을 더 좋아하나요?", choiceA: { text: "네, 익숙한 게 최고죠. 🧸", type: 'S' }, choiceB: { text: "아니요, 새로운 건 못 참죠! ✨", type: 'N' } },
-  { question: "간식이 없을 때도, 주인의 칭찬만으로 만족감을 표현하나요?", choiceA: { text: "아니요, 현실적인 편이에요. 🦴", type: 'T' }, choiceB: { text: "네, 칭찬은 강아지도 춤추게 해요! 💕", type: 'F' } },
-  { question: "정해진 시간에 산책을 나가지 않으면, 보채거나 불안해하나요?", choiceA: { text: "네, 칼같이 지켜야 해요. ⏰", type: 'J' }, choiceB: { text: "아니요, 딱히 상관 안 해요. 😌", type: 'P' } },
-  { question: "낯선 사람이 집에 방문했을 때, 경계하기보다 반기는 편인가요?", choiceA: { text: "네, 사람을 너무 좋아해요. 🤗", type: 'E' }, choiceB: { text: "아니요, 일단 짖고 봐요. 🚨", type: 'I' } },
-  { question: "장난감을 가지고 놀 때, 주로 물고 빠는 등 감각적으로 탐색하나요?", choiceA: { text: "네, 입으로 가져가는 게 국룰이죠. 👄", type: 'S' }, choiceB: { text: "아니요, 던지고 굴리면서 다양하게 놀아요. 🎾", type: 'N' } },
-  { question: "잘못했을 때 혼내면, 시무룩해지거나 눈치를 보나요?", choiceA: { text: "네, 감정이 얼굴에 다 드러나요. 🥺", type: 'F' }, choiceB: { text: "아니요, 금방 잊어버리는 것 같아요. 😄", type: 'T' } },
-  { question: "산책 코스가 항상 같아도, 즐거워하며 잘 다니나요?", choiceA: { text: "네, 안정적인 걸 좋아해요. 🛤️", type: 'J' }, choiceB: { text: "아니요, 새로운 길로 가고 싶어 해요. 🗺️", type: 'P' } },
+const questions = [
+    { question: "산책 중 낯선 사람이나 강아지를 만나면?", choiceA: { text: "“친구다!” 일단 꼬리부터 흔들고 본다.", type: 'E' }, choiceB: { text: "“누구세요?” 일단 거리를 두고 상황을 살핀다.", type: 'I' } },
+    { question: "새로운 산책길에 대한 반응은?", choiceA: { text: "“킁킁킁!” 익숙한 길의 냄새를 맡으며 안정감을 느낀다.", type: 'S' }, choiceB: { text: "“여긴 어디?” 새로운 길로 가자고 주인을 이끈다.", type: 'N' } },
+    { question: "주인이 “안돼!”라고 단호하게 말했을 때?", choiceA: { text: "“왜 안되지?” 잠시 멈칫하지만, 다시 시도할 궁리를 한다.", type: 'T' }, choiceB: { text: "“내가 뭘 잘못했나...” 금방 시무룩해져서 눈치를 본다.", type: 'F' } },
+    { question: "하루 일과(밥, 산책 시간)가 조금 달라지면?", choiceA: { text: "“시간 됐다!” 정확한 시간에 보채며 루틴을 지키려 한다.", type: 'J' }, choiceB: { text: "“주면 먹고, 나가면 걷는다~” 크게 신경 쓰지 않는다.", type: 'P' } },
+    { question: "집에 혼자 있을 때, 창밖 구경하는 것을 즐기나요?", choiceA: { text: "“세상 구경이 제일 재밌어!” 창밖 사람, 차에 관심이 많다.", type: 'E' }, choiceB: { text: "“내 집이 최고.” 창밖보다는 자기 자리에 엎드려 있는다.", type: 'I' } },
+    { question: "장난감을 가지고 놀 때, 주로 어떻게 노나요?", choiceA: { text: "“냠냠쩝쩝” 입으로 물고 빨고, 질감을 느끼는 데 집중한다.", type: 'S' }, choiceB: { text: "“이리 던지고 저리 던지고!” 상상력을 발휘해 다양한 방법으로 논다.", type: 'N' } },
+    { question: "주인이 외출했다가 돌아왔을 때?", choiceA: { text: "“왔는가.” 꼬리를 흔들지만, 하던 일(잠자기 등)을 마저 한다.", type: 'T' }, choiceB: { text: "“보고 싶었어!” 온몸으�� 격하게 반가움을 표현해야 직성이 풀린다.", type: 'F' } },
+    { question: "간식을 줄 때, “기다려” 훈련을 하면?", choiceA: { text: "“먹으랄 때까지...” 힘들어하지만, 지시를 따르려고 노력한다.", type: 'J' }, choiceB: { text: "“에이, 그냥 먹자!” 기다리는 것을 유독 힘들어한다.", type: 'P' } },
+    { question: "집에 손님이 방문했을 때, 아이의 첫 반응은?", choiceA: { text: "“새로운 집사인가?” 꼬리를 흔들며 먼저 다가가 아는 척을 한다.", type: 'E' }, choiceB: { text: "“수상한 사람이다!” 구석에 숨거나, 멀리서 경계하며 짖는다.", type: 'I' } },
+    { question: "‘노즈워크’ 놀이를 할 때, 간식을 찾는 방식은?", choiceA: { text: "“하나만 판다!” 한 구역을 꼼꼼히 뒤져서 찾아낸다.", type: 'S' }, choiceB: { text: "“대충 킁킁!” 전체를 빠르게 훑으며 감으로 찾아낸다.", type: 'N' } },
+    { question: "주인이 아프거나 슬퍼 보일 때, 옆에 와서 핥아주거나 기대나요?", choiceA: { text: "“음... 평소랑 다른데?” 어색해하며 주변을 맴돈다.", type: 'T' }, choiceB: { text: "“내가 지켜줄게!” 기가 막히게 감정을 알아채고 위로해준다.", type: 'F' } },
+    { question: "잠자리가 정��져 있나요, 아니면 아무 데서나 잘 자나요?", choiceA: { text: "“내 자리는 여기!” 자기 쿠션이나 정해진 장소에서만 자려고 한다.", type: 'J' }, choiceB: { text: "“여기가 침대요, 저기가 소파로다.” 피곤하면 어디서든 잘 잔다.", type: 'P' } },
 ];
 
 interface TestState {
-  step: 'start' | 'testing' | 'result';
+  step: 'intro' | 'testing' | 'result';
   answers: MbtiDimension[];
   currentQuestionIndex: number;
 }
@@ -35,7 +39,7 @@ type TestAction =
   | { type: 'RESET_TEST' };
 
 const initialState: TestState = {
-  step: 'start',
+  step: 'intro',
   answers: [],
   currentQuestionIndex: 0,
 };
@@ -46,7 +50,7 @@ function testReducer(state: TestState, action: TestAction): TestState {
       return { ...initialState, step: 'testing' };
     case 'ANSWER':
       const newAnswers = [...state.answers, action.payload];
-      const isLastQuestion = state.currentQuestionIndex === mbtiQuestions.length - 1;
+      const isLastQuestion = state.currentQuestionIndex === questions.length - 1;
       return {
         ...state,
         answers: newAnswers,
@@ -107,23 +111,51 @@ const QuestionCard = ({ question, onAnswer, index }: { question: any, onAnswer: 
     <div className="grid grid-cols-1 gap-4">
       <Button
         size="lg"
-        className="justify-center p-6 text-center h-auto text-base rounded-2xl bg-gradient-to-r from-orange-100 to-pink-100 text-orange-800 hover:from-orange-200 hover:to-pink-200 border-2 border-orange-300 hover:border-orange-400 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+        className="justify-center p-6 text-center h-auto text-base rounded-2xl bg-gradient-to-r from-orange-100 to-pink-100 text-orange-800 hover:from-orange-200 hover:to-pink-200 border-2 border-orange-300 hover:border-orange-400 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl whitespace-normal break-words"
         onClick={() => onAnswer(question.choiceA.type)}
       >
-        <Heart className="h-5 w-5 mr-2 text-pink-500" />
-        {question.choiceA.text}
+        <Heart className="h-5 w-5 mr-2 text-pink-500 flex-shrink-0" />
+        <span>{question.choiceA.text}</span>
       </Button>
       <Button
         size="lg"
-        className="justify-center p-6 text-center h-auto text-base rounded-2xl bg-gradient-to-r from-pink-100 to-purple-100 text-purple-800 hover:from-pink-200 hover:to-purple-200 border-2 border-purple-300 hover:border-purple-400 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+        className="justify-center p-6 text-center h-auto text-base rounded-2xl bg-gradient-to-r from-pink-100 to-purple-100 text-purple-800 hover:from-pink-200 hover:to-purple-200 border-2 border-purple-300 hover:border-purple-400 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl whitespace-normal break-words"
         onClick={() => onAnswer(question.choiceB.type)}
       >
-        <Heart className="h-5 w-5 mr-2 text-purple-500" />
-        {question.choiceB.text}
+        <Heart className="h-5 w-5 mr-2 text-purple-500 flex-shrink-0" />
+        <span>{question.choiceB.text}</span>
       </Button>
     </div>
   </div>
 );
+
+const IntroScreen = ({ onStart }: { onStart: () => void }) => (
+    <div className="text-center bg-white/90 backdrop-blur-md p-12 rounded-3xl shadow-2xl border-2 border-orange-200 transform hover:scale-[1.02] transition-all duration-300">
+        <div className="flex items-center justify-center mb-6">
+            <PawPrint className="h-12 w-12 text-orange-500 mr-4 animate-pulse" />
+            <h1 className="text-3xl md:text-4xl font-extrabold">
+                <span className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
+                    우리 강아지 성향 분석하기
+                </span>
+            </h1>
+            <PawPrint className="h-12 w-12 text-purple-500 ml-4 animate-pulse" />
+        </div>
+        <p className="text-gray-600 text-lg mb-8 leading-relaxed">
+            🐾 12가지 간단한 질문으로 우리 강아지의 진짜 성향을 알아보고, <br className="hidden sm:block" />
+            💕 더 깊이 이해하는 시간을 가져보세요!
+        </p>
+        <Button
+            size="lg"
+            onClick={onStart}
+            className="bg-gradient-to-r from-orange-400 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+        >
+            <Sparkles className="h-5 w-5 mr-2" />
+            분석 시작하기
+            <Heart className="h-5 w-5 ml-2 text-white" />
+        </Button>
+    </div>
+);
+
 
 const MbtiTestPage: React.FC = () => {
   const [state, dispatch] = useReducer(testReducer, initialState);
@@ -132,42 +164,21 @@ const MbtiTestPage: React.FC = () => {
   const renderContent = () => {
     switch (state.step) {
       case 'testing':
-        const question = mbtiQuestions[state.currentQuestionIndex];
+        const question = questions[state.currentQuestionIndex];
         return (
           <div key={state.currentQuestionIndex} ref={nodeRef}>
-            <PawgressBar current={state.currentQuestionIndex + 1} total={mbtiQuestions.length} />
+            <PawgressBar current={state.currentQuestionIndex + 1} total={questions.length} />
             <QuestionCard question={question} onAnswer={(type) => dispatch({ type: 'ANSWER', payload: type })} index={state.currentQuestionIndex} />
           </div>
         );
       case 'result':
         const finalResult = calculateResult(state.answers);
         return <MbtiResult ref={nodeRef} result={finalResult} onReset={() => dispatch({ type: 'RESET_TEST' })} />;
-      case 'start':
+      case 'intro':
       default:
         return (
-          <div className="text-center bg-white/90 backdrop-blur-md p-12 rounded-3xl shadow-2xl border-2 border-orange-200 transform hover:scale-[1.02] transition-all duration-300" ref={nodeRef}>
-            <div className="flex items-center justify-center mb-6">
-              <PawPrint className="h-12 w-12 text-orange-500 mr-4 animate-pulse" />
-              <h1 className="text-3xl md:text-4xl font-extrabold">
-                <span className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
-                  나의 강아지 소울메이트 찾기
-                </span>
-              </h1>
-              <PawPrint className="h-12 w-12 text-purple-500 ml-4 animate-pulse" />
-            </div>
-            <p className="text-gray-600 text-lg mb-8 leading-relaxed">
-              🐾 간단한 질문으로 내 강아지의 성향을 알아보고, <br className="hidden sm:block" /> 
-              💕 최고의 짝꿍을 찾아보세요!
-            </p>
-            <Button 
-              size="lg" 
-              onClick={() => dispatch({ type: 'START_TEST' })} 
-              className="bg-gradient-to-r from-orange-400 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-            >
-              <Sparkles className="h-5 w-5 mr-2" />
-              테스트 시작하기
-              <Heart className="h-5 w-5 ml-2 text-white" />
-            </Button>
+          <div ref={nodeRef}>
+            <IntroScreen onStart={() => dispatch({ type: 'START_TEST' })} />
           </div>
         );
     }
@@ -178,22 +189,22 @@ const MbtiTestPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-purple-50">
       <div className="container mx-auto max-w-4xl py-8 px-4">
-        <Link to="/" className="inline-flex items-center text-orange-600 hover:text-orange-700 hover:underline mb-6 font-medium transition-colors duration-200">
+        <Link to="/mbti-test" className="inline-flex items-center text-orange-600 hover:text-orange-700 hover:underline mb-6 font-medium transition-colors duration-200">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          메인으로 돌아가기
+          테스트 선택으로 돌아가기
         </Link>
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
             <PawPrint className="h-8 w-8 text-purple-500 mr-3" />
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">
               <span className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
-                견종 성향 테스트 (MBTI)
+                우리 강아지 성향 분석
               </span>
             </h1>
             <PawPrint className="h-8 w-8 text-purple-500 ml-3" />
           </div>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600 font-light leading-relaxed">
-            🌟 8가지 간단한 질문으로 당신의 반려견 성향을 알아보세요. 🌟
+            🌟 행동 뒤에 숨겨진 우리 아이의 진짜 마음을 알아보세요. 🌟
           </p>
         </div>
         <SwitchTransition>
