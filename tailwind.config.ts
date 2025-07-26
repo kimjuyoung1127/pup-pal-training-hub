@@ -54,52 +54,7 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 
-				green: '#4A7A62',
-				amber: '#FAA935',
-				red: '#C45132',
-				rust: '#8A2504',
         'dark-grey': '#333333', // 진한 회색 추가
-
-				// 강아지 앱 전용 컬러 팔레트
-				cream: {
-					DEFAULT: '#FFF1B6',
-					50: '#FFFCF9',
-					100: '#FFF6EE',
-					200: '#FFEBD8',
-					300: '#FFE0C2',
-					400: '#FFD5AC',
-					500: '#FFCA96',
-					600: '#E6B585',
-					700: '#CC9F74',
-					800: '#B38A63',
-					900: '#997552',
-				},
-				orange: {
-					50: '#FFF7F0',
-					100: '#FFEDE0',
-					200: '#FFD4B8',
-					300: '#FFBB90',
-					400: '#FFA268',
-					500: '#FFFFFF', // 메인 오렌지
-					600: '#E6983D',
-					700: '#CC872D',
-					800: '#B3761D',
-					900: '#99650D',
-				},
-
-				pink: {
-					50: '#FFF0F5',
-					100: '#FFE4EE',
-					200: '#FFCBE0',
-					300: '#FFAFD1',
-					400: '#FF94C3',
-					500: '#FF79B4',
-					600: '#E66DA3',
-					700: '#CC6092',
-					800: '#B35481',
-					900: '#994870',
-				},
-
 				
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',

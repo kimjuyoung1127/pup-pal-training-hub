@@ -39,6 +39,12 @@ import FailPage from './pages/legal_and_info/FailPage';
 
 const queryClient = new QueryClient();
 
+import CommunityPage from './pages/community/CommunityPage';
+
+import PostDetailPage from './pages/community/PostDetailPage';
+
+import PostEditorPage from './pages/community/PostEditorPage';
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <StagewiseToolbar config={{ plugins: [ReactPlugin] }} />
@@ -61,6 +67,10 @@ const App = () => (
               <Routes>
                 {/* Pet-Life Magazine & Woofpedia 기능 */}
                 <Route path="/" element={<HomePage />} />
+                <Route path="/community" element={<CommunityPage />} />
+                <Route path="/community/new" element={<PostEditorPage />} />
+                <Route path="/community/edit/:postId" element={<PostEditorPage />} /> {/* 수정 페이지 라우트 추가 */}
+                <Route path="/community/:postId" element={<PostDetailPage />} />
                 <Route path="/column" element={<BlogPage />} />
                 <Route path="/column/:id" element={<BlogDetailPage />} />
                 <Route path="/blog/:id" element={<BlogDetailPage />} /> {/* 추가: /blog/:id 경로 */}

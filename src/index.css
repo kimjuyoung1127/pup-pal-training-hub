@@ -1,91 +1,76 @@
-
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
 @layer base {
   :root {
-    /* 기본 색상 팔레트 정의 */
-    --white: 255 255 255;
-    --sky-100: 224 242 254; /* 연한 하늘색 */
-    --sky-200: 186 230 253;
-    --sky-300: 125 211 252;
-    --sky-400: 56 189 248;
-    --sky-700: 3 105 161;
-    --sky-800: 7 89 133;
-    --sky-900: 12 74 110; /* 더 진한 파란색 */
-    --orange-500: 255 169 77;
-    --gray-200: 229 231 235;
-    --gray-800: 55 65 81; /* 진한 회색 */
-    
-    /* 시스템 변수는 팔레트 참조 */
-    --background: 255 255 255; /* white */
-    --foreground: 12 74 110; /* sky-900 */
-    --card: 255 255 255; /* white */
-    --card-foreground: 12 74 110; /* sky-900 */
+    /* 🎨 새로운 사랑스러운 색상 팔레트 (HSL 형식으로 완전 수정) */
+    --background: 210 40% 98%;    /* slate-50 */
+    --foreground: 222.2 47.4% 11.2%; /* slate-800 */
 
-    --popover: 224 242 254; /* sky-100 */
-    --popover-foreground: 12 74 110; /* sky-900 */
+    --muted: 210 40% 96.1%;           /* slate-100 */
+    --muted-foreground: 215.4 16.3% 46.9%; /* slate-500 */
 
-    --primary: 56 189 248; /* sky-400 */
-    --primary-foreground: 255 255 255; /* white */
+    --popover: 0 0% 100%;         /* white */
+    --popover-foreground: 222.2 47.4% 11.2%; /* slate-800 */
 
-    --secondary: 186 230 253; /* sky-200 */
-    --secondary-foreground: 7 89 133; /* sky-800 */
+    --card: 0 0% 100%;         /* white */
+    --card-foreground: 222.2 47.4% 11.2%; /* slate-800 */
 
-    --muted: 186 230 253; /* sky-200 */
-    --muted-foreground: 3 105 161; /* sky-700 */
+    --border: 214.3 31.8% 91.4%; /* slate-200 */
+    --input: 214.3 31.8% 91.4%;  /* slate-200 */
 
-    --accent: 255 255 255; /* white */
-    --accent-foreground: 12 74 110; /* sky-900 */
+    /* 🌹 메인 색상 (Rose) */
+    --primary: 346.8 91.4% 60.2%;      /* rose-500 */
+    --primary-foreground: 0 0% 100%; /* white */
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* 🍊 보조/강조 색상 (Orange) */
+    --secondary: 24.6 95% 53.1%;         /* orange-500 */
+    --secondary-foreground: 0 0% 100%; /* white */
 
-    --border: 125 211 252; /* sky-300 */
-    --input: 125 211 252; /* sky-300 */
-    --ring: 56 189 248; /* sky-400 */
+    /* ✨ 호버/강조 색상 (노란색 문제 해결!) */
+    --accent: 346.8 91.4% 95.1%;           /* rose-100 */
+    --accent-foreground: 346.8 91.4% 30.2%; /* rose-800 */
+
+    /* 💍 포커스/링 색상 (노란색 문제 해결!) */
+    --ring: 346.8 91.4% 60.2%; /* rose-500 */
+
+    --destructive: 0 84.2% 60.2%; /* red-500 */
+    --destructive-foreground: 0 0% 100%; /* white */
 
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 55 65 81; /* dark gray */
-    --foreground: 255 255 255; /* white */
-
-    --card: 12 74 110; /* sky-900 */
-    --card-foreground: 255 255 255; /* white */
-
-    --popover: 12 74 110; /* sky-900 */
-    --popover-foreground: 255 255 255; /* white */
-
-    --primary: 56 189 248; /* sky-400 */
-    --primary-foreground: 12 74 110; /* sky-900 */
-
-    --secondary: 3 105 161; /* sky-700 */
-    --secondary-foreground: 255 255 255; /* white */
-
-    --muted: 3 105 161; /* sky-700 */
-    --muted-foreground: 125 211 252; /* sky-300 */
-
-    --accent: 3 105 161; /* sky-700 */
-    --accent-foreground: 255 255 255; /* white */
-
+    /* 다크 모드 HSL 값으로 수정 */
+    --background: 222.2 47.4% 11.2%;
+    --foreground: 210 40% 98%;
+    --muted: 215.4 16.3% 46.9%;
+    --muted-foreground: 215.3 13.9% 65.1%;
+    --popover: 222.2 47.4% 11.2%;
+    --popover-foreground: 210 40% 98%;
+    --card: 222.2 47.4% 11.2%;
+    --card-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --primary: 346.8 91.4% 60.2%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 24.6 95% 53.1%;
+    --secondary-foreground: 0 0% 100%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 3 105 161; /* sky-700 */
-    --input: 229 231 235; /* gray-200 */
-    --ring: 56 189 248; /* sky-400 */
+    --destructive-foreground: 0 0% 100%;
+    --ring: 346.8 91.4% 60.2%;
   }
 
   * {
-    border-color: var(--border);
+    border-color: hsl(var(--border));
   }
 
   body {
-    background-color: rgb(var(--background));
-    color: rgb(var(--foreground));
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-family: 'Pretendard', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
@@ -105,53 +90,6 @@
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: rgb(251 146 60); /* bg-orange-400 */
-  }
-}
-
-@layer components {
-  /* 공통 버튼 스타일 */
-  .btn-primary {
-    background-color: rgb(255, 169, 77);
-    color: white;
-    font-weight: 500;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
-    transition: all 200ms;
-    transform: scale(1);
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  }
-
-  .btn-secondary {
-    background-color: rgb(var(--sky-200));
-    color: rgb(var(--sky-800));
-    font-weight: 500;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
-    transition: all 200ms;
-    transform: scale(1);
-  }
-
-  /* 카드 스타일 */
-  .card-soft {
-    background-color: white;
-    border: 1px solid rgb(var(--sky-200));
-    border-radius: 1rem;
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    transition: all 200ms;
-  }
-
-  /* 입력 필드 스타일 */
-  .input-soft {
-    background-color: white;
-    border: 2px solid rgb(var(--sky-200));
-    border-radius: 0.75rem;
-    padding: 0.75rem 1rem;
-    transition: all 200ms;
-  }
-
-  .input-soft:focus {
-    border-color: rgb(56, 189, 248);
-    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+    background-color: hsl(var(--primary));
   }
 }

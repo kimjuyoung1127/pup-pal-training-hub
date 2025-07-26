@@ -1,8 +1,0 @@
-CREATE TABLE invitation_codes (
-  id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-  code TEXT NOT NULL UNIQUE,
-  is_used BOOLEAN DEFAULT FALSE,
-  used_by UUID REFERENCES auth.users(id),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  used_at TIMESTAMPTZ
-);

@@ -957,6 +957,39 @@ CREATE TABLE IF NOT EXISTS "public"."posts" (
 ALTER TABLE "public"."posts" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "public"."user_profiles" (
+    "id" "uuid" NOT NULL,
+    "plan" "text" DEFAULT 'free'::"text",
+    "plan_expiry_date" timestamp with time zone,
+    "username" "text",
+    "avatar_url" "text"
+);
+
+
+ALTER TABLE "public"."user_profiles" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."user_profiles" IS 'Stores public-facing profile information for users.';
+
+
+
+CREATE OR REPLACE VIEW "public"."posts_with_author" AS
+ SELECT "p"."id",
+    "p"."created_at",
+    "p"."user_id",
+    "p"."category",
+    "p"."title",
+    "p"."content",
+    "p"."view_count",
+    "up"."username",
+    "up"."avatar_url"
+   FROM ("public"."posts" "p"
+     LEFT JOIN "public"."user_profiles" "up" ON (("p"."user_id" = "up"."id")));
+
+
+ALTER VIEW "public"."posts_with_author" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "public"."recommended_videos" (
     "id" integer NOT NULL,
     "title" "text" NOT NULL,
@@ -1059,20 +1092,6 @@ ALTER SEQUENCE "public"."training_tips_id_seq" OWNER TO "postgres";
 
 
 ALTER SEQUENCE "public"."training_tips_id_seq" OWNED BY "public"."training_tips"."id";
-
-
-
-CREATE TABLE IF NOT EXISTS "public"."user_profiles" (
-    "id" "uuid" NOT NULL,
-    "plan" "text" DEFAULT 'free'::"text",
-    "plan_expiry_date" timestamp with time zone
-);
-
-
-ALTER TABLE "public"."user_profiles" OWNER TO "postgres";
-
-
-COMMENT ON TABLE "public"."user_profiles" IS 'Stores public-facing profile information for users.';
 
 
 
@@ -1251,6 +1270,11 @@ ALTER TABLE ONLY "public"."user_profiles"
 
 
 
+ALTER TABLE ONLY "public"."user_profiles"
+    ADD CONSTRAINT "user_profiles_username_key" UNIQUE ("username");
+
+
+
 ALTER TABLE ONLY "public"."ai_recommendations"
     ADD CONSTRAINT "ai_recommendations_dog_id_fkey" FOREIGN KEY ("dog_id") REFERENCES "public"."dogs"("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -1425,6 +1449,10 @@ CREATE POLICY "Allow public read access" ON "public"."posts" FOR SELECT USING (t
 
 
 CREATE POLICY "Allow public read access to published articles" ON "public"."articles" FOR SELECT USING (("is_published" = true));
+
+
+
+CREATE POLICY "Allow public read access to usernames and avatars" ON "public"."user_profiles" FOR SELECT USING (true);
 
 
 
@@ -1896,6 +1924,18 @@ GRANT ALL ON TABLE "public"."posts" TO "service_role";
 
 
 
+GRANT ALL ON TABLE "public"."user_profiles" TO "anon";
+GRANT ALL ON TABLE "public"."user_profiles" TO "authenticated";
+GRANT ALL ON TABLE "public"."user_profiles" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."posts_with_author" TO "anon";
+GRANT ALL ON TABLE "public"."posts_with_author" TO "authenticated";
+GRANT ALL ON TABLE "public"."posts_with_author" TO "service_role";
+
+
+
 GRANT ALL ON TABLE "public"."recommended_videos" TO "anon";
 GRANT ALL ON TABLE "public"."recommended_videos" TO "authenticated";
 GRANT ALL ON TABLE "public"."recommended_videos" TO "service_role";
@@ -1935,12 +1975,6 @@ GRANT ALL ON TABLE "public"."training_tips" TO "service_role";
 GRANT ALL ON SEQUENCE "public"."training_tips_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."training_tips_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."training_tips_id_seq" TO "service_role";
-
-
-
-GRANT ALL ON TABLE "public"."user_profiles" TO "anon";
-GRANT ALL ON TABLE "public"."user_profiles" TO "authenticated";
-GRANT ALL ON TABLE "public"."user_profiles" TO "service_role";
 
 
 
