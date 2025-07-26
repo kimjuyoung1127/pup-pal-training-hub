@@ -20,14 +20,13 @@ const aiSolutions = [
   { name: '견종 백과', icon: BookOpen, path: '/breeds', isProtected: true },
   { name: '견종 MBTI', icon: Compass, path: '/mbti-test', isProtected: true },
   { name: '댕댕이 궁합 테스트', icon: HeartHandshake, path: '/filter-wizard', isProtected: true },
+  { name: '전문가 영상', icon: Film, path: '/training/videos' },
   { name: 'AI 관절 추적', icon: Bone, path: '/joint-tracking', isDeveloping: true, isProtected: true },
 ];
 
 const trainingTools = [
   { name: '훈련 챗봇에게 물어보기', icon: MessageSquare, path: '/chat', isProtected: true },
-  { name: '맞춤 훈련 계획 추천', icon: Bot, path: '/app/training-recommender', isProtected: true }, // AppCore의 메인 기능으로 연결
-  { name: '전문가 영상 찾아보기', icon: Film, path: '/training/videos', isProtected: true }, // TBD
-  { name: '훈련 일지 관리', icon: BarChart3, path: '/app', isProtected: true }, // AppCore의 메인 기능으로 연결
+  { name: '맞춤 훈련 계획 추천', icon: Bot, path: '/app/training-recommender', isProtected: true },
 ];
 
 const navItems = [
