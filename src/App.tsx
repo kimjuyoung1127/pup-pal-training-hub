@@ -46,9 +46,6 @@ import PostDetailPage from './pages/community/PostDetailPage';
 
 import PostEditorPage from './pages/community/PostEditorPage';
 
-import JointAnalysisPage from './pages/tools/JointAnalysisPage';
-import JointAnalysisHistoryPage from './pages/history/JointAnalysisHistoryPage';
-
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -87,8 +84,6 @@ const App = () => (
                 <Route path="/breeds" element={<BlogPage />} /> {/* 견종 백과 경로를 BlogPage로 연결 */}
                 <Route path="/chat" element={<GeminiChatPage />} /> {/* 추가: GeminiChatPage 경로 */}
                 <Route path="/training/videos" element={<TrainingVideosPage />} />
-                <Route path="/tools/joint-analysis" element={<JointAnalysisPage />} />
-                <Route path="/history/joint-analysis" element={<JointAnalysisHistoryPage />} />
                 
                 {/* Mungai 핵심 기능은 /app 경로 하위에 위치 */}
                 <Route path="/app/*" element={<Index />} />

@@ -10,6 +10,9 @@ import logging
 import numpy as np
 from supabase import create_client, Client
 from dotenv import load_dotenv
+from postgrest.exceptions import APIError
+import cv2  # ✅ 추가!
+
 
 # .env 파일 로드
 load_dotenv()
@@ -87,6 +90,8 @@ async def process_video(
     dog_id: str = Form(...)
 ):
     upload_path = ""
+    processed_avi_path = ""
+    final_mp4_path = ""
     try:
         # 1. 업로드 파일 저장
         upload_path = os.path.join(UPLOAD_DIR, file.filename)
@@ -94,7 +99,7 @@ async def process_video(
             shutil.copyfileobj(file.file, buffer)
 
         # 2. 모델 예측 실행
-        logger.info(f"'{upload_path}' 영상 처리를 시작합니다... (사용자: {user_id}, 강아지: {dog_id})")
+        logger.info(f"'{upload_path}' 영상 처리를 시작합니다...")
         results = model.predict(
             source=upload_path,
             save=True,
@@ -103,41 +108,68 @@ async def process_video(
             exist_ok=True
         )
         
-        # 3. 핵심 지표 계산
-        # (실제로는 'results' 객체에서 키포인트를 추출해야 함)
+        # YOLO 결과물 경로 (대부분 .avi)
+        processed_avi_path = os.path.join(results[0].save_dir, file.filename)
+        
+        # 3. MP4로 변환 (OpenCV 사용)
+        logger.info(f"'{processed_avi_path}'를 MP4로 변환 시작...")
+        base_filename = os.path.splitext(file.filename)[0]
+        final_mp4_filename = f"{base_filename}.mp4"
+        final_mp4_path = os.path.join(results[0].save_dir, final_mp4_filename)
+    
+        # OpenCV로 변환
+        cap = cv2.VideoCapture(processed_avi_path)
+        # 💡 코덱을 웹 표준인 H.264(avc1)으로 변경
+        fourcc = cv2.VideoWriter_fourcc(*'avc1') 
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    
+        out = cv2.VideoWriter(final_mp4_path, fourcc, fps, (width, height))
+    
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            out.write(frame)
+    
+        cap.release()
+        out.release()
+        logger.info(f"MP4 변환 완료: '{final_mp4_path}'")
+
+        # 4. 핵심 지표 계산
         analysis_results = calculate_metrics_from_keypoints(results)
 
-        # 4. 완전한 URL로 결과 경로 생성
+        # 5. 완전한 URL로 최종 결과 경로 생성
         base_url = str(request.base_url)
-        processed_video_url = f"{base_url}{PROCESSED_DIR}/results/{file.filename}"
-        logger.info(f"영상 처리 완료. 결과 URL: {processed_video_url}")
+        processed_video_url = f"{base_url}{PROCESSED_DIR}/results/{final_mp4_filename}"
+        logger.info(f"영상 처리 완료. 최종 결과 URL: {processed_video_url}")
 
-        # --- 5. 기준점 확인 및 DB 저장 로직 ---
-        # 이 강아지에 대한 기준선(baseline)이 이미 있는지 확인
-        baseline_check = supabase.table('joint_analysis_records').select('id').eq('dog_id', dog_id).eq('is_baseline', True).execute()
-        
-        is_first_analysis = not baseline_check.data
-        
-        if is_first_analysis:
-            logger.info(f"{dog_id}의 첫 분석입니다. 기준점으로 저장합니다.")
-        
-        db_record = {
-            'user_id': user_id,
-            'dog_id': dog_id,
-            'original_video_filename': file.filename,
-            'processed_video_url': processed_video_url,
-            'analysis_results': analysis_results,
-            'is_baseline': is_first_analysis
-        }
+        # 6. 기준점 확인 및 DB 저장 로직
+        try:
+            baseline_check = supabase.table('joint_analysis_records').select('id', count='exact').eq('dog_id', dog_id).eq('is_baseline', True).execute()
+            is_first_analysis = baseline_check.count == 0
+            
+            if is_first_analysis:
+                logger.info(f"{dog_id}의 첫 분석입니다. 기준점으로 저장합니다.")
+            
+            db_record = {
+                'user_id': user_id,
+                'dog_id': dog_id,
+                'original_video_filename': file.filename,
+                'processed_video_url': processed_video_url,
+                'analysis_results': analysis_results,
+                'is_baseline': is_first_analysis
+            }
 
-        insert_response = supabase.table('joint_analysis_records').insert(db_record).execute()
-        
-        if insert_response.error:
-            raise Exception(f"DB 저장 실패: {insert_response.error.message}")
+            insert_response = supabase.table('joint_analysis_records').insert(db_record).execute()
+            logger.info(f"DB 저장 성공. Record: {insert_response.data}")
 
-        logger.info(f"DB 저장 성공. Record ID: {insert_response.data[0]['id']}")
+        except APIError as db_error:
+            logger.error(f"DB 저장 실패: {db_error.message}")
+            raise Exception(f"DB 저장 실패: {db_error.message}")
 
-        # 6. 응답 반환
+        # 7. 응답 반환
         return JSONResponse(
             status_code=200,
             content={
@@ -155,8 +187,12 @@ async def process_video(
             content={"message": f"서버 내부 오류 발생: {str(e)}"}
         )
     finally:
+        # 임시 파일들 정리
         if upload_path and os.path.exists(upload_path):
             os.remove(upload_path)
+        if processed_avi_path and os.path.exists(processed_avi_path):
+            os.remove(processed_avi_path)
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

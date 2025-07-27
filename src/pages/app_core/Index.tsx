@@ -13,6 +13,8 @@ import { useDogProfile } from '@/hooks/useDogProfile';
 import TestNavPage from './TestNavPage';
 import AiTrainingRecommender from '@/components/AiTrainingRecommender';
 import AppCoreHeader from '@/components/AppCoreHeader';
+import PostureAnalysisPage from '@/pages/tools/PostureAnalysisPage';
+import PostureAnalysisHistoryPage from '@/pages/history/PostureAnalysisHistoryPage';
 
 const AppCore: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -66,6 +68,8 @@ const AppCore: React.FC = () => {
           
           {/* Extra pages, not in header but accessible */}
           <Route path="training-recommender" element={<AiTrainingRecommender />} />
+          <Route path="posture-analysis" element={<PostureAnalysisPage />} />
+          <Route path="posture-analysis-history" element={<PostureAnalysisHistoryPage />} />
           <Route path="test-nav" element={<TestNavPage />} />
 
           {/* Auth routes */}

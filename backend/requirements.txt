@@ -7,3 +7,4 @@ torchvision
 supabase
 python-dotenv
 numpy
+moviepy

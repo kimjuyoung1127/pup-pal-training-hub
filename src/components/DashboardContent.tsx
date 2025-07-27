@@ -224,10 +224,10 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
           <div className="text-2xl">🤖</div>
         </Button>
 
-        <Button onClick={() => navigate('/tools/joint-analysis')} className="w-full btn-primary justify-between py-6 bg-orange-500 hover:bg-orange-600 text-white joint-analysis-button">
+        <Button onClick={() => navigate('/app/posture-analysis')} className="w-full btn-primary justify-between py-6 bg-orange-500 hover:bg-orange-600 text-white joint-analysis-button">
           <div className="flex items-center space-x-3">
             <HeartPulse className="w-5 h-5" />
-            <span className="text-lg">AI 관절 움직임 분석</span>
+            <span className="text-lg">AI 자세 분석</span>
           </div>
           <div className="text-2xl">🔬</div>
         </Button>
