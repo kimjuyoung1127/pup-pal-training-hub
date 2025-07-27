@@ -17,20 +17,14 @@ const MainLayoutV2: React.FC<MainLayoutProps> = ({ children }) => {
     overflowX: 'hidden',
     width: '100%',
     maxWidth: '100vw',
-    // position: 'fixed', // 이 줄을 제거하거나 주석 처리
-    // top: 0,
-    // left: 0,
-    // right: 0,
-    // bottom: 0,
   };
 
   const mainStyle: React.CSSProperties = {
     flex: 1,
     paddingBottom: '5rem',
     overflowX: 'hidden',
-    // overflowY: 'auto', // 이 줄도 제거 (기본 스크롤 사용)
     width: '100%',
-    WebkitOverflowScrolling: 'touch', // iOS 부드러운 스크롤
+    WebkitOverflowScrolling: 'touch',
   };
 
   return (
