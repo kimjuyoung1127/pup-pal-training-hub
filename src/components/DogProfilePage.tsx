@@ -12,6 +12,34 @@ import TrainingStats from './dog-profile/TrainingStats';
 import QuickActions from './dog-profile/QuickActions';
 import DeleteProfileDialog from './dog-profile/DeleteProfileDialog';
 import GrowthMissionBoard from './dog-profile/GrowthMissionBoard';
+import { Card } from '@/components/ui/card'; // Card 컴포넌트 import 추가
+import { DogInfo, AgeGroup, GenderKey, breedData } from '@/types/dog'; // 타입 및 데이터 import 추가
+
+// getDogReminder 함수를 DogProfilePage 내부 또는 외부 유틸리티로 이동
+const getDogReminder = (dogInfo: DogInfo | null) => {
+  if (!dogInfo || dogInfo.weight === null || !dogInfo.age || dogInfo.age.years === null) return null;
+
+  const { weight, age, breed, gender } = dogInfo;
+  const totalMonths = age.years * 12 + (age.months || 0);
+
+  const ageGroup: AgeGroup = totalMonths < 12 ? 'puppy' : (age.years < 8 ? 'adult' : 'senior');
+  const genderKey: GenderKey = gender === '수컷' ? 'male' : 'female';
+
+  const currentBreedData = breedData[breed] || breedData['믹스견'];
+  const idealWeight = currentBreedData.idealWeight[ageGroup][genderKey];
+  const [idealWeightLower, idealWeightUpper] = idealWeight;
+
+  if (weight > idealWeightUpper * 1.2) {
+    return `현재 체중(${weight}kg)이 적정 범위(${idealWeightLower}~${idealWeightUpper}kg)보다 많이 나가요. 관절 보호에 신경 써주세요. 🦴`;
+  } else if (weight > idealWeightUpper) {
+    return `현재 체중(${weight}kg)이 적정 범위(${idealWeightLower}~${idealWeightUpper}kg)를 살짝 넘었어요. 꾸준한 산책으로 관리해주세요. 🏃‍♂️`;
+  } else if (weight < idealWeightLower) {
+    return `현재 체중(${weight}kg)이 적정 범위(${idealWeightLower}~${idealWeightUpper}kg)보다 조금 미달이에요. 영양 균형을 확인하고 체력을 보충해주세요. 🍚`;
+  } else {
+    return `현재 적정 체중(${weight}kg)을 잘 유지하고 있어요! 👍`;
+  }
+};
+
 
 interface DogProfilePageProps {
   onNavigate: (page: string, params?: any) => void;
@@ -31,6 +59,8 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
     handleImageDelete,
     handleDeleteDogProfile,
   } = useDogProfile();
+
+  const reminder = getDogReminder(dogInfo); // dogInfo를 사용하여 리마인더 메시지 생성
 
   const Header = () => (
     <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-4">
@@ -118,6 +148,25 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
         >
           <HealthStatusCard healthStatusNames={healthStatusNames} />
         </motion.div>
+
+        {reminder && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="dog-reminder-card"
+          >
+            <Card className="card-soft p-6 bg-blue-100">
+              <div className="flex items-start space-x-3">
+                <div className="text-2xl">🐶</div>
+                <div>
+                  <h3 className="font-bold text-sky-900 mb-2">{dogInfo.name} 리마인드</h3>
+                  <p className="text-sm text-sky-800 leading-relaxed">{reminder}</p>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -14,7 +14,6 @@ import {
 
 const navItems = [
     { path: "/app", title: "홈", end: true },
-    { path: "/app/dog-info", title: "강아지 등록" },
     { path: "/app/my-page", title: "내 프로필" },
     { 
       title: "훈련 과정", 
@@ -32,7 +31,6 @@ const navItems = [
         { path: "/app/posture-analysis-history", title: "자세 분석 기록", description: "자세 변화 추이를 그래프와 데이터로 확인하세요." },
       ]
     },
-    { path: "/app/settings", title: "설정" },
 ];
 
 const AppCoreHeader: React.FC = () => {
@@ -61,11 +59,11 @@ const AppCoreHeader: React.FC = () => {
                     </NavigationMenuContent>
                   </>
                 ) : (
-                  <NavLink to={item.path!} end={item.end}>
-                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  <NavigationMenuLink asChild>
+                    <NavLink to={item.path!} end={item.end} className={navigationMenuTriggerStyle()}>
                       {item.title}
-                    </NavigationMenuLink>
-                  </NavLink>
+                    </NavLink>
+                  </NavigationMenuLink>
                 )}
               </NavigationMenuItem>
             ))}

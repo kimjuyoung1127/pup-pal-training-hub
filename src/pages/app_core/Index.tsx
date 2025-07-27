@@ -10,17 +10,24 @@ import TrainingHistoryPage from '@/components/TrainingHistoryPage';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
 import { useDogProfile } from '@/hooks/useDogProfile';
-import TestNavPage from './TestNavPage';
 import AiTrainingRecommender from '@/components/AiTrainingRecommender';
 import AppCoreHeader from '@/components/AppCoreHeader';
 import PostureAnalysisPage from '@/pages/tools/PostureAnalysisPage';
 import PostureAnalysisHistoryPage from '@/pages/history/PostureAnalysisHistoryPage';
+import { TrainingProgram } from '@/lib/trainingData';
 
 const AppCore: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { dogInfo: profileDogInfo, isLoading: isDogInfoLoading } = useDogProfile();
   const location = useLocation();
+  
+  // 투어 관련 상태 추가
+  const [runTour, setRunTour] = useState(false);
+  
+  const startTour = () => {
+    setRunTour(true);
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -35,6 +42,15 @@ const AppCore: React.FC = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+  
+  // 첫 방문 시 투어 시작 로직 추가
+  useEffect(() => {
+    const hasSeenTour = localStorage.getItem('hasSeenDashboardTour');
+    if (!hasSeenTour && session && profileDogInfo) {
+      setRunTour(true);
+      localStorage.setItem('hasSeenDashboardTour', 'true');
+    }
+  }, [session, profileDogInfo]);
 
   if (loading || isDogInfoLoading) {
     return (
@@ -56,28 +72,34 @@ const AppCore: React.FC = () => {
   }
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative">
       <AppCoreHeader />
       <main className="p-4">
         <Routes>
-          <Route index element={<DashboardPage />} />
+          <Route index element={<DashboardPage runTour={runTour} setRunTour={setRunTour} startTour={startTour} />} />
           <Route path="dog-info" element={<DogInfoPage onComplete={() => window.location.reload()} dogInfoToEdit={null} />} />
-          <Route path="my-page" element={<DogProfilePage />} />
-          <Route path="history" element={<TrainingHistoryPage />} />
+          <Route path="my-page" element={<DogProfilePage onNavigate={function (page: string, params?: any): void {
+            throw new Error('Function not implemented.');
+          } } />} />
+          <Route path="history" element={<TrainingHistoryPage onNavigate={function (page: string, params?: any): void {
+            throw new Error('Function not implemented.');
+          } } />} />
           <Route path="settings" element={<SettingsPage />} />
           
           {/* Extra pages, not in header but accessible */}
-          <Route path="training-recommender" element={<AiTrainingRecommender />} />
+          <Route path="training-recommender" element={<AiTrainingRecommender onSelectTraining={function (training: TrainingProgram): void {
+            throw new Error('Function not implemented.');
+          } } selectedTrainingTitle={''} />} />
           <Route path="posture-analysis" element={<PostureAnalysisPage />} />
           <Route path="posture-analysis-history" element={<PostureAnalysisHistoryPage />} />
-          <Route path="test-nav" element={<TestNavPage />} />
+          
 
           {/* Auth routes */}
           <Route path="onboarding" element={<OnboardingPage onComplete={() => {}} />} />
           <Route path="login" element={<LoginPage onLogin={() => {}} />} />
 
           {/* Fallback Route */}
-          <Route path="*" element={<DashboardPage />} />
+          <Route path="*" element={<DashboardPage runTour={runTour} setRunTour={setRunTour} startTour={startTour} />} />
         </Routes>
       </main>
     </div>

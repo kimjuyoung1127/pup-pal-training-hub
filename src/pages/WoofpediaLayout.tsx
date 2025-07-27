@@ -8,10 +8,10 @@ import WoofpediaBottomNav from '@/components/WoofpediaBottomNav';
 
 const WoofpediaLayout: React.FC = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
       <Header />
       
-      <main className="flex-grow pb-20">
+      <main className="flex-1 overflow-auto">
         <Outlet /> {/* 여기에 각 페이지의 내용이 렌더링됩니다. */}
       </main>
       

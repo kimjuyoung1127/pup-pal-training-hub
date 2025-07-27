@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Settings, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import DashboardContent from './DashboardContent';
@@ -7,18 +8,36 @@ import AdSense from './ads/AdSense';
 import { useDogProfile } from '@/hooks/useDogProfile';
 
 interface DashboardPageProps {
-  onNavigate: (page: string, params?: any) => void;
   runTour: boolean;
   setRunTour: (run: boolean) => void;
   startTour: () => void;
 }
 
-const DashboardPage = ({ onNavigate, runTour, setRunTour, startTour }: DashboardPageProps) => {
+const DashboardPage = ({ runTour, setRunTour, startTour }: DashboardPageProps) => {
+  const navigate = useNavigate();
   const { plan } = useDogProfile();
+
+  const handleNavigate = (page: string, params?: any) => {
+    switch (page) {
+      case 'settings':
+        navigate('/app/settings');
+        break;
+      case 'dog-info':
+        navigate('/app/dog-info');
+        break;
+      case 'history':
+        navigate('/app/history');
+        break;
+      default:
+        console.warn(`Unhandled navigation to: ${page}`);
+        break;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-100">
+    <div className="h-full "> {/* pb-24 추가 */}
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-sky-200 px-6 py-4 sticky top-0 z-10 shadow-sm">
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-3 sticky top-0 z-10 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="text-xl">🐾</div>
@@ -30,14 +49,14 @@ const DashboardPage = ({ onNavigate, runTour, setRunTour, startTour }: Dashboard
           <div className="flex items-center space-x-2">
             <Button
               size="sm"
-              onClick={startTour} // Index.tsx에서 받은 startTour 함수를 연결합니다.
+              onClick={startTour}
               className="text-sky-600 hover:text-sky-800 bg-transparent hover:bg-sky-100 focus:ring-0"
             >
               <HelpCircle className="w-5 h-5" />
             </Button>
             <Button
               size="sm"
-              onClick={() => onNavigate('settings')}
+              onClick={() => navigate('/app/settings')}
               className="text-sky-600 hover:text-sky-800 bg-transparent hover:bg-sky-100 focus:ring-0"
             >
               <Settings className="w-5 h-5" />
@@ -46,8 +65,14 @@ const DashboardPage = ({ onNavigate, runTour, setRunTour, startTour }: Dashboard
         </div>
       </div>
 
-      <DashboardContent onNavigate={onNavigate} runTour={runTour} setRunTour={setRunTour} />
-            {plan === 'free' && (
+      {/* 메인 콘텐츠를 컴팩트한 카드로 감싸기 */}
+      <div className="p-4">
+        <div className="max-w-md mx-auto bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-4">
+          <DashboardContent onNavigate={handleNavigate} runTour={runTour} setRunTour={setRunTour} />
+        </div>
+      </div>
+      
+      {plan === 'free' && (
         <div className="p-4">
           <AdSense />
         </div>
@@ -57,3 +82,4 @@ const DashboardPage = ({ onNavigate, runTour, setRunTour, startTour }: Dashboard
 };
 
 export default DashboardPage;
+

@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-800 text-gray-400 pt-12 sm:pt-16">
+    <footer className="bg-gray-800 text-gray-400 pt-4 sm:pt-6">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* About Section */}
           <div className="md:col-span-1">
-            <h3 className="text-xl font-bold text-white mb-4">Mung-AI</h3>
+            <h3 className="text-lg font-bold text-white mb-2">Mung-AI</h3>
             <p className="text-sm">
               반려동물의 행복한 삶을 위한 모든 정보. Mung-AI가 함께합니다.
             </p>
@@ -47,7 +47,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-gray-700 text-center">
+        <div className="mt-4 pt-4 border-t border-gray-700 text-center">
           <p className="text-sm">&copy; {new Date().getFullYear()} Mung-AI. All rights reserved.</p>
         </div>
       </div>

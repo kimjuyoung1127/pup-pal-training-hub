@@ -1,19 +1,13 @@
-
 import { useEffect, useState } from 'react';
-import { useDashboardStore } from '@/store/dashboardStore';
 import { welcomeMessages } from '@/lib/welcomeMessages';
-import { trainingTips } from '@/lib/trainingTips';
-import { breedData, DogInfo, AgeGroup, GenderKey } from '@/types/dog';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { BookOpen, BarChart3, Sparkles, HeartPulse } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import Joyride, { Step, CallBackProps } from 'react-joyride';
+import Joyride, { CallBackProps } from 'react-joyride';
 import { useDashboardData } from '@/hooks/useDashboardData';
-import { toast } from 'sonner';
-import confetti from 'canvas-confetti';
+import { tourSteps } from '@/lib/tourSteps'; // 분리된 투어 스텝 import
 import '@/App.css';
 
 const PawPrintLoading = () => (
@@ -27,54 +21,15 @@ const PawPrintLoading = () => (
 
 interface DashboardContentProps {
   onNavigate: (page: string) => void;
+  runTour: boolean;
+  setRunTour: (run: boolean) => void;
 }
 
-const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
-  const { dog, tip, mission, isLoading } = useDashboardData();
-  const { missionCompleted, toggleMissionCompleted, resetMissionIfNeeded } = useDashboardStore();
+const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentProps) => {
+  const { dog, isLoading } = useDashboardData();
   const navigate = useNavigate();
 
-  const [runTour, setRunTour] = useState(false);
-
-  useEffect(() => {
-    const isFirstVisit = localStorage.getItem('hasVisitedDashboard') !== 'true';
-    if (isFirstVisit) {
-      setRunTour(true);
-      localStorage.setItem('hasVisitedDashboard', 'true');
-    }
-  }, []);
-
   const [randomWelcome, setRandomWelcome] = useState('');
-  const [randomTip, setRandomTip] = useState('');
-  const [showMission, setShowMission] = useState(true);
-
-  const tourSteps: Step[] = [
-    {
-      target: '.ai-coach-button',
-      title: 'AI 훈련 코치',
-      content: 'AI 훈련 코치와 대화하며 강아지 훈련에 대한 도움을 받을 수 있습니다.',
-      disableBeacon: true,
-      disableScrolling: false,
-    },
-    {
-      target: '.dog-info-button',
-      title: '강아지 정보 입력',
-      content: '강아지의 정보를 입력하고 맞춤형 서비스를 받아보세요.',
-      disableScrolling: false,
-    },
-    {
-      target: '.training-history-button',
-      title: '훈련 기록 보기',
-      content: '이곳에서 강아지의 훈련 진행 상황을 확인할 수 있습니다.',
-      disableScrolling: false,
-    },
-    {
-      target: '.offline-training-button',
-      title: '오프라인 훈련소 가기',
-      content: '전문가의 도움이 필요하다면 오프라인 훈련소 정보를 찾아보세요.',
-      disableScrolling: false,
-    },
-  ];
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status } = data;
@@ -88,62 +43,9 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
   const weatherIcon = '☀️';
 
   useEffect(() => {
-    resetMissionIfNeeded();
-    const lastCompletionDate = localStorage.getItem('missionCompletionDate');
-    const todayStr = new Date().toISOString().split('T')[0];
-    if (lastCompletionDate === todayStr) {
-      setShowMission(false);
-    } else {
-      setShowMission(true);
-    }
-  }, [resetMissionIfNeeded]);
-
-  useEffect(() => {
     const welcomeIndex = Math.floor(Math.random() * welcomeMessages.length);
     setRandomWelcome(welcomeMessages[welcomeIndex].replace('{dogName}', dogName));
-
-    const tipIndex = Math.floor(Math.random() * trainingTips.length);
-    setRandomTip(trainingTips[tipIndex]);
   }, [dogName]);
-
-  const handleMissionComplete = () => {
-    toggleMissionCompleted();
-    toast.success('오늘의 미션 완료! 멋져요! 🎉');
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-    });
-    setShowMission(false);
-    const todayStr = new Date().toISOString().split('T')[0];
-    localStorage.setItem('missionCompletionDate', todayStr);
-  };
-
-  const getDogReminder = (dogInfo: DogInfo | null) => {
-    if (!dogInfo || dogInfo.weight === null || !dogInfo.age || dogInfo.age.years === null) return null;
-
-    const { weight, age, breed, gender } = dogInfo;
-    const totalMonths = age.years * 12 + (age.months || 0);
-
-    const ageGroup: AgeGroup = totalMonths < 12 ? 'puppy' : (age.years < 8 ? 'adult' : 'senior');
-    const genderKey: GenderKey = gender === '수컷' ? 'male' : 'female';
-
-    const currentBreedData = breedData[breed] || breedData['믹스견'];
-    const idealWeight = currentBreedData.idealWeight[ageGroup][genderKey];
-    const [idealWeightLower, idealWeightUpper] = idealWeight;
-
-    if (weight > idealWeightUpper * 1.2) {
-      return `현재 체중(${weight}kg)이 적정 범위(${idealWeightLower}~${idealWeightUpper}kg)보다 많이 나가요. 관절 보호에 신경 써주세요. 🦴`;
-    } else if (weight > idealWeightUpper) {
-      return `현재 체중(${weight}kg)이 적정 범위(${idealWeightLower}~${idealWeightUpper}kg)를 살짝 넘었어요. 꾸준한 산책으로 관리해주세요. 🏃‍♂️`;
-    } else if (weight < idealWeightLower) {
-      return `현재 체중(${weight}kg)이 적정 범위(${idealWeightLower}~${idealWeightUpper}kg)보다 조금 미달이에요. 영양 균형을 확인하고 체력을 보충해주세요. 🍚`;
-    } else {
-      return `현재 적정 체중(${weight}kg)을 잘 유지하고 있어요! 👍`;
-    }
-  };
-
-  const reminder = getDogReminder(dog);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -165,7 +67,7 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
 
   return (
     <motion.div
-      className="p-6 space-y-6 relative"
+      className="px-6 pt-6 pb-6 space-y-6" // pt-24를 pt-6으로 변경하여 간격 최적화
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -207,120 +109,104 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
         }}
       />
 
+      {/* Welcome Card - 개선된 스타일 */}
+      <motion.div variants={itemVariants} className="welcome-card mb-6">
+        <Card className="card-soft p-6 bg-gradient-to-r from-sky-50 to-blue-50 border border-sky-200 shadow-lg">
+          <div className="flex items-center space-x-4">
+            <div className="text-4xl bg-sky-100 p-3 rounded-full">👋</div>
+            <div className="flex-1">
+              <h2 className="text-xl font-bold text-sky-900 mb-2">
+                {randomWelcome}
+              </h2>
+              <p className="text-sm text-sky-700 flex items-center space-x-2">
+                <span>{today.toLocaleDateString('ko-KR')}</span>
+                <span className="text-lg">{weatherIcon}</span>
+              </p>
+            </div>
+          </div>
+        </Card>
+      </motion.div>
+
+      {/* Action Buttons - 강아지 정보입력과 오프라인훈련을 밝은 색으로 변경 */}
       <motion.div className="space-y-4 action-buttons" variants={itemVariants}>
-        <Button onClick={() => onNavigate('dog-info')} className="w-full btn-secondary justify-between py-6 bg-teal-500 hover:bg-teal-600 text-white dog-info-button">
+        <Button 
+          onClick={() => onNavigate('dog-info')} 
+          className="w-full justify-between py-6 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] dog-info-button"
+        >
           <div className="flex items-center space-x-3">
-            <BookOpen className="w-5 h-5" />
-            <span className="text-lg">강아지 정보 입력하기</span>
+            <div className="bg-white/20 p-2 rounded-lg">
+              <BookOpen className="w-5 h-5" />
+            </div>
+            <span className="text-lg font-semibold">강아지 정보 입력하기</span>
           </div>
           <div className="text-2xl">🐕</div>
         </Button>
 
-        <Button onClick={() => navigate('/chat')} className="w-full btn-primary justify-between py-6 bg-blue-500 hover:bg-blue-600 text-white ai-coach-button">
+        <Button 
+          onClick={() => navigate('/app/training-recommender')} 
+          className="w-full justify-between py-6 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] ai-recommender-button"
+        >
           <div className="flex items-center space-x-3">
-            <Sparkles className="w-5 h-5" />
-            <span className="text-lg">AI 훈련 코치와 대화하기</span>
+            <div className="bg-white/20 p-2 rounded-lg">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <span className="text-lg font-semibold">AI 훈련 추천</span>
+          </div>
+          <div className="text-2xl">✨</div>
+        </Button>
+
+        <Button 
+          onClick={() => navigate('/chat')} 
+          className="w-full justify-between py-6 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] ai-coach-button"
+        >
+          <div className="flex items-center space-x-3">
+            <div className="bg-white/20 p-2 rounded-lg">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <span className="text-lg font-semibold">AI 훈련 코치와 대화하기</span>
           </div>
           <div className="text-2xl">🤖</div>
         </Button>
 
-        <Button onClick={() => navigate('/app/posture-analysis')} className="w-full btn-primary justify-between py-6 bg-orange-500 hover:bg-orange-600 text-white joint-analysis-button">
+        <Button 
+          onClick={() => navigate('/app/posture-analysis')} 
+          className="w-full justify-between py-6 bg-gradient-to-r from-violet-600 to-purple-700 hover:from-violet-700 hover:to-purple-800 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] joint-analysis-button"
+        >
           <div className="flex items-center space-x-3">
-            <HeartPulse className="w-5 h-5" />
-            <span className="text-lg">AI 자세 분석</span>
+            <div className="bg-white/20 p-2 rounded-lg">
+              <HeartPulse className="w-5 h-5" />
+            </div>
+            <span className="text-lg font-semibold">AI 자세 분석</span>
           </div>
           <div className="text-2xl">🔬</div>
         </Button>
 
-        <Button onClick={() => onNavigate('history')} className="w-full btn-secondary justify-between py-6 bg-indigo-500 hover:bg-indigo-600 text-white training-history-button">
+        <Button 
+          onClick={() => onNavigate('history')} 
+          className="w-full justify-between py-6 bg-gradient-to-r from-amber-600 to-orange-700 hover:from-amber-700 hover:to-orange-800 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] training-history-button"
+        >
           <div className="flex items-center space-x-3">
-            <BarChart3 className="w-5 h-5" />
-            <span className="text-lg">훈련 기록 보기</span>
+            <div className="bg-white/20 p-2 rounded-lg">
+              <BarChart3 className="w-5 h-5" />
+            </div>
+            <span className="text-lg font-semibold">훈련 기록 보기</span>
           </div>
           <div className="text-2xl">📊</div>
         </Button>
         
-        <Button onClick={() => window.open('https://puppyvill.com/jason', '_blank')} className="w-full btn-secondary justify-between py-6 bg-purple-500 hover:bg-purple-600 text-white offline-training-button">
+        <Button 
+          onClick={() => window.open('https://puppyvill.com/jason', '_blank')} 
+          className="w-full justify-between py-6 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] offline-training-button"
+        >
           <div className="flex items-center space-x-3">
-            <BookOpen className="w-5 h-5" />
-            <span className="text-lg">오프라인 훈련 받아보기</span>
+            <div className="bg-white/20 p-2 rounded-lg">
+              <BookOpen className="w-5 h-5" />
+            </div>
+            <span className="text-lg font-semibold">오프라인 훈련 받아보기</span>
           </div>
           <div className="text-2xl">🎓</div>
         </Button>
       </motion.div>
-
-      <motion.div variants={itemVariants} className="welcome-card">
-        <Card className="card-soft p-6 bg-sky-100">
-          <div className="flex items-center space-x-4">
-            <div className="text-4xl">👋</div>
-            <div className="flex-1">
-              <h2 className="text-xl font-bold text-sky-900 mb-1">
-                {randomWelcome}
-              </h2>
-              <p className="text-sky-700">
-                {today.toLocaleDateString('ko-KR')} {weatherIcon}
-              </p>
-            </div>
-          </div>
-        </Card>
-      </motion.div>
-
-      {reminder && (
-        <motion.div variants={itemVariants} className="dog-reminder-card">
-          <Card className="card-soft p-6 bg-blue-100">
-            <div className="flex items-start space-x-3">
-              <div className="text-2xl">🐶</div>
-              <div>
-                <h3 className="font-bold text-sky-900 mb-2">{dogName} 리마인드</h3>
-                <p className="text-sm text-sky-800 leading-relaxed">{reminder}</p>
-              </div>
-            </div>
-          </Card>
-        </motion.div>
-      )}
-
-      <motion.div variants={itemVariants} className="training-tip-card">
-        <Card className="card-soft p-6 bg-gradient-to-r from-sky-100 to-blue-200">
-          <div className="flex items-start space-x-3">
-            <div className="text-2xl">💡</div>
-            <div>
-              <h3 className="font-bold text-sky-900 mb-2">오늘의 팁</h3>
-              <p className="text-sm text-sky-800 leading-relaxed">
-                {randomTip}
-              </p>
-            </div>
-          </div>
-        </Card>
-      </motion.div>
-
-      <AnimatePresence>
-        {mission && showMission && !missionCompleted && (
-          <motion.div
-            variants={itemVariants}
-            initial="hidden"
-            animate="visible"
-            exit={{ opacity: 0, y: -20, transition: { duration: 0.5 } }}
-            className="daily-mission-card"
-          >
-            <Card className="card-soft p-6 bg-blue-100">
-              <div className="flex items-start space-x-3">
-                <div className="text-2xl">🎯</div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-sky-900 mb-2">오늘의 미션</h3>
-                  <p className="text-sm text-sky-800 leading-relaxed">{mission.mission}</p>
-                </div>
-                <Checkbox
-                  checked={missionCompleted}
-                  onCheckedChange={handleMissionComplete}
-                  className="w-6 h-6 border-sky-400 data-[state=checked]:bg-sky-600"
-                  id="daily-mission"
-                />
-              </div>
-            </Card>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
     </motion.div>
   );
 };

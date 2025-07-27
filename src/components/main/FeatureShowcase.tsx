@@ -57,9 +57,9 @@ export function FeatureShowcase() {
                 </p>
               </CardContent>
               <div className="p-6 pt-0">
-                <Link to={feature.link}>
-                  <Button className="w-full">{feature.cta}</Button>
-                </Link>
+                <Button asChild className="w-full">
+                  <Link to={feature.link}>{feature.cta}</Link>
+                </Button>
               </div>
             </Card>
           ))}
