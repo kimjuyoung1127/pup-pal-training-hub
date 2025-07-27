@@ -65,9 +65,9 @@ const DashboardPage = ({ runTour, setRunTour, startTour }: DashboardPageProps) =
         </div>
       </div>
 
-      {/* 메인 콘텐츠를 컴팩트한 카드로 감싸기 */}
-      <div className="p-4">
-        <div className="max-w-md mx-auto bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-4">
+      {/* 메인 콘텐츠를 컴팩트한 카드로 감싸기 - 모바일 최적화 */}
+      <div className="p-2 sm:p-4">
+        <div className="max-w-md mx-auto bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-2 sm:p-4">
           <DashboardContent onNavigate={handleNavigate} runTour={runTour} setRunTour={setRunTour} />
         </div>
       </div>
