@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { BookOpen, BarChart3, Sparkles } from 'lucide-react';
+import { BookOpen, BarChart3, Sparkles, HeartPulse } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Joyride, { Step, CallBackProps } from 'react-joyride';
 import { useDashboardData } from '@/hooks/useDashboardData';
@@ -208,6 +208,14 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
       />
 
       <motion.div className="space-y-4 action-buttons" variants={itemVariants}>
+        <Button onClick={() => onNavigate('dog-info')} className="w-full btn-secondary justify-between py-6 bg-teal-500 hover:bg-teal-600 text-white dog-info-button">
+          <div className="flex items-center space-x-3">
+            <BookOpen className="w-5 h-5" />
+            <span className="text-lg">강아지 정보 입력하기</span>
+          </div>
+          <div className="text-2xl">🐕</div>
+        </Button>
+
         <Button onClick={() => navigate('/chat')} className="w-full btn-primary justify-between py-6 bg-blue-500 hover:bg-blue-600 text-white ai-coach-button">
           <div className="flex items-center space-x-3">
             <Sparkles className="w-5 h-5" />
@@ -216,12 +224,12 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
           <div className="text-2xl">🤖</div>
         </Button>
 
-        <Button onClick={() => onNavigate('dog-info')} className="w-full btn-secondary justify-between py-6 bg-teal-500 hover:bg-teal-600 text-white dog-info-button">
+        <Button onClick={() => navigate('/tools/joint-analysis')} className="w-full btn-primary justify-between py-6 bg-orange-500 hover:bg-orange-600 text-white joint-analysis-button">
           <div className="flex items-center space-x-3">
-            <BookOpen className="w-5 h-5" />
-            <span className="text-lg">강아지 정보 입력하기</span>
+            <HeartPulse className="w-5 h-5" />
+            <span className="text-lg">AI 관절 움직임 분석</span>
           </div>
-          <div className="text-2xl">🐕</div>
+          <div className="text-2xl">🔬</div>
         </Button>
 
         <Button onClick={() => onNavigate('history')} className="w-full btn-secondary justify-between py-6 bg-indigo-500 hover:bg-indigo-600 text-white training-history-button">
@@ -231,6 +239,7 @@ const DashboardContent = ({ onNavigate }: DashboardContentProps) => {
           </div>
           <div className="text-2xl">📊</div>
         </Button>
+        
         <Button onClick={() => window.open('https://puppyvill.com/jason', '_blank')} className="w-full btn-secondary justify-between py-6 bg-purple-500 hover:bg-purple-600 text-white offline-training-button">
           <div className="flex items-center space-x-3">
             <BookOpen className="w-5 h-5" />
