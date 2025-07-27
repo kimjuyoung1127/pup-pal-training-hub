@@ -12,7 +12,7 @@ const MainLayoutV2: React.FC<MainLayoutProps> = ({ children }) => {
   const layoutStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
-    minHeight: '100vh',
+    minHeight: '100dvh',
     backgroundColor: '#F9FAFB', // bg-gray-50
   };
 
