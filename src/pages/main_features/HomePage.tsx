@@ -23,7 +23,17 @@ const HomePage: React.FC = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
-        variants={sectionVariants}
+        variants={{
+          hidden: { opacity: 0, y: 50 },
+          visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: {
+              duration: 0.8,
+              ease: [0.43, 0.13, 0.23, 0.96] // Using bezier curve instead of string
+            }
+          }
+        }}
       >
         <HeroSection />
       </motion.div>
@@ -32,7 +42,17 @@ const HomePage: React.FC = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
-        variants={sectionVariants}
+        variants={{
+          hidden: { opacity: 0, y: 50 },
+          visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: {
+              duration: 0.8,
+              ease: [0.43, 0.13, 0.23, 0.96] // Using bezier curve instead of string
+            }
+          }
+        }}
       >
         <DetailedFeatureIntroduction />
       </motion.div>
@@ -41,7 +61,17 @@ const HomePage: React.FC = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
-        variants={sectionVariants}
+        variants={{
+          hidden: { opacity: 0, y: 50 },
+          visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: {
+              duration: 0.8,
+              ease: [0.43, 0.13, 0.23, 0.96]
+            }
+          }
+        }}
       >
         <FullArticleFeed />
       </motion.div>

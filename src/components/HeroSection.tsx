@@ -1,50 +1,55 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="relative h-[60vh] min-h-[400px] md:h-[70vh] lg:h-[80vh] w-full flex items-center justify-center text-center text-white">
-      {/* Background Image */}
+    <section className="relative h-[75vh] min-h-[500px] w-full flex items-center justify-center text-center text-white overflow-hidden">
+      {/* Background Video/Image */}
       <div className="absolute inset-0 z-0">
         <img 
           src="/hero/images/1.png" 
           alt="행복한 강아지와 주인" 
           className="w-full h-full object-cover"
         />
-        {/* Soft overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/30 to-transparent"></div>
+        {/* Solid overlay for perfect text readability */}
+        <div className="absolute inset-0 bg-black/50"></div>
       </div>
       
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center px-4 animate-fade-in-up">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.6)' }}>
-          함께하는 모든 순간이<br />더 특별해지도록
+      <motion.div 
+        className="relative z-10 flex flex-col items-center px-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeInOut" }}
+      >
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4">
+          AI가 만드는 똑똑한 반려생활, Mung-Ai
         </h1>
-        <p className="max-w-2xl text-lg md:text-xl lg:text-2xl mb-8 text-slate-100" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
-          전문가의 지식과 AI 기술을 결합하여<br />당신과 반려견의 삶에 최고의 가이드를 제공합니다.
+        <p className="max-w-3xl text-lg md:text-xl text-slate-200 mb-8">
+          더 이상 추측하지 마세요. 데이터와 전문가의 지식으로<br/>당신의 반려 생활을 가장 완벽한 순간으로 만듭니다.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link to="/app">
             <Button 
               size="lg" 
-              variant="outline"
-              className="bg-white/10 text-white border-2 border-white hover:bg-white/20 backdrop-blur-sm transition-all duration-300 text-lg px-8 py-6 rounded-full shadow-lg w-full sm:w-auto"
+              className="bg-amber-500 text-slate-900 font-bold hover:bg-amber-400 transition-transform duration-300 ease-in-out hover:scale-105 text-lg px-10 py-7 rounded-full shadow-lg w-full sm:w-auto"
             >
-              AI 분석 시작하기
+              AI 솔루션 시작하기
             </Button>
           </Link>
           <a href="#features">
             <Button 
               size="lg" 
               variant="outline"
-              className="bg-white/10 text-white border-2 border-white hover:bg-white/20 backdrop-blur-sm transition-all duration-300 text-lg px-8 py-6 rounded-full shadow-lg w-full sm:w-auto"
+              className="bg-transparent text-white border-2 border-white hover:bg-white/20 backdrop-blur-sm transition-all duration-300 text-lg px-8 py-6 rounded-full shadow-lg w-full sm:w-auto"
             >
-              핵심 기능 알아보기
+              핵심 기능 둘러보기
             </Button>
           </a>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };

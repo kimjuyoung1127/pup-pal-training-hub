@@ -38,8 +38,8 @@ const MainLayoutV2: React.FC<MainLayoutProps> = ({ children }) => {
       <Header />
       <main style={mainStyle}>
         {children}
+        <Footer />
       </main>
-      <Footer />
       <WoofpediaBottomNav />
     </div>
   );

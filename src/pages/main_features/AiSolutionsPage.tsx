@@ -16,7 +16,7 @@ const AiSolutionsPage: React.FC = () => {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-extrabold text-gray-800">✨ AI 솔루션 모아보기</h1>
           <p className="mt-4 text-lg text-gray-600">
-            당신의 반려 생활을 더욱 스마트���고 풍요롭게 만들어 줄 특별한 기능들을 만나보세요.
+            당신의 반려 생활을 더욱 스마트하고 풍요롭게 만들어 줄 특별한 기능들을 만나보세요.
           </p>
         </div>
 

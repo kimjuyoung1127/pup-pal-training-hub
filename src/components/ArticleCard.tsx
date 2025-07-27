@@ -21,9 +21,10 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ data, type }) => {
     <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden h-full flex flex-col group transform hover:-translate-y-1">
       <div className="relative overflow-hidden">
         <img 
-          src={data.cover_image_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=1974&auto=format&fit=crop'} 
+          src={data.cover_image_url ? `${data.cover_image_url}?transform=w_400,h_300,f_webp` : 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=1974&auto=format&fit=crop'} 
           alt={data.title} 
           className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out"
+          loading="lazy"
         />
       </div>
       <div className="p-6 flex flex-col flex-grow">

@@ -1,85 +1,131 @@
-import React from 'react';
-import { PawPrint, BrainCircuit, HeartHandshake, Search, Bone } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+"use client";
 
-const FeatureDetail = ({ icon, title, subtitle, description, image, imageAlt, reverse = false }) => (
-  <div className={`flex flex-col lg:flex-row items-start gap-12 lg:gap-20 ${reverse ? 'lg:flex-row-reverse' : ''}`}>
-    <div className="lg:w-1/2 rounded-2xl shadow-lg overflow-hidden aspect-[4/3] bg-white">
-      <img src={image} alt={imageAlt} className="w-full h-full object-contain" />
-    </div>
-    <div className="lg:w-1/2">
-      <div className="inline-flex items-center justify-center w-16 h-16 mb-6 bg-amber-100 rounded-full">
-        {icon}
+import React from 'react';
+import { motion } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
+import { BrainCircuit, Dog, Sparkles, BookOpenCheck } from 'lucide-react';
+
+const features = [
+  {
+    id: 1,
+    title: 'AI 견종 분석 & 추천',
+    description:
+      '나의 라이프스타일, 성향과 환경에 완벽하게 맞는 견종을 AI가 과학적으로 분석하고 추천합니다.',
+    Icon: Dog,
+    image_path: '/features/1.png',
+  },
+  {
+    id: 2,
+    title: 'AI 행동 및 심리 분석',
+    description:
+      '최신 Ai 기술로 반려견의 관절 움직임까지 감지하는 AI가 행동의 숨은 의미를 정확히 해석합니다. 강아지의 내면의 성향을 파악하고 더 깊은 유대감을 형성하세요.',
+    Icon: BrainCircuit,
+    image_path: '/features/2.png',
+  },
+  {
+    id: 3,
+    title: 'AI 기반 맞춤형 콘텐츠',
+    description:
+      '당신의 관심사와 반려견의 품종, 나이, 건강 상태에 맞춰 AI가 매일 맞춤형 아티클과 팁을 제공합니다. 넘쳐나는 정보 속에서 헤매지 말고, 나에게 꼭 필요한 지식만 얻으세요.',
+    Icon: Sparkles,
+    image_path: '/features/3.png',
+  },
+  {
+    id: 4,
+    title: '신뢰도 높은 전문가 매거진',
+    description:
+      '모든 콘텐츠는 수의사와 훈련 전문가의 검수를 거칩니다. AI의 기술력과 전문가의 신뢰도를 결합하여, 당신의 반려 생활을 가장 정확하고 안전한 길로 안내합니다.',
+    Icon: BookOpenCheck,
+    image_path: '/features/4.png',
+  },
+];
+
+const FeatureSection = ({ feature, index }) => {
+  const { ref, inView } = useInView({
+    triggerOnce: true, // 한 번만 애니메이션 실행
+    threshold: 0.2, // 20% 보였을 때 실행
+  });
+
+  const variants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.8,
+        ease: [0.43, 0.13, 0.23, 0.96] // 부드러운 ease-out 곡선
+      }
+    }
+  };
+
+  const isReversed = index % 2 !== 0;
+
+  return (
+    <motion.div
+      ref={ref}
+      initial="hidden"
+      animate={inView ? "visible" : "hidden"}
+      variants={{
+        hidden: { opacity: 0, y: 50 },
+        visible: { 
+          opacity: 1, 
+          y: 0,
+          transition: {
+            duration: 0.8,
+            ease: "easeOut"
+          }
+        }
+      }}
+      className={`grid md:grid-cols-2 gap-12 md:gap-16 items-center`}
+    >
+      <div className={`rounded-2xl overflow-hidden shadow-lg aspect-[4/3] ${isReversed ? 'md:order-last' : ''}`}>
+        <img
+          src={feature.image_path}
+          alt={feature.title}
+          className="w-full h-full object-cover"
+          loading="lazy"
+        />
       </div>
-      <h3 className="text-3xl font-bold text-slate-800 mb-4">{title}</h3>
-      <p className="text-amber-600 font-semibold mb-6">{subtitle}</p>
-      <p className="text-slate-600 leading-relaxed">{description}</p>
-    </div>
-  </div>
-);
+      <div className="flex flex-col justify-center">
+        <div className="flex items-center gap-4 mb-4">
+          <feature.Icon className="w-10 h-10 text-amber-500 flex-shrink-0" />
+          <h3 className="text-3xl font-bold text-slate-900">{feature.title}</h3>
+        </div>
+        <p className="text-slate-600 text-lg leading-relaxed">
+          {feature.description}
+        </p>
+      </div>
+    </motion.div>
+  );
+};
 
 export const DetailedFeatureIntroduction = () => {
   return (
-    <section id="features" className="w-full py-20 lg:py-32 bg-cream-50">
+    <section id="features" className="w-full py-24 md:py-32 bg-cream-50">
       <div className="container mx-auto px-4 md:px-6">
-        {/* Section Header */}
-        <div className="flex flex-col items-center justify-center space-y-4 text-center mb-20">
-          <div className="inline-block rounded-lg bg-cream-200 px-4 py-2 text-sm text-amber-700 font-semibold">
-            Mung-AI의 약속
-          </div>
-          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl text-slate-800">
-            단순한 앱을 넘어, 든든한 파트너로
-          </h2>
-          <p className="max-w-3xl text-lg text-slate-600">
-            Mung-AI는 어렵고 막막한 반려 생활의 모든 순간에, 데이터와 진심을 담아 가장 현명한 길을 안내합니다.
-            우리가 어떻게 그 약속을 지키는지 확인해보세요.
-          </p>
+        <div className="text-center mb-20">
+          <motion.h2 
+            className="text-4xl md:text-5xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+          >
+            Mung-Ai, AI로 완성하는 반려 생활
+          </motion.h2>
+          <motion.p 
+            className="mt-4 text-lg text-slate-600 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+          >
+            단순 정보 제공을 넘어, AI 기술로 당신의 반려 생활에 실질적인 도움을 드립니다.
+          </motion.p>
         </div>
-
-        {/* Features Details */}
+        
         <div className="space-y-24">
-          <FeatureDetail
-            icon={<Search className="w-8 h-8 text-amber-600" />}
-            title="AI 견종 추천: 운명의 파트너 찾기"
-            subtitle="“어떤 아이를 데려와야 할지 막막해요”"
-            description="수백 종의 강아지, 저마다 다른 성격과 필요조건. Mung-AI의 AI 견종 추천은 당신의 라이프스타일, 환경, 성향을 정밀하게 분석하여 평생을 함께할 가장 이상적인 반려견을 찾아줍니다. 더 이상 추측에 의존하지 마세요. 데이터가 당신의 완벽한 시작을 도와드립니다."
-            image="https://images.unsplash.com/photo-1529429617124-95b109e86bb8?q=80&w=1935&auto=format&fit=crop"
-            imageAlt="다양한 강아지들 중에서 선택을 고민하는 모습"
-          />
-
-          <FeatureDetail
-            icon={<PawPrint className="w-8 h-8 text-amber-600" />}
-            title="강아지 MBTI: 마음을 여는 열쇠"
-            subtitle="“우리 아이, 도대체 왜 이러는 걸까요?”"
-            description="말 못 하는 반려견의 행동에는 숨겨진 성격과 이유가 있습니다. Mung-AI가 개발한 강아지 MBTI는 과학적인 분석을 통해 반려견의 타고난 기질과 성향을 16가지 유형으로 알려줍니다. 우리 아이의 진짜 마음을 이해하고, 더 깊은 유대감을 형성하는 첫걸음이 될 거예요."
-            image="https://images.unsplash.com/photo-1541364983171-a8ba01e95cfc?q=80&w=1974&auto=format&fit=crop"
-            imageAlt="주인과 교감하는 강아지"
-            reverse={true}
-          />
-
-          <FeatureDetail
-            icon={<BrainCircuit className="w-8 h-8 text-amber-600" />}
-            title="AI 행동 분석: 문제의 본질을 해결"
-            subtitle="“짖고, 물고... 어떻게 해야 할지 모르겠어요”"
-            description="문제 행동에는 반드시 원인이 있습니다. Mung-AI의 행동 분석 시스템은 수의학과 동물행동학 전문가들의 지식을 학습한 AI가 영상과 설문을 통해 문제의 핵심을 파악하고, 맞춤형 훈련 솔루션을 제공합니다. 이제 혼자 끙끙 앓지 말고, 전문가의 지혜를 빌려보세요."
-            image="https://images.unsplash.com/photo-1587300003388-59208cc962cb?q=80&w=2070&auto=format&fit=crop"
-            imageAlt="훈련받는 강아지"
-          />
-        </div>
-
-        {/* Final CTA */}
-        <div className="text-center mt-24">
-            <h3 className="text-3xl font-bold text-slate-800 mb-4">이제, Mung-AI와 함께 시작할 시간</h3>
-            <p className="max-w-2xl mx-auto text-slate-600 mb-8 leading-relaxed">
-                최고의 전문가들이 설계한 지식과 최첨단 AI의 만남.<br />
-                당신의 반려 생활을 혁신할 모든 준비가 끝났습니다.
-            </p>
-            <Link to="/app">
-                <Button size="lg" className="bg-amber-500 text-slate-900 font-bold hover:bg-amber-400 transition-transform duration-300 ease-in-out hover:scale-105 text-lg px-10 py-7 rounded-full shadow-lg">
-                    내 반려견 프로필 만들고 시작하기
-                </Button>
-            </Link>
+          {features.map((feature, index) => (
+            <FeatureSection key={feature.id} feature={feature} index={index} />
+          ))}
         </div>
       </div>
     </section>
