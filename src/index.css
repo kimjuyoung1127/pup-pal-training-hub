@@ -101,9 +101,10 @@ html, body {
   overflow-x: hidden;
   overscroll-behavior-x: none; /* 좌우 오버스크롤 차단 */
   overscroll-behavior-y: contain; /* 세로는 컨테이너 내에서만 */
-  position: fixed;
+  /* position: fixed; 이 줄을 제거하거나 주석 처리 */
   width: 100%;
-  height: 100%;
+  /* height: 100%; 이 줄도 제거하거나 주석 처리 */
+  min-height: 100vh; /* 대신 min-height 사용 */
 }
 
 /* iOS Safari 고무줄 효과 차단 */
