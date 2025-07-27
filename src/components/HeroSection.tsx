@@ -28,7 +28,7 @@ const HeroSection: React.FC = () => {
           AI가 만드는 똑똑한 반려생활, Mung-Ai
         </h1>
         <p className="max-w-3xl text-lg md:text-xl text-slate-200 mb-8">
-          더 이상 추측하지 마세요. 데이터와 전문가의 지식으로<br/>당신의 반려 생활을 가장 완벽한 순간으로 만듭니다.
+          AI와 함께<br/>당신의 반려 생활을 가장 완벽한 순간으로 만듭니다.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link to="/app">
