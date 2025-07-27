@@ -13,12 +13,24 @@ const MainLayoutV2: React.FC<MainLayoutProps> = ({ children }) => {
     display: 'flex',
     flexDirection: 'column',
     minHeight: '100dvh',
-    backgroundColor: '#F9FAFB', // bg-gray-50
+    backgroundColor: '#F9FAFB',
+    overflowX: 'hidden',
+    width: '100%',
+    maxWidth: '100vw',
+    position: 'fixed', // 고정 위치로 설정
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   };
 
   const mainStyle: React.CSSProperties = {
     flex: 1,
-    paddingBottom: '5rem', // pb-20
+    paddingBottom: '5rem',
+    overflowX: 'hidden',
+    overflowY: 'auto', // 세로 스크롤만 허용
+    width: '100%',
+    WebkitOverflowScrolling: 'touch', // iOS 부드러운 스크롤
   };
 
   return (
