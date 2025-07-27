@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
 import { BrainCircuit, Dog, Sparkles, BookOpenCheck } from 'lucide-react';
 
 const features = [
@@ -10,7 +9,7 @@ const features = [
     id: 1,
     title: 'AI 견종 분석 & 추천',
     description:
-      '나의 라이프스타일, 성향과 환경에 완벽하게 맞는 견종을 AI가 과학적으로 분석하고 추천합니다.',
+      '나의 라이프스타일, 성향과 환경에 완벽하게 맞는 견종을 AI가 과학적으로 분석하고 추천합니다. 더 이상 잘못된 정보에 의존하지 마세요. 데이터가 운명의 파트너를 찾아드립니다.',
     Icon: Dog,
     image_path: '/features/1.png',
   },
@@ -18,7 +17,7 @@ const features = [
     id: 2,
     title: 'AI 행동 및 심리 분석',
     description:
-      '최신 Ai 기술로 반려견의 관절 움직임까지 감지하는 AI가 행동의 숨은 의미를 정확히 해석합니다. 강아지의 내면의 성향을 파악하고 더 깊은 유대감을 형성하세요.',
+      'YOLOv8 기술로 반려견의 관절 움직임까지 감지하는 AI가 행동의 숨은 의미를 정확히 해석합니다. 강아지 MBTI 테스트로 내면의 성향을 파악하고 더 깊은 유대감을 형성하세요.',
     Icon: BrainCircuit,
     image_path: '/features/2.png',
   },
@@ -41,20 +40,11 @@ const features = [
 ];
 
 const FeatureSection = ({ feature, index }) => {
-  const { ref, inView } = useInView({
-    triggerOnce: true, // 한 번만 애니메이션 실행
-    threshold: 0.2, // 20% 보였을 때 실행
-  });
-
   const variants = {
     hidden: { opacity: 0, y: 50 },
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: {
-        duration: 0.8,
-        ease: [0.43, 0.13, 0.23, 0.96] // 부드러운 ease-out 곡선
-      }
     }
   };
 
@@ -62,20 +52,11 @@ const FeatureSection = ({ feature, index }) => {
 
   return (
     <motion.div
-      ref={ref}
       initial="hidden"
-      animate={inView ? "visible" : "hidden"}
-      variants={{
-        hidden: { opacity: 0, y: 50 },
-        visible: { 
-          opacity: 1, 
-          y: 0,
-          transition: {
-            duration: 0.8,
-            ease: "easeOut"
-          }
-        }
-      }}
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.25 }} // 25% 보였을 때 한 번만 실행
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      variants={variants}
       className={`grid md:grid-cols-2 gap-12 md:gap-16 items-center`}
     >
       <div className={`rounded-2xl overflow-hidden shadow-lg aspect-[4/3] ${isReversed ? 'md:order-last' : ''}`}>
@@ -107,15 +88,17 @@ export const DetailedFeatureIntroduction = () => {
           <motion.h2 
             className="text-4xl md:text-5xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700"
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
-            Mung-Ai, AI로 완성하는 반려 생활
+            Pet-Life, AI로 완성하는 반려 생활
           </motion.h2>
           <motion.p 
             className="mt-4 text-lg text-slate-600 max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.2 }}
           >
             단순 정보 제공을 넘어, AI 기술로 당신의 반려 생활에 실질적인 도움을 드립니다.
