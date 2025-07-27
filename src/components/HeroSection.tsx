@@ -25,10 +25,10 @@ const HeroSection: React.FC = () => {
         transition={{ duration: 0.8, ease: "easeInOut" }}
       >
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4">
-          AI가 만드는 똑똑한 반려생활, Mung-Ai
+          AI와 함께하는 반려생활, Mung-Ai
         </h1>
-        <p className="max-w-3xl text-lg md:text-xl text-slate-200 mb-8">
-          AI와 함께<br/>당신의 반려 생활을 가장 완벽한 순간으로 만듭니다.
+        <p className="max-w-3xl text-lg md:text-xl text-slate-200 mb-8 break-keep">
+          AI와 함께 당신의 반려 생활을 가장 완벽한 순간으로 만듭니다.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link to="/app">
