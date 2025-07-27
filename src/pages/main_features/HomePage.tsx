@@ -22,7 +22,7 @@ const HomePage: React.FC = () => {
       <motion.div
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.1 }} // amount를 0.3에서 0.1로 변경
         variants={{
           hidden: { opacity: 0, y: 50 },
           visible: { 
@@ -41,7 +41,7 @@ const HomePage: React.FC = () => {
       <motion.div
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.1 }} // amount를 0.3에서 0.1로 변경
         variants={{
           hidden: { opacity: 0, y: 50 },
           visible: { 
@@ -60,7 +60,7 @@ const HomePage: React.FC = () => {
       <motion.div
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.1 }} // amount를 0.3에서 0.1로 변경
         variants={{
           hidden: { opacity: 0, y: 50 },
           visible: { 
