@@ -12,6 +12,7 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 from postgrest.exceptions import APIError
 import cv2
+from urllib.parse import urljoin  # 이것도 상단으로 이동
 
 # .env 파일 로드
 load_dotenv()
@@ -77,8 +78,9 @@ def calculate_metrics_from_keypoints(keypoints):
 def read_root():
     return {"message": "AI 관절 추적 API 서버 V3에 오신 것을 환영합니다!"}
 
+# 첫 번째 @app.post("/api/process-video") 함수 삭제 (79-130번째 줄)
+# 두 번째 함수만 유지 (135번째 줄부터)
 
-# --- 3. API 엔드포인트 수정 ---
 @app.post("/api/process-video")
 async def process_video(
     request: Request,
@@ -136,15 +138,17 @@ async def process_video(
         # 4. 핵심 지표 계산
         analysis_results = calculate_metrics_from_keypoints(results)
 
-        # 5. 완전한 URL 생성 (단순화)
-        base_url = str(request.base_url).rstrip('/')
-        # 실제 저장 경로에서 서빙 기본 경로를 기준으로 상대 경로 계산
+        # 5. 완전한 URL 생성 (수정된 버전)
+        base_url = str(request.base_url).rstrip('/')  # 끝의 / 제거
         relative_path = os.path.relpath(final_mp4_path, PROCESSED_DIR)
-        processed_video_url = f"{base_url}{STATIC_ROUTE.lstrip('/')}/{relative_path}"
+        # Windows 경로(\)를 URL 경로(/)로 변경
+        relative_path_for_url = relative_path.replace(os.path.sep, '/')
+        
+        # 올바른 URL 조합
+        processed_video_url = f"{base_url}{STATIC_ROUTE}/{relative_path_for_url}"
         
         logger.info(f"영상 처리 완료. 최종 결과 URL: {processed_video_url}")
-
-        # 6. DB 저장 로직
+    # 6. DB 저장 로직
         try:
             baseline_check = supabase.table('joint_analysis_records').select('id', count='exact').eq('dog_id', dog_id).eq('is_baseline', True).execute()
             is_first_analysis = baseline_check.count == 0
