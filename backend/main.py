@@ -98,11 +98,13 @@ async def process_video(
         yolo_save_dir = os.path.join(PROCESSED_DIR, "results")
         logger.info(f"YOLO 결과를 '{yolo_save_dir}'에 저장합니다.")
         
+    
+        # 수정된 코드만 사용
         results = model.predict(
             source=upload_path,
             save=True,
-            project=yolo_save_dir,
-            name="video",
+            project=PROCESSED_DIR,  # /code/processed
+            name="results",  # results 폴더에 직접 저장
             exist_ok=True
         )
         
