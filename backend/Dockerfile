@@ -1,8 +1,11 @@
 # Python 3.9 버전을 기반으로 환경을 구성합니다.
 FROM python:3.9
 
-# OpenCV 실행에 필요한 시스템 라이브러리를 설치합니다.
-RUN apt-get update && apt-get install -y libgl1-mesa-glx
+# OpenCV 및 비디오 처리에 필요한 시스템 라이브러리를 설치합니다.
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    ffmpeg \
+    libx264-dev
 
 # 작업 디렉토리를 /code 로 설정합니다.
 WORKDIR /code
