@@ -48,7 +48,9 @@ os.makedirs(PROCESSED_DIR, exist_ok=True)
 app.mount(f"/{PROCESSED_DIR}", StaticFiles(directory=PROCESSED_DIR), name="processed-videos")
 
 # YOLO 모델 로드
-MODEL_PATH = "best.pt"
+# 현재 파일의 위치를 기준으로 절대 경로 생성
+current_dir = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(current_dir, "models", "best.pt")
 model = YOLO(MODEL_PATH)
 
 # 업로드 폴더 생성
@@ -194,5 +196,5 @@ async def process_video(
             os.remove(processed_avi_path)
 
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+# if __name__ == "__main__":
+#     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

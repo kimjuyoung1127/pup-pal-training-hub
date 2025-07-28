@@ -7,4 +7,5 @@ torchvision
 supabase
 python-dotenv
 numpy
-moviepy
+gunicorn
+opencv-python-headless
