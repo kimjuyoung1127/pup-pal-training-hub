@@ -1,5 +1,5 @@
 from fastapi import FastAPI, File, UploadFile, Request, Form
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import uvicorn
@@ -12,7 +12,8 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 from postgrest.exceptions import APIError
 import cv2
-from urllib.parse import urljoin  # 이것도 상단으로 이동
+from urllib.parse import urljoin
+from pathlib import Path
 
 # .env 파일 로드
 load_dotenv()
@@ -56,12 +57,45 @@ STATIC_ROUTE = "/processed"
 os.makedirs(PROCESSED_DIR, exist_ok=True)
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# 정적 파일 서빙: URL 경로를 실제 파일 시스템 경로에 매핑
-app.mount(STATIC_ROUTE, StaticFiles(directory=PROCESSED_DIR), name="processed-videos")
-logger.info(f"✅ 정적 파일 마운트: URL '{STATIC_ROUTE}' -> 디렉토리 '{PROCESSED_DIR}'")
+# 기존 정적 파일 마운트 제거 (또는 주석 처리)
+# app.mount(STATIC_ROUTE, StaticFiles(directory=PROCESSED_DIR), name="processed-videos")
+# logger.info(f"✅ 정적 파일 마운트: URL '{STATIC_ROUTE}' -> 디렉토리 '{PROCESSED_DIR}'")
 
 # YOLO 모델 로드
 model = YOLO(MODEL_PATH)
+
+# 직접 파일 서빙 엔드포인트 추가
+@app.get("/video/{filename}")
+async def serve_video(filename: str):
+    """직접 비디오 파일 서빙"""
+    try:
+        # 파일명 검증 (보안을 위해)
+        if not filename.endswith('.mp4'):
+            return JSONResponse(status_code=400, content={"message": "Invalid file format"})
+        
+        # 디렉토리 탈출 공격 방지
+        safe_filename = os.path.basename(filename)
+        
+        # 파일 경로 구성
+        file_path = os.path.join(PROCESSED_DIR, "results", safe_filename)
+        
+        # 파일 존재 여부 확인
+        if not os.path.exists(file_path):
+            logger.error(f"파일을 찾을 수 없습니다: {file_path}")
+            return JSONResponse(status_code=404, content={"message": "File not found"})
+        
+        logger.info(f"비디오 파일 서빙: {file_path}")
+        
+        # FileResponse로 파일 반환
+        return FileResponse(
+            path=file_path,
+            media_type="video/mp4",
+            filename=safe_filename
+        )
+        
+    except Exception as e:
+        logger.error(f"파일 서빙 오류: {e}")
+        return JSONResponse(status_code=500, content={"message": "Internal server error"})
 
 # --- 2. 핵심 지표 계산 함수 (시뮬레이션) ---
 def calculate_metrics_from_keypoints(keypoints):
@@ -140,19 +174,15 @@ async def process_video(
         # 4. 핵심 지표 계산
         analysis_results = calculate_metrics_from_keypoints(results)
 
-        # 5. 완전한 URL 생성 (수정된 버전)
+        # 5. 완전한 URL 생성 (직접 파일 서빙 방식으로 수정)
         base_url = str(request.base_url).rstrip('/')
-        # PROCESSED_DIR 기준으로 상대 경로 계산
-        relative_path = os.path.relpath(final_mp4_path, PROCESSED_DIR)
-        # Windows 경로(\)를 URL 경로(/)로 변경
-        relative_path_for_url = relative_path.replace(os.path.sep, '/')
         
-        # 올바른 URL 조합
-        processed_video_url = f"{base_url}{STATIC_ROUTE}/{relative_path_for_url}"
+        # 직접 파일 서빙 엔드포인트 사용
+        processed_video_url = f"{base_url}/video/{final_mp4_filename}"
         
         logger.info(f"영상 처리 완료. 최종 결과 URL: {processed_video_url}")
         logger.info(f"파일 실제 경로: {final_mp4_path}")
-        logger.info(f"상대 경로: {relative_path_for_url}")
+        logger.info(f"파일명: {final_mp4_filename}")
         
         # 6. DB 저장 로직
         try:
