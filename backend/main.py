@@ -149,27 +149,62 @@ async def process_video(
         # YOLO가 생성한 파일 경로 (video 폴더 안에 있음)
         processed_avi_path = os.path.join(actual_save_dir, file.filename)
         
-        # 3. MP4로 변환
+        # 3. MP4로 변환 (오류 처리 강화)
         base_filename = os.path.splitext(file.filename)[0]
         final_mp4_filename = f"{base_filename}.mp4"
         final_mp4_path = os.path.join(actual_save_dir, final_mp4_filename)
-    
-        cap = cv2.VideoCapture(processed_avi_path)
-        fourcc = cv2.VideoWriter_fourcc(*'avc1') 
-        fps = cap.get(cv2.CAP_PROP_FPS)
-        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    
-        out = cv2.VideoWriter(final_mp4_path, fourcc, fps, (width, height))
-    
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            out.write(frame)
-    
-        cap.release()
-        out.release()
+        
+        try:
+            # 원본 AVI 파일 존재 확인
+            if not os.path.exists(processed_avi_path):
+                logger.error(f"YOLO 처리된 AVI 파일을 찾을 수 없습니다: {processed_avi_path}")
+                raise Exception("YOLO 처리 파일이 생성되지 않았습니다")
+            
+            cap = cv2.VideoCapture(processed_avi_path)
+            if not cap.isOpened():
+                logger.error(f"비디오 파일을 열 수 없습니다: {processed_avi_path}")
+                raise Exception("비디오 파일 읽기 실패")
+                
+            fourcc = cv2.VideoWriter_fourcc(*'avc1') 
+            fps = cap.get(cv2.CAP_PROP_FPS)
+            width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        
+            out = cv2.VideoWriter(final_mp4_path, fourcc, fps, (width, height))
+            if not out.isOpened():
+                logger.error(f"MP4 파일 생성 실패: {final_mp4_path}")
+                cap.release()
+                raise Exception("MP4 파일 생성 실패")
+        
+            frame_count = 0
+            while True:
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                out.write(frame)
+                frame_count += 1
+        
+            cap.release()
+            out.release()
+            
+            # MP4 파일 생성 확인
+            if not os.path.exists(final_mp4_path):
+                logger.error(f"MP4 파일이 생성되지 않았습니다: {final_mp4_path}")
+                raise Exception("MP4 변환 실패")
+                
+            file_size = os.path.getsize(final_mp4_path)
+            if file_size == 0:
+                logger.error(f"MP4 파일이 비어있습니다: {final_mp4_path}")
+                raise Exception("MP4 파일이 비어있음")
+                
+            logger.info(f"MP4 변환 성공: {final_mp4_path} (크기: {file_size} bytes, 프레임: {frame_count})")
+            
+        except Exception as e:
+            logger.error(f"MP4 변환 중 오류 발생: {e}")
+            # 임시 파일 정리
+            if os.path.exists(temp_file_path):
+                os.remove(temp_file_path)
+            raise Exception(f"비디오 변환 실패: {e}")
 
         # 4. 핵심 지표 계산
         analysis_results = calculate_metrics_from_keypoints(results)
@@ -222,6 +257,11 @@ async def process_video(
         )
     finally:
         # 임시 파일들 정리
+        # 디버깅 정보 추가
+        logger.info(f"YOLO 결과 디렉토리 내용: {os.listdir(actual_save_dir) if os.path.exists(actual_save_dir) else '디렉토리 없음'}")
+        logger.info(f"AVI 파일 존재 여부: {os.path.exists(processed_avi_path)}")
+        if os.path.exists(processed_avi_path):
+            logger.info(f"AVI 파일 크기: {os.path.getsize(processed_avi_path)} bytes")
         if upload_path and os.path.exists(upload_path):
             os.remove(upload_path)
         if processed_avi_path and os.path.exists(processed_avi_path):
