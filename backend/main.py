@@ -78,9 +78,6 @@ def calculate_metrics_from_keypoints(keypoints):
 def read_root():
     return {"message": "AI 관절 추적 API 서버 V3에 오신 것을 환영합니다!"}
 
-# 첫 번째 @app.post("/api/process-video") 함수 삭제 (79-130번째 줄)
-# 두 번째 함수만 유지 (135번째 줄부터)
-
 @app.post("/api/process-video")
 async def process_video(
     request: Request,
@@ -97,7 +94,7 @@ async def process_video(
         with open(upload_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        # 2. 모델 예측 실행 (저장 경로를 명확히 지정)
+        # 2. 모델 예측 실행
         yolo_save_dir = os.path.join(PROCESSED_DIR, "results")
         logger.info(f"YOLO 결과를 '{yolo_save_dir}'에 저장합니다.")
         
@@ -105,12 +102,15 @@ async def process_video(
             source=upload_path,
             save=True,
             project=yolo_save_dir,
-            name="video", # 항상 'video'라는 하위 폴더에 저장되도록 고정
+            name="video",
             exist_ok=True
         )
         
-        # predict가 생성한 최종 폴더 경로 (e.g., /code/processed/results/video)
+        # 실제 저장된 폴더 경로 확인
         actual_save_dir = results[0].save_dir
+        logger.info(f"실제 저장 경로: {actual_save_dir}")
+        
+        # YOLO가 생성한 파일 경로 (video 폴더 안에 있음)
         processed_avi_path = os.path.join(actual_save_dir, file.filename)
         
         # 3. MP4로 변환
@@ -139,7 +139,8 @@ async def process_video(
         analysis_results = calculate_metrics_from_keypoints(results)
 
         # 5. 완전한 URL 생성 (수정된 버전)
-        base_url = str(request.base_url).rstrip('/')  # 끝의 / 제거
+        base_url = str(request.base_url).rstrip('/')
+        # PROCESSED_DIR 기준으로 상대 경로 계산
         relative_path = os.path.relpath(final_mp4_path, PROCESSED_DIR)
         # Windows 경로(\)를 URL 경로(/)로 변경
         relative_path_for_url = relative_path.replace(os.path.sep, '/')
@@ -148,7 +149,10 @@ async def process_video(
         processed_video_url = f"{base_url}{STATIC_ROUTE}/{relative_path_for_url}"
         
         logger.info(f"영상 처리 완료. 최종 결과 URL: {processed_video_url}")
-    # 6. DB 저장 로직
+        logger.info(f"파일 실제 경로: {final_mp4_path}")
+        logger.info(f"상대 경로: {relative_path_for_url}")
+        
+        # 6. DB 저장 로직
         try:
             baseline_check = supabase.table('joint_analysis_records').select('id', count='exact').eq('dog_id', dog_id).eq('is_baseline', True).execute()
             is_first_analysis = baseline_check.count == 0
