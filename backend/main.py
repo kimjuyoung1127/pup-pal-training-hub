@@ -132,25 +132,40 @@ async def process_video(
         yolo_save_dir = os.path.join(PROCESSED_DIR, "results")
         logger.info(f"YOLO 결과를 '{yolo_save_dir}'에 저장합니다.")
         
-    
         # 수정된 코드만 사용
         results = model.predict(
             source=upload_path,
             save=True,
             project=PROCESSED_DIR,  # /code/processed
             name="results",  # results 폴더에 직접 저장
-            exist_ok=True
+            exist_ok=True,
+            verbose=False  # 로그 출력 줄이기
         )
         
         # 실제 저장된 폴더 경로 확인
         actual_save_dir = results[0].save_dir
         logger.info(f"실제 저장 경로: {actual_save_dir}")
         
-        # YOLO가 생성한 파일 경로 (video 폴더 안에 있음)
-        processed_avi_path = os.path.join(actual_save_dir, file.filename)
+        # 디렉토리 내용 확인 및 실제 파일 찾기
+        if os.path.exists(actual_save_dir):
+            dir_contents = os.listdir(actual_save_dir)
+            logger.info(f"YOLO 결과 디렉토리 내용: {dir_contents}")
+            
+            # 실제 생성된 파일 찾기
+            avi_files = [f for f in dir_contents if f.endswith('.avi')]
+            if avi_files:
+                actual_avi_filename = avi_files[0]
+                processed_avi_path = os.path.join(actual_save_dir, actual_avi_filename)
+                logger.info(f"실제 AVI 파일: {processed_avi_path}")
+            else:
+                logger.error(f"AVI 파일을 찾을 수 없습니다. 디렉토리 내용: {dir_contents}")
+                raise Exception("YOLO 처리 결과 파일이 생성되지 않았습니다")
+        else:
+            logger.error(f"결과 디렉토리가 존재하지 않습니다: {actual_save_dir}")
+            raise Exception("YOLO 결과 디렉토리가 생성되지 않았습니다")
         
         # 3. MP4로 변환 (오류 처리 강화)
-        base_filename = os.path.splitext(file.filename)[0]
+        base_filename = os.path.splitext(actual_avi_filename)[0]  # 실제 파일명 사용
         final_mp4_filename = f"{base_filename}.mp4"
         final_mp4_path = os.path.join(actual_save_dir, final_mp4_filename)
         
@@ -201,9 +216,9 @@ async def process_video(
             
         except Exception as e:
             logger.error(f"MP4 변환 중 오류 발생: {e}")
-            # 임시 파일 정리
-            if os.path.exists(temp_file_path):
-                os.remove(temp_file_path)
+            # 임시 파일 정리 (upload_path 사용)
+            if upload_path and os.path.exists(upload_path):
+                os.remove(upload_path)
             raise Exception(f"비디오 변환 실패: {e}")
 
         # 4. 핵심 지표 계산
