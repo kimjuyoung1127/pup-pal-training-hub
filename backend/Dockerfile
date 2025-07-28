@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     libx264-dev
 
-# 작업 디렉토리를 /code 로 설정합니다.
+
 WORKDIR /code
 
 # requirements.txt 파일을 먼저 복사하여 라이브러리를 설치합니다.
