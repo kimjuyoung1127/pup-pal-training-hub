@@ -88,7 +88,7 @@ const PostureAnalysisPage = () => {
     formData.append('dog_id', selectedDogId);
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const API_URL = import.meta.env.VITE_API_URL || 'https://juyoungkim-dogpose.hf.space';
       
       const response = await axios.post(`${API_URL}/api/process-video`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
