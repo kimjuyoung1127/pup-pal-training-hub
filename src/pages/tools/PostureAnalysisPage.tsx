@@ -57,7 +57,8 @@ export default function PostureAnalysisPage() {
 
     try {
       // ★★★ 새로운 백엔드 엔드포인트 호출
-      const response = await fetch('http://127.0.0.1:8000/api/process-video-client-render', {
+      const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/process-video-client-render`;
+      const response = await fetch(apiUrl, {
         method: 'POST',
         body: formData,
       });
