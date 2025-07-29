@@ -87,9 +87,9 @@ def analyze_video_in_background(job_id: str, video_path: str):
         jobs[job_id]['status'] = 'failed'
         jobs[job_id]['error'] = str(e)
     finally:
-        # 분석이 끝난 원본 비디오 파일 삭제 (선택 사항)
-        if os.path.exists(video_path):
-            os.remove(video_path)
+        # 참고: 원본 비디오 파일은 사용자가 결과를 확인할 수 있도록 삭제하지 않습니다.
+        # 주기적으로 오래된 파일을 정리하는 별도의 로직을 추후에 추가할 수 있습니다.
+        logger.info(f"작업 {job_id}의 백그라운드 처리가 종료되었습니다.")
 
 
 @app.get("/")
