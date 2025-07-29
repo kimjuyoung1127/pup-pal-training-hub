@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Terminal, Video, Loader2, History, Dog } from "lucide-react"; // Dog 아이콘 추가
+import { Terminal, Video, Loader2, History, Dog, BarChart } from "lucide-react"; // Dog 아이콘 추가
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Select 컴포넌트 추가
 import { useUser } from '@supabase/auth-helpers-react'; // 사용자 정보를 가져오기 위한 훅
 import { useUserDogs } from '@/pages/history/useUserDogs'; // 강아지 목록을 가져오기 위한 훅
