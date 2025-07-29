@@ -2,15 +2,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { JointAnalysisRecord } from '@/types/analysis';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Video, BadgeCheck } from 'lucide-react';
+import { Calendar, Award, Share2, Eye } from 'lucide-react';
 
 interface JointAnalysisHistoryListProps {
   records: JointAnalysisRecord[];
+  onShare: (record: JointAnalysisRecord) => void;
+  onDetailView: (record: JointAnalysisRecord) => void;
 }
 
-const JointAnalysisHistoryList: React.FC<JointAnalysisHistoryListProps> = ({ records }) => {
+const JointAnalysisHistoryList: React.FC<JointAnalysisHistoryListProps> = ({ records, onShare, onDetailView }) => {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -35,34 +37,29 @@ const JointAnalysisHistoryList: React.FC<JointAnalysisHistoryListProps> = ({ rec
     >
       {records.map((record) => (
         <motion.div key={record.id} variants={itemVariants}>
-          <Card>
+          <Card className="hover:shadow-md transition-shadow duration-200">
             <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex-grow">
-                <div className="flex items-center mb-2">
-                  <p className="font-semibold text-lg">{new Date(record.created_at).toLocaleString('ko-KR')}</p>
-                  {record.is_baseline && (
-                    <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      <BadgeCheck className="w-3 h-3 mr-1" />
-                      기준점
-                    </span>
-                  )}
+                <div className="flex items-center text-sm text-gray-500 mb-2">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  <span>{new Date(record.created_at).toLocaleString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                 </div>
-                <p className="text-sm text-gray-500 truncate" title={record.original_video_filename}>
-                  원본 영상: {record.original_video_filename}
-                </p>
-                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-                  <span><strong>안정성:</strong> {record.analysis_results?.scores?.stability}점</span>
-                  {/* <span><strong>대칭성:</strong> {record.analysis_results.symmetry}%</span>
-                  <span><strong>보폭:</strong> {record.analysis_results.stride_length}cm</span> */}
+                <div className="flex items-center font-semibold text-lg">
+                  <Award className="w-5 h-5 mr-2 text-amber-600" />
+                  <span>안정��� 점수: {record.stability_score?.toFixed(1) ?? 'N/A'}점</span>
                 </div>
               </div>
-              <a href={record.processed_video_url} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                <Button variant="outline" className="w-full">
-                  <Video className="w-4 h-4 mr-2" />
-                  결과 영상 보기
-                </Button>
-              </a>
             </CardContent>
+            <CardFooter className="bg-gray-50/50 p-3 flex justify-end items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => onShare(record)}>
+                <Share2 className="w-4 h-4 mr-2" />
+                공유
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => onDetailView(record)}>
+                <Eye className="w-4 h-4 mr-2" />
+                상세 보기
+              </Button>
+            </CardFooter>
           </Card>
         </motion.div>
       ))}

@@ -13,12 +13,29 @@ import EmptyJointAnalysisHistory from '@/components/posture-analysis-history/Emp
 import JointAnalysisHistoryList from '@/components/posture-analysis-history/JointAnalysisHistoryList';
 import LatestAnalysisResultCard from './LatestAnalysisResultCard';
 import { JointAnalysisRecord } from '@/types/analysis';
+import AnalysisDetailModal from './AnalysisDetailModal';
 
 const PostureAnalysisHistoryPage: React.FC = () => {
   const navigate = useNavigate();
   const { data: dogs, isLoading: isLoadingDogs, isError: isErrorDogs } = useUserDogs();
   
   const [activeDogId, setActiveDogId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<JointAnalysisRecord | null>(null);
+
+  const handleOpenModal = (record: JointAnalysisRecord) => {
+    setSelectedRecord(record);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedRecord(null);
+  };
+
+  const handleShare = (record: JointAnalysisRecord) => {
+    alert(`공유 기능 구현 예정 (ID: ${record.id})`);
+  };
 
   // dogs 데이터가 로드되면, activeDogId를 첫 번째 강아지로 설정
   useEffect(() => {
@@ -75,7 +92,7 @@ const PostureAnalysisHistoryPage: React.FC = () => {
               <Sparkles className="w-6 h-6 mr-3 text-yellow-500" />
               최신 분석 결과
             </h2>
-            <LatestAnalysisResultCard record={latestResult} />
+            <LatestAnalysisResultCard record={latestResult} onViewDetail={handleOpenModal} />
           </div>
         )}
         
@@ -85,7 +102,7 @@ const PostureAnalysisHistoryPage: React.FC = () => {
               <History className="w-6 h-6 mr-3 text-gray-500" />
               과거 기록
             </h2>
-            <JointAnalysisHistoryList records={pastHistory} />
+            <JointAnalysisHistoryList records={pastHistory} onDetailView={handleOpenModal} onShare={handleShare} />
           </div>
         )}
       </>
@@ -148,6 +165,12 @@ const PostureAnalysisHistoryPage: React.FC = () => {
           </Tabs>
         )}
       </motion.div>
+
+      <AnalysisDetailModal 
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        record={selectedRecord}
+      />
     </>
   );
 };

@@ -11,15 +11,14 @@ import { Badge } from '@/components/ui/badge';
 
 interface LatestAnalysisResultCardProps {
   record: JointAnalysisRecord;
+  onViewDetail: (record: JointAnalysisRecord) => void;
 }
 
-const LatestAnalysisResultCard: React.FC<LatestAnalysisResultCardProps> = ({ record }) => {
+const LatestAnalysisResultCard: React.FC<LatestAnalysisResultCardProps> = ({ record, onViewDetail }) => {
   const navigate = useNavigate();
 
-  const handleNavigateToDetail = () => {
-    // 상세 페이지 구현 시 아래 경로로 이동
-    // navigate(`/app/history/${record.id}`);
-    alert(`상세보기 기능 구현 예정 (ID: ${record.id})`);
+  const handleViewDetail = () => {
+    onViewDetail(record);
   };
 
   const formattedDate = new Date(record.created_at).toLocaleDateString('ko-KR', {
@@ -73,7 +72,7 @@ const LatestAnalysisResultCard: React.FC<LatestAnalysisResultCardProps> = ({ rec
           </p>
         </CardContent>
         <CardFooter className="bg-gray-50 p-4 flex justify-end">
-          <Button onClick={handleNavigateToDetail}>
+          <Button onClick={handleViewDetail}>
             <Video className="w-4 h-4 mr-2" />
             자세히 보기
           </Button>
