@@ -9,13 +9,29 @@ from ultralytics import YOLO
 import logging
 import uuid
 import cv2
+import numpy as np
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
+from supabase import create_client, Client
+from dotenv import load_dotenv
+
+# --- 환경 변수 로드 ---
+load_dotenv()
 
 # --- 기본 설정 ---
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 app = FastAPI()
+
+# --- Supabase 클라이언트 초기화 ---
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    logger.warning("Supabase 환경 변수가 설정되지 않았습니다. DB 연동 기능이 비활성화됩니다.")
+    supabase: Client | None = None
+else:
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # --- 경로 설정 ---
 BASE_DIR = Path(__file__).resolve().parent
@@ -42,9 +58,52 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # --- 모델 및 작업 상태 저장소 ---
 model = YOLO(MODEL_PATH)
-# 경고: 이 방식은 서버 재시작 시 모든 작업 내역이 사라���는 한계가 있습니다.
-# 실제 프로덕션에서는 Redis나 DB를 사용하여 작업 상태를 영구적으로 저장해야 합니다.
 jobs: Dict[str, Dict] = {}
+
+# --- 안정성 점수 계산 함수 ---
+def calculate_stability_score(keypoints_data: List[List[List[List[float]]]]) -> int:
+    """
+    관절 좌표 데이터의 표준편차를 기반으로 안정성 점수를 계산합니다.
+    점수가 높을수록 안정적입니다.
+    """
+    if not keypoints_data:
+        return 0
+
+    # 몸의 중심을 나타내는 주요 관절 인덱스 (YOLO 17-point model 기준)
+    # 5: l_shoulder, 6: r_shoulder, 11: l_hip, 12: r_hip
+    core_joint_indices = [5, 6, 11, 12]
+    
+    all_core_joint_positions = []
+
+    for frame_keypoints in keypoints_data:
+        if not frame_keypoints: continue
+        # 첫 번째 감지된 객체(강아지)만 사용
+        dog_keypoints = frame_keypoints[0]
+        
+        frame_core_positions = []
+        for idx in core_joint_indices:
+            if idx < len(dog_keypoints) and dog_keypoints[idx]:
+                frame_core_positions.append(dog_keypoints[idx])
+        
+        if frame_core_positions:
+            # 프레임 내 핵심 관절들의 평균 위치
+            avg_position_in_frame = np.mean(frame_core_positions, axis=0)
+            all_core_joint_positions.append(avg_position_in_frame)
+
+    if not all_core_joint_positions:
+        return 0
+
+    # 모든 프레임에 걸친 평균 위치의 표준편차 계산
+    std_dev = np.std(all_core_joint_positions, axis=0)
+    
+    # 흔들림 정도 (x, y 표준편차의 평균)
+    shake_magnitude = np.mean(std_dev)
+
+    # 점수화 (100점 만점, 흔들림이 클수록 점수 하락)
+    # 가중치는 실험을 통해 조정 가능
+    score = max(0, 100 - (shake_magnitude * 5))
+    
+    return int(score)
 
 # --- 실제 분석 및 저장 로직 ---
 def analyze_video_in_background(job_id: str, video_path: str, user_id: str, dog_id: str, original_filename: str):
@@ -55,7 +114,7 @@ def analyze_video_in_background(job_id: str, video_path: str, user_id: str, dog_
         # 1. 비디오 분석
         cap = cv2.VideoCapture(video_path)
         if not cap.isOpened():
-            raise Exception("업로드된 비디오 파일을 열 수 없습니다.")
+            raise Exception("업로드된 비디오 파일을 열 수 없��니다.")
         fps = cap.get(cv2.CAP_PROP_FPS)
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         cap.release()
@@ -101,16 +160,14 @@ def analyze_video_in_background(job_id: str, video_path: str, user_id: str, dog_
                     "original_video_filename": original_filename,
                     "processed_video_url": jobs[job_id]['original_video_url'],
                     "analysis_results": analysis_results_json,
-                    "notes": f"Stability Score: {stability_score}" # 예시 노트
+                    "notes": f"Stability Score: {stability_score}"
                 }
                 
                 supabase.table('joint_analysis_records').insert(record_to_insert).execute()
-                logger.info(f"작업 {job_id}의 ���석 결과를 Supabase에 저장했습니다.")
+                logger.info(f"작업 {job_id}의 분석 결과를 Supabase에 저장했습니다.")
 
             except Exception as db_error:
                 logger.error(f"Supabase 저장 실패: {db_error}", exc_info=True)
-                # DB 저장이 실패해도 작업 자체는 성공으로 간주할 수 있음
-                # 또는 jobs[job_id]['status'] = 'db_failed' 와 같이 별도 상태 관리 가능
 
         jobs[job_id]['status'] = 'completed'
         logger.info(f"작업 {job_id} 완료.")
