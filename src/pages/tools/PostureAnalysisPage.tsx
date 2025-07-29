@@ -1,224 +1,232 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
-import { Database } from '@/integrations/supabase/types';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { UploadCloud, Video, AlertCircle, CheckCircle, BarChart, History } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal, Video } from "lucide-react";
 
-type Dog = Database['public']['Tables']['dogs']['Row'];
+// YOLO 모델의 스켈레톤 연결 정보 (ultralytics/cfg/datasets/dog-pose.yaml 참고)
+// 0-based index로 변환하여 사용합니다. (YAML 파일의 1-based index - 1)
+const SKELETON = [
+  [15, 13], [13, 11], [16, 14], [14, 12], [11, 12], [5, 11], [6, 12], [5, 6],
+  [5, 7], [6, 8], [7, 9], [8, 10], [1, 2], [0, 1], [0, 2], [1, 3], [2, 4], [3, 5], [4, 6]
+];
+const POINT_COLOR = "#f59e0b"; // 관절 포인트 색상 (Amber 500)
+const LINE_COLOR = "#84cc16"; // 스켈레톤 라인 색상 (Lime 500)
 
-interface AnalysisResult {
-  stability: number;
-  symmetry: number;
-  stride_length: number;
-}
-
-const PostureAnalysisPage = () => {
-  const { session } = useAuth();
-  const user = session?.user;
-  const navigate = useNavigate();
-
-  const [dogs, setDogs] = useState<Dog[]>([]);
-  const [selectedDogId, setSelectedDogId] = useState<string>('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
-  const [statusMessage, setStatusMessage] = useState<string>('');
+export default function PostureAnalysisPage() {
+  const [file, setFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
 
-  const [processedVideoUrl, setProcessedVideoUrl] = useState<string | null>(null);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
-  const [isBaseline, setIsBaseline] = useState<boolean>(false);
+  // 서버로부터 받을 데이�����
+  const [analysisResult, setAnalysisResult] = useState<{
+    original_video_url: string;
+    keypoints_data: number[][][][]; // [frame][person][point][xy]
+    fps: number;
+  } | null>(null);
 
-  // 사용자의 강아지 목록 불러오기
-  useEffect(() => {
-    const fetchDogs = async () => {
-      if (!user) return;
-      const { data, error } = await supabase
-        .from('dogs')
-        .select('*')
-        .eq('user_id', user.id);
-      
-      if (error) {
-        console.error('Error fetching dogs:', error);
-        setError('강아지 목록을 불러오는 데 실패했습니다.');
-      } else {
-        setDogs(data || []);
-      }
-    };
-    fetchDogs();
-  }, [user]);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationFrameId = useRef<number>();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (!file.type.startsWith('video/')) {
-        setError('비디오 파일만 업로드할 수 있습니다. (mp4, mov 등)');
-        return;
-      }
-      setSelectedFile(file);
-      // 새 파일 선택 시 이전 결과 초기화
-      setProcessedVideoUrl(null);
-      setAnalysisResult(null);
+    if (event.target.files && event.target.files[0]) {
+      setFile(event.target.files[0]);
+      setAnalysisResult(null); // 새 파일 선택 시 이전 결과 초기화
       setError(null);
     }
   };
 
-  const handleSubmit = async () => {
-    if (!selectedFile || !selectedDogId || !user) {
-      setError('분석할 강아지와 비디오 파일을 모두 선택해주세요.');
+  const handleAnalyzeClick = async () => {
+    if (!file) {
+      setError("분석할 동영상 파일을 선택해주세요.");
       return;
     }
 
     setIsLoading(true);
     setError(null);
-    setUploadProgress(0);
-    setStatusMessage('영상 업로드 준비 중...');
+    setProgress(0);
 
     const formData = new FormData();
-    formData.append('file', selectedFile);
-    formData.append('user_id', user.id);
-    formData.append('dog_id', selectedDogId);
+    formData.append('file', file);
+    // 실제 앱에서는 로그인된 사용자 정보 등을 사용해야 합니다.
+    formData.append('user_id', 'test-user-id');
+    formData.append('dog_id', 'test-dog-id');
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'https://juyoungkim-dogpose.hf.space';
-      
-      const response = await axios.post(`${API_URL}/api/process-video`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        onUploadProgress: (progressEvent) => {
-          const percent = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
-          setUploadProgress(percent);
-          if (percent < 100) {
-            setStatusMessage(`영상 업로드 중... ${percent}%`);
-          } else {
-            setStatusMessage('서버에서 영상을 분석 중입니다. 잠시만 기다려주세요...');
-          }
-        },
+      // ★★★ 새로운 백엔드 엔드포인트 호출
+      const response = await fetch('http://127.0.0.1:8000/api/process-video-client-render', {
+        method: 'POST',
+        body: formData,
       });
+      
+      // 간단한 프로그레스 시뮬레이션
+      setProgress(50);
 
-      if (response.status === 200 && response.data) {
-        setProcessedVideoUrl(response.data.processed_video_url);
-        setAnalysisResult(response.data.analysis_results);
-        setIsBaseline(response.data.is_baseline);
-      } else {
-        setError('영상 처리 중 오류가 발생했습니다.');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || '분석에 실패했습니다.');
       }
-    } catch (err) {
-      console.error('API Error:', err);
-      setError('서버와 통신하는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
+
+      const data = await response.json();
+      setAnalysisResult(data);
+      setProgress(100);
+
+    } catch (err: any) {
+      setError(err.message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const renderResult = () => (
-    <Card className="mt-8 bg-green-50 border-green-200">
-      <CardHeader>
-        <CardTitle className="flex items-center text-2xl text-green-800">
-          <CheckCircle className="w-8 h-8 mr-3" />
-          분석 완료!
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4 text-center p-6">
-        <p className="text-green-700">
-          AI 자세 분석이 성공적으로 완료되었습니다.
-          <br />
-          상세 결과 페이지에서 모든 기록과 변화를 확인해보세요.
-        </p>
-        <Button 
-          onClick={() => navigate('/app/posture-analysis-history')}
-          className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
-        >
-            <History className="w-4 h-4 mr-2" />
-            자세한 결과 보기
-        </Button>
-      </CardContent>
-    </Card>
-  );
+  // ★★★★★ 핵심: 비디오 재생에 맞춰 캔버스에 그림을 그리는 로직
+  useEffect(() => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    
+    if (!video || !canvas || !analysisResult) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const drawSkeletons = () => {
+      if (video.paused || video.ended) return;
+
+      // 캔버스 초기화
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 현재 비디오 시간으로 프레임 인덱스 계산
+      const currentFrameIndex = Math.floor(video.currentTime * analysisResult.fps);
+      if (currentFrameIndex >= analysisResult.keypoints_data.length) {
+        return;
+      }
+
+      const frameKeypoints = analysisResult.keypoints_data[currentFrameIndex];
+      if (!frameKeypoints || frameKeypoints.length === 0) return;
+
+      // 비디오의 실제 크기와 캔버스 크기를 맞춤 (한 번만 설정)
+      if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+      }
+
+      // 각 객체(강아지)의 스켈레톤 그리기
+      frameKeypoints.forEach((dogKeypoints: number[][]) => {
+        // 1. 관절 포인트(점) 그리기
+        dogKeypoints.forEach(point => {
+          const [x, y] = point;
+          ctx.beginPath();
+          ctx.arc(x, y, 5, 0, 2 * Math.PI);
+          ctx.fillStyle = POINT_COLOR;
+          ctx.fill();
+        });
+
+        // 2. 스켈레톤(선) 그리기
+        SKELETON.forEach(pair => {
+          const [startIdx, endIdx] = pair;
+          const startPoint = dogKeypoints[startIdx];
+          const endPoint = dogKeypoints[endIdx];
+
+          if (startPoint && endPoint && startPoint.length > 0 && endPoint.length > 0) {
+            ctx.beginPath();
+            ctx.moveTo(startPoint[0], startPoint[1]);
+            ctx.lineTo(endPoint[0], endPoint[1]);
+            ctx.strokeStyle = LINE_COLOR;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+          }
+        });
+      });
+    };
+
+    const renderLoop = () => {
+      drawSkeletons();
+      animationFrameId.current = requestAnimationFrame(renderLoop);
+    };
+
+    const startRenderLoop = () => {
+        cancelAnimationFrame(animationFrameId.current!);
+        renderLoop();
+    }
+    
+    const stopRenderLoop = () => {
+        cancelAnimationFrame(animationFrameId.current!);
+    }
+
+    video.addEventListener('play', startRenderLoop);
+    video.addEventListener('playing', startRenderLoop);
+    video.addEventListener('seeked', drawSkeletons); // 탐색 후 바로 그리기
+    video.addEventListener('pause', stopRenderLoop);
+    video.addEventListener('ended', stopRenderLoop);
+    
+    // 컴포넌트 언마운트 시 이벤트 리스너 정리
+    return () => {
+      video.removeEventListener('play', startRenderLoop);
+      video.removeEventListener('playing', startRenderLoop);
+      video.removeEventListener('seeked', drawSkeletons);
+      video.removeEventListener('pause', stopRenderLoop);
+      video.removeEventListener('ended', stopRenderLoop);
+      cancelAnimationFrame(animationFrameId.current!);
+    };
+
+  }, [analysisResult]);
 
   return (
-    <div className="container mx-auto p-4 md:p-8 max-w-4xl">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">AI 자세 분석</h1>
-        <p className="text-gray-600 mt-2">
-          강아지의 걷는 영상을 업로드하여 자세를 분석하고, 변화를 추적하여 건강을 관리하세요.
+    <div className="container mx-auto p-4 max-w-4xl">
+      <div className="flex flex-col items-center text-center mb-8">
+        <h1 className="text-4xl font-bold tracking-tight">AI 강아지 자세 분석</h1>
+        <p className="mt-2 text-lg text-muted-foreground">
+          동영상을 업로드하여 AI가 강아지의 관절 움직임을 실시간으로 분석하는 것을 확인해보세요.
         </p>
       </div>
 
-      <Card>
-        <CardContent className="p-6 space-y-6">
-          {/* 1. 강아지 선택 */}
-          <div className="space-y-2">
-            <label htmlFor="dog-select" className="font-semibold">1. 분석할 강아지 선택</label>
-            <Select onValueChange={setSelectedDogId} value={selectedDogId} disabled={isLoading}>
-              <SelectTrigger id="dog-select">
-                <SelectValue placeholder="강아지를 선택해주세요" />
-              </SelectTrigger>
-              <SelectContent>
-                {dogs.map((dog) => (
-                  <SelectItem key={dog.id} value={dog.id.toString()}>{dog.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+      <div className="bg-card border rounded-lg p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <div className="flex-grow w-full">
+            <Input 
+              type="file" 
+              accept="video/mp4,video/quicktime,video/x-msvideo" 
+              onChange={handleFileChange} 
+              className="cursor-pointer"
+            />
           </div>
-
-          {/* 2. 영상 업로드 */}
-          <div className="space-y-2">
-            <label className="font-semibold">2. 분석할 영상 업로드</label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-              <UploadCloud className="mx-auto h-12 w-12 text-gray-400" />
-              <input
-                type="file"
-                id="video-upload"
-                className="hidden"
-                accept="video/*"
-                onChange={handleFileChange}
-                disabled={isLoading}
-              />
-              <label htmlFor="video-upload" className={`mt-4 font-semibold ${isLoading ? 'text-gray-500' : 'text-blue-600 cursor-pointer hover:underline'}`}>
-                영상 파일 선택하기
-              </label>
-              {selectedFile && <p className="text-sm text-gray-500 mt-2">{selectedFile.name}</p>}
-            </div>
-          </div>
-
-          {/* 3. 분석 시작 */}
-          <Button
-            onClick={handleSubmit}
-            disabled={!selectedFile || !selectedDogId || isLoading}
-            className="w-full text-lg py-6"
-          >
-            <BarChart className="w-5 h-5 mr-2" />
-            {isLoading ? '분석 중...' : '분석 시작하기'}
+          <Button onClick={handleAnalyzeClick} disabled={isLoading || !file} className="w-full sm:w-auto">
+            <Video className="mr-2 h-4 w-4" />
+            {isLoading ? '분석 중...' : '자세 분석 시작'}
           </Button>
-        </CardContent>
-      </Card>
+        </div>
 
-      {isLoading && (
-        <div className="mt-8 space-y-2">
-          <Progress value={uploadProgress} className="w-full" />
-          <p className="text-center text-gray-600">{statusMessage}</p>
+        {isLoading && <Progress value={progress} className="w-full mt-4" />}
+        {error && (
+          <Alert variant="destructive" className="mt-4">
+            <Terminal className="h-4 w-4" />
+            <AlertTitle>오류가 발생했습니다</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+      </div>
+
+      {analysisResult && (
+        <div className="mt-8">
+          <h2 className="text-2xl font-semibold mb-4 text-center">분석 결과</h2>
+          <div className="relative w-full max-w-2xl mx-auto border rounded-lg overflow-hidden">
+            <video
+              ref={videoRef}
+              src={analysisResult.original_video_url}
+              controls
+              playsInline
+              crossOrigin="anonymous" // CORS 이슈 방지
+              className="w-full h-auto aspect-video"
+            />
+            <canvas
+              ref={canvasRef}
+              className="absolute top-0 left-0 w-full h-full pointer-events-none"
+            />
+          </div>
         </div>
       )}
-
-      {error && (
-        <Alert variant="destructive" className="mt-8">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>오류 발생</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {processedVideoUrl && analysisResult && !isLoading && renderResult()}
     </div>
   );
-};
-
-export default PostureAnalysisPage;
+}
