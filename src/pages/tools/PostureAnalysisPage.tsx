@@ -1,9 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Terminal, Video, Loader2 } from "lucide-react";
+import { Terminal, Video, Loader2, History, Dog } from "lucide-react"; // Dog 아이콘 추가
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Select 컴포넌트 추가
+import { useUser } from '@supabase/auth-helpers-react'; // 사용자 정보를 가져오기 위한 훅
+import { useUserDogs } from '@/pages/history/useUserDogs'; // 강아지 목록을 가져오기 위한 훅
 
 // --- 상수 정의 ---
 const SKELETON = [
@@ -19,9 +23,15 @@ type JobStatus = 'idle' | 'uploading' | 'processing' | 'completed' | 'failed';
 type AnalysisResult = {
   keypoints_data: number[][][][];
   fps: number;
+  stability_score: number; // 점수 필드 추가
 };
 
 export default function PostureAnalysisPage() {
+  // --- 사용자 및 강아지 정보 ---
+  const user = useUser();
+  const { data: dogs, isLoading: isLoadingDogs } = useUserDogs();
+  const [selectedDogId, setSelectedDogId] = useState<string | null>(null);
+
   // --- 상태 관리 ---
   const [file, setFile] = useState<File | null>(null);
   const [jobId, setJobId] = useState<string | null>(null);
@@ -36,8 +46,15 @@ export default function PostureAnalysisPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameId = useRef<number>();
   const pollingTimer = useRef<NodeJS.Timeout>();
+  const navigate = useNavigate();
 
-  // --- 핸들러 함수 (이전과 동일) ---
+  // 강아지 목록이 로드되면 첫 번째 강아지를 자동으로 선택
+  useEffect(() => {
+    if (dogs && dogs.length > 0 && !selectedDogId) {
+      setSelectedDogId(dogs[0].id);
+    }
+  }, [dogs, selectedDogId]);
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setFile(event.target.files[0]);
@@ -51,17 +68,42 @@ export default function PostureAnalysisPage() {
     }
   };
 
+  const handleGoToHistory = () => {
+    if (analysisResult && videoUrl) {
+      const resultToStore = {
+        analysisResult,
+        videoUrl,
+        analyzedAt: new Date().toISOString(),
+      };
+      localStorage.setItem('latestPostureAnalysis', JSON.stringify(resultToStore));
+      navigate('/app/posture-analysis-history');
+    } else {
+      setError("분석 결과가 없어 기록 페이지로 이동할 수 없습니다.");
+    }
+  };
+
   const handleAnalyzeClick = async () => {
     if (!file) {
       setError("분석할 동영상 파일을 선택해주세요.");
       return;
     }
+    if (!user) {
+      setError("로그인이 필요합니다.");
+      return;
+    }
+    if (!selectedDogId) {
+      setError("분석할 강아지를 선택해주세요.");
+      return;
+    }
+
     setStatus('uploading');
     setError(null);
     setProgress(0);
 
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('user_id', user.id);
+    formData.append('dog_id', selectedDogId);
 
     try {
       const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/jobs`;
@@ -167,7 +209,7 @@ export default function PostureAnalysisPage() {
           const transformedY = originalY * scale + offsetY;
           
           ctx.beginPath();
-          ctx.arc(transformedX, transformedY, 5, 0, 2 * Math.PI);
+          ctx.arc(transformedX, transformedY, 3, 0, 2 * Math.PI); // 점 반지름 수정 (5 -> 3)
           ctx.fillStyle = POINT_COLOR;
           ctx.fill();
         });
@@ -187,7 +229,7 @@ export default function PostureAnalysisPage() {
             ctx.moveTo(transformedStartX, transformedStartY);
             ctx.lineTo(transformedEndX, transformedEndY);
             ctx.strokeStyle = LINE_COLOR;
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 2; // 선 두께 수정 (3 -> 2)
             ctx.stroke();
           }
         });
@@ -238,13 +280,47 @@ export default function PostureAnalysisPage() {
       </div>
 
       <div className="bg-card border rounded-lg p-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row items-center gap-4">
-          <div className="flex-grow w-full">
-            <Input type="file" accept="video/*" onChange={handleFileChange} disabled={status === 'processing' || status === 'uploading'} />
+        <div className="space-y-4">
+          <div>
+            <label className="font-semibold text-sm mb-2 block"><Dog className="inline-block mr-2 h-4 w-4" />분석할 강아지 선택</label>
+            <Select onValueChange={setSelectedDogId} value={selectedDogId || ''} disabled={isLoadingDogs || !dogs || dogs.length === 0}>
+              <SelectTrigger>
+                <SelectValue placeholder={isLoadingDogs ? "강아지 목록을 불러오는 중..." : "강아지를 선택해주세요"} />
+              </SelectTrigger>
+              <SelectContent>
+                {dogs && dogs.map(dog => (
+                  <SelectItem key={dog.id} value={dog.id}>{dog.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {!isLoadingDogs && (!dogs || dogs.length === 0) && (
+              <p className="text-xs text-muted-foreground mt-1">
+                등록된 강아지가 없습니다. 먼저 강아지를 등록해주세요.
+              </p>
+            )}
           </div>
-          <Button onClick={handleAnalyzeClick} disabled={!file || status === 'processing' || status === 'uploading'} className="w-full sm:w-auto">
-            {status === 'idle' && <Video className="mr-2 h-4 w-4" />}
-            {(status === 'processing' || status === 'uploading') && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+
+          <div>
+            <label className="font-semibold text-sm mb-2 block"><Video className="inline-block mr-2 h-4 w-4" />분석할 동영상 업로드</label>
+            <Input 
+              type="file" 
+              accept="video/*" 
+              onChange={handleFileChange} 
+              disabled={status === 'processing' || status === 'uploading'} 
+            />
+          </div>
+          
+          <Button 
+            onClick={handleAnalyzeClick} 
+            disabled={!file || !selectedDogId || status === 'processing' || status === 'uploading'} 
+            className="w-full"
+          >
+            {(status === 'processing' || status === 'uploading') ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <BarChart className="mr-2 h-4 w-4" />
+            )}
+            
             {status === 'idle' && '자세 분석 시작'}
             {status === 'uploading' && '업로드 중...'}
             {status === 'processing' && '분석 중...'}
@@ -277,6 +353,12 @@ export default function PostureAnalysisPage() {
           <div className="relative w-full max-w-2xl mx-auto border rounded-lg overflow-hidden">
             <video ref={videoRef} src={videoUrl} controls playsInline crossOrigin="anonymous" className="w-full h-auto aspect-video" />
             <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
+          </div>
+          <div className="text-center mt-4">
+            <Button onClick={handleGoToHistory}>
+              <History className="mr-2 h-4 w-4" />
+              결과 저장 및 기록 보기
+            </Button>
           </div>
         </div>
       )}

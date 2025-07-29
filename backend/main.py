@@ -46,12 +46,13 @@ model = YOLO(MODEL_PATH)
 # 실제 프로덕션에서는 Redis나 DB를 사용하여 작업 상태를 영구적으로 저장해야 합니다.
 jobs: Dict[str, Dict] = {}
 
-# --- 실제 분석을 수행하는 함수 ---
-def analyze_video_in_background(job_id: str, video_path: str):
-    """백그라운드에서 비디오 분석을 수행하고 jobs 딕셔너리를 업데이트합니다."""
+# --- 실제 분석 및 저장 로직 ---
+def analyze_video_in_background(job_id: str, video_path: str, user_id: str, dog_id: str, original_filename: str):
+    """백그라운드에서 비디오 분석, 점수 계산, DB 저장을 수행합니다."""
     try:
         jobs[job_id]['status'] = 'processing'
         
+        # 1. 비디오 분석
         cap = cv2.VideoCapture(video_path)
         if not cap.isOpened():
             raise Exception("업로드된 비디오 파일을 열 수 없습니다.")
@@ -71,15 +72,47 @@ def analyze_video_in_background(job_id: str, video_path: str):
                 keypoints_data.append([])
             
             processed_frames += 1
-            # 진행률 업데이트
             jobs[job_id]['progress'] = int((processed_frames / total_frames) * 100)
 
-        # 최종 결과 저장
-        jobs[job_id]['status'] = 'completed'
-        jobs[job_id]['result'] = {
+        # 2. 안정성 점수 계산
+        stability_score = calculate_stability_score(keypoints_data)
+
+        # 3. 최종 결과 구성
+        analysis_results_json = {
             "keypoints_data": keypoints_data,
-            "fps": fps
+            "fps": fps,
+            "stability_score": stability_score
         }
+        
+        jobs[job_id]['result'] = analysis_results_json
+        
+        # 4. Supabase에 저장
+        if supabase:
+            try:
+                # 4-1. 이 강아지의 첫 분석인지 확인 (is_baseline)
+                count_res = supabase.table('joint_analysis_records').select('id', count='exact').eq('dog_id', dog_id).execute()
+                is_baseline = count_res.count == 0
+
+                # 4-2. 저장할 데이터 준비
+                record_to_insert = {
+                    "user_id": user_id,
+                    "dog_id": dog_id,
+                    "is_baseline": is_baseline,
+                    "original_video_filename": original_filename,
+                    "processed_video_url": jobs[job_id]['original_video_url'],
+                    "analysis_results": analysis_results_json,
+                    "notes": f"Stability Score: {stability_score}" # 예시 노트
+                }
+                
+                supabase.table('joint_analysis_records').insert(record_to_insert).execute()
+                logger.info(f"작업 {job_id}의 ���석 결과를 Supabase에 저장했습니다.")
+
+            except Exception as db_error:
+                logger.error(f"Supabase 저장 실패: {db_error}", exc_info=True)
+                # DB 저장이 실패해도 작업 자체는 성공으로 간주할 수 있음
+                # 또는 jobs[job_id]['status'] = 'db_failed' 와 같이 별도 상태 관리 가능
+
+        jobs[job_id]['status'] = 'completed'
         logger.info(f"작업 {job_id} 완료.")
 
     except Exception as e:
@@ -87,31 +120,29 @@ def analyze_video_in_background(job_id: str, video_path: str):
         jobs[job_id]['status'] = 'failed'
         jobs[job_id]['error'] = str(e)
     finally:
-        # 참고: 원본 비디오 파일은 사용자가 결과를 확인할 수 있도록 삭제하지 않습니다.
-        # 주기적으로 오래된 파일을 정리하는 별도의 로직을 추후에 추가할 수 있습니다.
         logger.info(f"작업 {job_id}의 백그라운드 처리가 종료되었습니다.")
 
 
 @app.get("/")
 def read_root():
-    return {"message": "AI 관절 추적 API 서버 V5 (비동기 작업 아키텍처)"}
+    return {"message": "AI 관절 추적 API 서버 V6 (DB 저장 및 점수화 기능 추가)"}
 
 # --- 1. 작업 생성 엔드포인트 ---
 @app.post("/api/jobs")
 async def create_analysis_job(
     request: Request,
     background_tasks: BackgroundTasks,
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    user_id: str = Form(...),
+    dog_id: str = Form(...)
 ):
     job_id = str(uuid.uuid4())
     unique_filename = f"{job_id}_{file.filename}"
     upload_path = os.path.join(UPLOAD_DIR, unique_filename)
 
-    # 파일 저장
     with open(upload_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # 작업 초기 상태 설정
     scheme = request.headers.get("x-forwarded-proto", "https")
     host = request.headers.get("host", request.url.netloc)
     base_url = f"{scheme}://{host}"
@@ -120,15 +151,15 @@ async def create_analysis_job(
     jobs[job_id] = {
         'status': 'pending',
         'progress': 0,
-        'original_video_url': original_video_url
+        'original_video_url': original_video_url,
+        'user_id': user_id,
+        'dog_id': dog_id
     }
 
-    # 백그라운드에서 실제 분석 작업 시작
-    background_tasks.add_task(analyze_video_in_background, job_id, upload_path)
+    background_tasks.add_task(analyze_video_in_background, job_id, upload_path, user_id, dog_id, file.filename)
 
-    # 즉시 작업 ID와 상태 확인 URL 반환
     return JSONResponse(
-        status_code=202, # 202 Accepted: 요청이 접수되었으며, 처리는 나중에 될 것임
+        status_code=202,
         content={
             "message": "영상 분석 작업이 시작되었습니다.",
             "job_id": job_id,
