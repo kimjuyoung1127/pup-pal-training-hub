@@ -72,10 +72,6 @@ const LatestAnalysisResultCard: React.FC<LatestAnalysisResultCardProps> = ({ rec
           </p>
         </CardContent>
         <CardFooter className="bg-gray-50 p-4 flex justify-end">
-          <Button onClick={handleViewDetail}>
-            <Video className="w-4 h-4 mr-2" />
-            자세히 보기
-          </Button>
         </CardFooter>
       </Card>
     </motion.div>
