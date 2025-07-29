@@ -12,7 +12,7 @@ const SKELETON = [
 ];
 const POINT_COLOR = "#f59e0b";
 const LINE_COLOR = "#84cc16";
-const POLLING_INTERVAL = 2000; // 2초마다 상태 확인
+const POLLING_INTERVAL = 2000;
 
 // --- 타입 정의 ---
 type JobStatus = 'idle' | 'uploading' | 'processing' | 'completed' | 'failed';
@@ -34,13 +34,13 @@ export default function PostureAnalysisPage() {
   // --- Ref 관리 ---
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationFrameId = useRef<number>();
   const pollingTimer = useRef<NodeJS.Timeout>();
 
   // --- 핸들러 함수 ---
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setFile(event.target.files[0]);
-      // 모든 상태 초기화
       setJobId(null);
       setStatus('idle');
       setProgress(0);
@@ -74,7 +74,7 @@ export default function PostureAnalysisPage() {
 
       const data = await response.json();
       setJobId(data.job_id);
-      setStatus('processing'); // 상태를 'processing'으로 변경하여 폴링 시작
+      setStatus('processing');
     } catch (err: any) {
       setError(err.message);
       setStatus('failed');
@@ -84,7 +84,6 @@ export default function PostureAnalysisPage() {
   // --- 폴링 로직 ---
   const pollJobStatus = useCallback(async () => {
     if (!jobId) return;
-
     try {
       const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/jobs/${jobId}`;
       const response = await fetch(apiUrl);
@@ -104,7 +103,6 @@ export default function PostureAnalysisPage() {
         setError(data.error || '알 수 없는 오류로 분석에 실패했습니다.');
         clearTimeout(pollingTimer.current);
       } else {
-        // 계속 ���링
         pollingTimer.current = setTimeout(pollJobStatus, POLLING_INTERVAL);
       }
     } catch (err: any) {
@@ -116,31 +114,97 @@ export default function PostureAnalysisPage() {
 
   useEffect(() => {
     if (status === 'processing') {
-      // 즉시 한 번 호출하고, 그 뒤로 타이머 설정
       pollJobStatus();
     }
-    // 컴포넌트 언마운트 시 타이머 정리
     return () => clearTimeout(pollingTimer.current);
   }, [status, pollJobStatus]);
 
-
-  // --- 캔버스 렌더링 로직 ---
+  // ★★★★★ 최종 수정: 비어있던 캔버스 렌더링 로직을 완벽하게 복원 ★★★★★
   useEffect(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas || !analysisResult) return;
-    // (이전과 동일한 렌더링 로직)
-    // ...
-  }, [analysisResult]);
 
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const drawSkeletons = () => {
+      if (video.paused || video.ended) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const currentFrameIndex = Math.floor(video.currentTime * analysisResult.fps);
+      if (currentFrameIndex >= analysisResult.keypoints_data.length) return;
+
+      const frameKeypoints = analysisResult.keypoints_data[currentFrameIndex];
+      if (!frameKeypoints || frameKeypoints.length === 0) return;
+
+      if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+      }
+
+      frameKeypoints.forEach((dogKeypoints: number[][]) => {
+        dogKeypoints.forEach(point => {
+          const [x, y] = point;
+          ctx.beginPath();
+          ctx.arc(x, y, 5, 0, 2 * Math.PI);
+          ctx.fillStyle = POINT_COLOR;
+          ctx.fill();
+        });
+
+        SKELETON.forEach(pair => {
+          const [startIdx, endIdx] = pair;
+          const startPoint = dogKeypoints[startIdx];
+          const endPoint = dogKeypoints[endIdx];
+          if (startPoint && endPoint && startPoint.length > 0 && endPoint.length > 0) {
+            ctx.beginPath();
+            ctx.moveTo(startPoint[0], startPoint[1]);
+            ctx.lineTo(endPoint[0], endPoint[1]);
+            ctx.strokeStyle = LINE_COLOR;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+          }
+        });
+      });
+    };
+
+    const renderLoop = () => {
+      drawSkeletons();
+      animationFrameId.current = requestAnimationFrame(renderLoop);
+    };
+
+    const startRenderLoop = () => {
+      cancelAnimationFrame(animationFrameId.current!);
+      renderLoop();
+    };
+    
+    const stopRenderLoop = () => {
+      cancelAnimationFrame(animationFrameId.current!);
+    };
+
+    video.addEventListener('play', startRenderLoop);
+    video.addEventListener('playing', startRenderLoop);
+    video.addEventListener('seeked', drawSkeletons);
+    video.addEventListener('pause', stopRenderLoop);
+    video.addEventListener('ended', stopRenderLoop);
+    
+    return () => {
+      video.removeEventListener('play', startRenderLoop);
+      video.removeEventListener('playing', startRenderLoop);
+      video.removeEventListener('seeked', drawSkeletons);
+      video.removeEventListener('pause', stopRenderLoop);
+      video.removeEventListener('ended', stopRenderLoop);
+      cancelAnimationFrame(animationFrameId.current!);
+    };
+  }, [analysisResult]);
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      {/* (UI 부분은 이전과 거의 동일, 상태에 따른 메시지만 변경) */}
       <div className="flex flex-col items-center text-center mb-8">
         <h1 className="text-4xl font-bold tracking-tight">AI 강아지 자세 분석 (비동기)</h1>
         <p className="mt-2 text-lg text-muted-foreground">
-          대용량 영상도 안정적으로! AI가 강아지의 관절 움직임을 분석하는 ���안 다른 작업을 하실 수 있습니다.
+          대용량 영상도 안정적으로! AI가 강아지의 관절 움직임을 분석하는 동안 다른 작업을 하실 수 있습니다.
         </p>
       </div>
 
