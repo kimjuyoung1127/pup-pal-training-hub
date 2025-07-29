@@ -15,7 +15,9 @@ export interface AnalysisRecord {
     stability: number;
     symmetry: number;
     stride_length: number;
+    stride_width: number;
   };
+  notes: string;
 }
 
 const fetchJointAnalysisHistory = async (dogId: string | undefined, userId: string | undefined) => {
@@ -25,7 +27,7 @@ const fetchJointAnalysisHistory = async (dogId: string | undefined, userId: stri
 
   const { data, error } = await supabase
     .from('joint_analysis_records')
-    .select('*')
+    .select('id, created_at, dog_name, original_video_filename, processed_video_url, analysis_results, notes')
     .eq('user_id', userId)
     .eq('dog_id', dogId)
     .order('created_at', { ascending: false });
