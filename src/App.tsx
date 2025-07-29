@@ -45,6 +45,8 @@ import CommunityPage from './pages/community/CommunityPage';
 import PostDetailPage from './pages/community/PostDetailPage';
 
 import PostEditorPage from './pages/community/PostEditorPage';
+import { SessionContextProvider } from '@supabase/auth-helpers-react';
+import { supabase } from './integrations/supabase/client';
 
 
 const App = () => (
@@ -85,8 +87,12 @@ const App = () => (
                 <Route path="/chat" element={<GeminiChatPage />} /> {/* 추가: GeminiChatPage 경로 */}
                 <Route path="/training/videos" element={<TrainingVideosPage />} />
                 
-                {/* Mungai 핵심 기능은 /app 경로 하위에 위치 */}
-                <Route path="/app/*" element={<Index />} />
+                {/* Mungai 핵심 기능은 /app 경로 하위에 위치하며, 이 부분만 인증 컨텍스트로 감쌉니다. */}
+                <Route path="/app/*" element={
+                  <SessionContextProvider supabaseClient={supabase}>
+                    <Index />
+                  </SessionContextProvider>
+                } />
 
                 {/* 기타 독립적인 페이지들 */}
                 <Route path="/privacy" element={<PrivacyPolicyPage />} />
