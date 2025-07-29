@@ -122,10 +122,15 @@ async def process_video_client_render(
                 keypoints_data.append([])
         logger.info(f"총 {frame_count} 프레임에서 키포인트 추출 완료")
 
-        # 5. 클라이언트가 접근할 원본 비디오 URL 생성
-        base_url = str(request.base_url).rstrip('/')
+        # 5. 클라이언트가 접근할 원본 비디오 URL 생성 (HTTPS 강제)
+        # Hugging Face Spaces와 같은 리버스 프록시 환경에서는 'x-forwarded-proto' 헤더를
+        # 확인하여 실제 프로토콜(https)을 결정해야 Mixed Content 오류를 방지할 수 있습니다.
+        scheme = request.headers.get("x-forwarded-proto", request.url.scheme)
+        host = request.headers.get("host", request.url.netloc)
+        base_url = f"{scheme}://{host}"
+
         original_video_url = f"{base_url}/uploads/{unique_filename}"
-        logger.info(f"생성된 원본 비디오 URL: {original_video_url}")
+        logger.info(f"생성된 원본 비디오 URL (HTTPS 적용): {original_video_url}")
 
         # 6. DB 저장 로직 (옵션, 여기서는 생략)
         # 필요하다면 여기에 Supabase 저장 로직을 추가할 수 있습니다.

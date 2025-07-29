@@ -30,3 +30,5 @@ dist-ssr
 
 # Supabase local development files (if any)
 supabase/.temp/
+
+
