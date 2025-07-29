@@ -1,47 +1,34 @@
-from fastapi import FastAPI, File, UploadFile, Request, Form
+from fastapi import FastAPI, File, UploadFile, Request, Form, BackgroundTasks, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles # StaticFiles를 사용합니다.
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 import os
 import shutil
 from ultralytics import YOLO
 import logging
-import uuid # 고유 ID 생성을 위해 추가
-import cv2 # FPS 정보를 얻기 위해 필요
-from pathlib import Path # 경로 관리를 위해 추가
-from supabase import create_client, Client
-from dotenv import load_dotenv
+import uuid
+import cv2
+from pathlib import Path
+from typing import Dict
 
-# .env 파일 로드
-load_dotenv()
-
-# --- Supabase 클라이언트 설정 ---
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY")
-
-if not SUPABASE_URL or not SUPABASE_KEY:
-    raise ValueError("Supabase URL 또는 Service Key가 .env 파일에 설정되지 않았습니다.")
-
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-
-
-# 로깅 설정
+# --- 기본 설정 ---
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# FastAPI 앱 생성
 app = FastAPI()
 
-# CORS 미들웨어 추가
-# 허용할 출처 목록 - 실제 운영 및 개발 환경을 명시적으로 지정합니다.
-origins = [
-    "https://mungai.co.kr",      # 실제 운영 도메인
-    "http://localhost:5173",     # Vite 로컬 개발 환경
-    "http://localhost:3000",     # Create React App 로컬 개발 환경
-    "http://127.0.0.1:8000",    # 백엔드 자체 접속 (필요시)
-]
+# --- 경로 설정 ---
+BASE_DIR = Path(__file__).resolve().parent
+UPLOAD_DIR = BASE_DIR / "uploads"
+MODEL_PATH = BASE_DIR / "models" / "best.pt"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+# --- CORS 설정 ---
+origins = [
+    "https://mungai.co.kr",
+    "http://localhost:5173",
+    "http://localhost:3000",
+]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -50,116 +37,125 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- 경로 설정 ---
-# 스크립트가 실행되는 위치를 기준으로 경로를 설정하여 환경 독립적으로 만듭니다.
-BASE_DIR = Path(__file__).resolve().parent
-UPLOAD_DIR = BASE_DIR / "uploads"
-MODEL_PATH = BASE_DIR / "models" / "best.pt"
-
-# 폴더 생성
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-# 'uploads' 디렉토리를 정적 파일로 제공하기 위한 설정
-# 클라이언트가 원본 비디오에 접근할 수 있도록 URL 경로를 만들어줍니다.
+# --- 정적 파일 마운트 ---
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
-logger.info(f"✅ 정적 파일 마운트: URL '/uploads' -> 디렉토리 '{UPLOAD_DIR}'")
 
-
-# YOLO 모델 로드
+# --- 모델 및 작업 상태 저장소 ---
 model = YOLO(MODEL_PATH)
+# 경고: 이 방식은 서버 재시작 시 모든 작업 내역이 사라���는 한계가 있습니다.
+# 실제 프로덕션에서는 Redis나 DB를 사용하여 작업 상태를 영구적으로 저장해야 합니다.
+jobs: Dict[str, Dict] = {}
 
-@app.get("/")
-def read_root():
-    return {"message": "AI 관절 추적 API 서버 V4 (클라이언트 렌더링)에 오신 것을 환영합니다!"}
-
-
-# 기존 process_video 엔드포인트는 비활성화하거나 삭제할 수 있습니다.
-# 여기서는 새로운 엔드포인트를 추가합니다.
-@app.post("/api/process-video-client-render")
-async def process_video_client_render(
-    request: Request,
-    file: UploadFile = File(...),
-    user_id: str = Form(...),
-    dog_id: str = Form(...)
-):
-    # 1. 업로드된 비디오에 고유 이름 부여���고 저장
-    # 파일명 충돌을 방지하고 URL을 예측 가능하게 만듭니다.
-    unique_filename = f"{uuid.uuid4()}_{file.filename}"
-    upload_path = os.path.join(UPLOAD_DIR, unique_filename)
-
+# --- 실제 분석을 수행하는 함수 ---
+def analyze_video_in_background(job_id: str, video_path: str):
+    """백그라운드에서 비디오 분석을 수행하고 jobs 딕셔너리를 업데이트합니다."""
     try:
-        with open(upload_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        logger.info(f"파일 저장 완료: {upload_path}")
-
-        # 2. 비디오의 FPS(초당 프레임 수) 정보 얻기
-        cap = cv2.VideoCapture(upload_path)
+        jobs[job_id]['status'] = 'processing'
+        
+        cap = cv2.VideoCapture(video_path)
         if not cap.isOpened():
-            logger.error(f"업로드된 비디오 파일을 열 수 없습니다: {upload_path}")
             raise Exception("업로드된 비디오 파일을 열 수 없습니다.")
         fps = cap.get(cv2.CAP_PROP_FPS)
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         cap.release()
-        logger.info(f"비디오 정보 확인: FPS={fps}")
 
-        # 3. 모델 예측 실행 (★★★★★ 중요: 비디오 저장 옵션 끄기)
-        # save=False: 서버에 결과 비디오를 저장하지 않습니다.
-        # stream=True: 큰 비디오 파일의 메모리 사용량을 최적화합니다.
-        results = model.predict(source=upload_path, save=False, stream=True, verbose=False)
-        logger.info("YOLO 모델 예측 실행 완료")
+        results = model.predict(source=video_path, save=False, stream=True, verbose=False)
 
-        # 4. 결과에서 관절 좌표 데이터 추출
         keypoints_data = []
-        frame_count = 0
+        processed_frames = 0
         for r in results:
-            frame_count += 1
-            # r.keypoints가 존재하고, 데이터가 있을 경우에만 처리
             if r.keypoints and r.keypoints.xy.numel() > 0:
-                # .cpu().numpy()로 데이터를 파이썬 리스트로 변환
                 keypoints_for_frame = r.keypoints.xy.cpu().numpy().tolist()
                 keypoints_data.append(keypoints_for_frame)
             else:
-                # 키포인트가 없는 프레임은 빈 리스트 추가
                 keypoints_data.append([])
-        logger.info(f"총 {frame_count} 프레임에서 키포인트 추출 완료")
+            
+            processed_frames += 1
+            # 진행률 업데이트
+            jobs[job_id]['progress'] = int((processed_frames / total_frames) * 100)
 
-        # 5. 클라이언트가 접근할 원본 비디오 URL 생성 (HTTPS 강제)
-        # Hugging Face Spaces와 같은 리버스 프록시 환경에서는 'x-forwarded-proto' 헤더를
-        # 확인하여 실제 프로토콜(https)을 결정해야 Mixed Content 오류를 방지할 수 있습니다.
-        scheme = request.headers.get("x-forwarded-proto", request.url.scheme)
-        host = request.headers.get("host", request.url.netloc)
-        base_url = f"{scheme}://{host}"
-
-        original_video_url = f"{base_url}/uploads/{unique_filename}"
-        logger.info(f"생성된 원본 비디오 URL (HTTPS 적용): {original_video_url}")
-
-        # 6. DB 저장 로직 (옵션, 여기서는 생략)
-        # 필요하다면 여기에 Supabase 저장 로직을 추가할 수 있습니다.
-        # 예: supabase.table('analysis_logs').insert({...}).execute()
-
-        # 7. 최종 결과 반환
-        return JSONResponse(
-            status_code=200,
-            content={
-                "message": "분석 성공: 클라이언트 렌더링 데이터를 반환합니다.",
-                "original_video_url": original_video_url,
-                "keypoints_data": keypoints_data, # 모든 프레임의 관절 좌표
-                "fps": fps # 비디오 FPS 정보
-            }
-        )
+        # 최종 결과 저장
+        jobs[job_id]['status'] = 'completed'
+        jobs[job_id]['result'] = {
+            "keypoints_data": keypoints_data,
+            "fps": fps
+        }
+        logger.info(f"작업 {job_id} 완료.")
 
     except Exception as e:
-        logger.error(f"클라이언트 렌더링 처리 중 오류 발생: {e}", exc_info=True)
-        # 오류 발생 시 업로드된 파일 삭제
-        if os.path.exists(upload_path):
-            os.remove(upload_path)
-        return JSONResponse(
-            status_code=500,
-            content={"message": f"서버 내부 오류 발생: {str(e)}"}
-        )
-    # finally 블록은 더 이상 복잡한 파일 정리가 필요 없으므로 제거합니다.
+        logger.error(f"작업 {job_id} 실패: {e}", exc_info=True)
+        jobs[job_id]['status'] = 'failed'
+        jobs[job_id]['error'] = str(e)
+    finally:
+        # 분석이 끝난 원본 비디오 파일 삭제 (선택 사항)
+        if os.path.exists(video_path):
+            os.remove(video_path)
 
-# 기존 /api/process-video 엔드포인트는 남겨두거나 삭제할 수 있습니다.
-# 혼동을 피하기 위해 주석 처리하거나 삭제하는 것을 권장합니다.
+
+@app.get("/")
+def read_root():
+    return {"message": "AI 관절 추적 API 서버 V5 (비동기 작업 아키텍처)"}
+
+# --- 1. 작업 생성 엔드포인트 ---
+@app.post("/api/jobs")
+async def create_analysis_job(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...)
+):
+    job_id = str(uuid.uuid4())
+    unique_filename = f"{job_id}_{file.filename}"
+    upload_path = os.path.join(UPLOAD_DIR, unique_filename)
+
+    # 파일 저장
+    with open(upload_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    # 작업 초기 상태 설정
+    scheme = request.headers.get("x-forwarded-proto", "https")
+    host = request.headers.get("host", request.url.netloc)
+    base_url = f"{scheme}://{host}"
+    original_video_url = f"{base_url}/uploads/{unique_filename}"
+    
+    jobs[job_id] = {
+        'status': 'pending',
+        'progress': 0,
+        'original_video_url': original_video_url
+    }
+
+    # 백그라운드에서 실제 분석 작업 시작
+    background_tasks.add_task(analyze_video_in_background, job_id, upload_path)
+
+    # 즉시 작업 ID와 상태 확인 URL 반환
+    return JSONResponse(
+        status_code=202, # 202 Accepted: 요청이 접수되었으며, 처리는 나중에 될 것임
+        content={
+            "message": "영상 분석 작업이 시작되었습니다.",
+            "job_id": job_id,
+            "status_url": f"{base_url}/api/jobs/{job_id}"
+        }
+    )
+
+# --- 2. 작업 상태 확인 엔드포인트 ---
+@app.get("/api/jobs/{job_id}")
+async def get_job_status(job_id: str):
+    job = jobs.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="작업을 찾을 수 없습니다.")
+
+    response_content = {
+        "job_id": job_id,
+        "status": job['status'],
+        "progress": job.get('progress', 0),
+        "original_video_url": job['original_video_url']
+    }
+    
+    if job['status'] == 'completed':
+        response_content['result'] = job.get('result')
+    elif job['status'] == 'failed':
+        response_content['error'] = job.get('error')
+        
+    return JSONResponse(content=response_content)
 
 # if __name__ == "__main__":
 #     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
