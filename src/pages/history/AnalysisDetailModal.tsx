@@ -125,7 +125,7 @@ const AnalysisDetailModal: React.FC<AnalysisDetailModalProps> = ({ isOpen, onClo
               <BarChart className="w-5 h-5 mr-3 text-orange-500" />
               <div>
                 <p className="font-semibold">안정성 점수</p>
-                <p className="text-2xl font-bold">{record.stability_score?.toFixed(1) ?? 'N/A'}점</p>
+                <p className="text-2xl font-bold">{record.analysis_results?.scores?.stability?.toFixed(1) ?? 'N/A'}점</p>
               </div>
             </div>
             <div className="flex items-center">
