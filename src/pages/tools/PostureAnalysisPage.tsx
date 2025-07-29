@@ -69,14 +69,35 @@ export default function PostureAnalysisPage() {
   };
 
   const handleGoToHistory = () => {
-    if (analysisResult && videoUrl) {
+    if (analysisResult && videoUrl && user && selectedDogId) {
+      // JointAnalysisRecord 타입에 맞춰 데이터 재구성
       const resultToStore = {
-        analysisResult,
-        videoUrl,
-        analyzedAt: new Date().toISOString(),
+        id: Date.now(), // 임시 ID (DB의 실제 ID와는 다름)
+        user_id: user.id,
+        dog_id: selectedDogId,
+        created_at: new Date().toISOString(),
+        is_baseline: false, // 이 정보는 백엔드에서 결정되므로 기본값 설정
+        original_video_filename: file?.name || 'unknown_video',
+        processed_video_url: videoUrl,
+        analysis_results: {
+          frames: [], // 프론트에서는 전체 프레임 데이터가 없으므로 비워둠
+          metadata: { // fps만 사용 가능
+            fps: analysisResult.fps,
+            width: videoRef.current?.videoWidth || 0,
+            height: videoRef.current?.videoHeight || 0,
+            frame_count: 0,
+          },
+          scores: {
+            stability: analysisResult.stability_score,
+          }
+        },
+        // 프론트에서 가공해서 사용하는 추가 정보
+        dog_name: dogs?.find(d => d.id === selectedDogId)?.name || 'Unknown Dog',
+        stability_score: analysisResult.stability_score,
       };
-      localStorage.setItem('latestPostureAnalysis', JSON.stringify(resultToStore));
-      navigate('/app/posture-analysis-history');
+
+      localStorage.setItem('latestAnalysisResult', JSON.stringify(resultToStore));
+      navigate('/app/posture-analysis-history'); // 올바른 경로로 수정
     } else {
       setError("분석 결과가 없어 기록 페이지로 이동할 수 없습니다.");
     }

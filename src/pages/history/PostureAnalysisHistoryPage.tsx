@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { History, BarChart, AlertCircle } from 'lucide-react';
+import { History, BarChart, AlertCircle, Sparkles, Share2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,12 +11,13 @@ import { useJointAnalysisHistory } from '@/hooks/useJointAnalysisHistory';
 import JointAnalysisHistorySkeleton from '@/components/posture-analysis-history/JointAnalysisHistorySkeleton';
 import EmptyJointAnalysisHistory from '@/components/posture-analysis-history/EmptyJointAnalysisHistory';
 import JointAnalysisHistoryList from '@/components/posture-analysis-history/JointAnalysisHistoryList';
+import LatestAnalysisResultCard from './LatestAnalysisResultCard';
+import { JointAnalysisRecord } from '@/types/analysis';
 
 const PostureAnalysisHistoryPage: React.FC = () => {
   const navigate = useNavigate();
   const { data: dogs, isLoading: isLoadingDogs, isError: isErrorDogs } = useUserDogs();
   
-  // activeDogId의 초기 상태를 null로 변경
   const [activeDogId, setActiveDogId] = useState<string | null>(null);
 
   // dogs 데이터가 로드되면, activeDogId를 첫 번째 강아지로 설정
@@ -26,11 +27,26 @@ const PostureAnalysisHistoryPage: React.FC = () => {
     }
   }, [dogs, activeDogId]);
 
-  // activeDogId가 유효할 때만 쿼리를 실행하도록 함
-  const { data: historyData, isLoading: isLoadingHistory, isError: isErrorHistory } = useJointAnalysisHistory(activeDogId || undefined);
+  const { data: historyData, isLoading: isLoadingHistory, isError: isErrorHistory, refetch } = useJointAnalysisHistory(activeDogId || undefined);
+
+  // 페이지에 들어올 때마다 데이터를 새로고침하여 최신 상태를 반영
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
+  // 최신 결과와 과거 기록을 분리
+  const { latestResult, pastHistory } = useMemo(() => {
+    if (!historyData || historyData.length === 0) {
+      return { latestResult: null, pastHistory: [] };
+    }
+    // created_at 기준으로 내림차순 정렬되어 있다고 가정
+    const sortedHistory = [...historyData].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    const latest = sortedHistory[0];
+    const past = sortedHistory.slice(1);
+    return { latestResult: latest, pastHistory: past };
+  }, [historyData]);
 
   const renderContent = () => {
-    // activeDogId가 아직 설정되지 않았거나, 히스토리 로딩 중일 때 스켈레톤 표시
     if (!activeDogId || isLoadingHistory) {
       return <JointAnalysisHistorySkeleton />;
     }
@@ -46,83 +62,93 @@ const PostureAnalysisHistoryPage: React.FC = () => {
         </Alert>
       );
     }
-
-    if (!historyData || historyData.length === 0) {
+    
+    if (!latestResult && pastHistory.length === 0) {
       return <EmptyJointAnalysisHistory />;
     }
 
-    return <JointAnalysisHistoryList records={historyData} />;
+    return (
+      <>
+        {latestResult && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-800 flex items-center mb-4">
+              <Sparkles className="w-6 h-6 mr-3 text-yellow-500" />
+              최신 분석 결과
+            </h2>
+            <LatestAnalysisResultCard record={latestResult} />
+          </div>
+        )}
+        
+        {pastHistory.length > 0 && (
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 flex items-center mb-4">
+              <History className="w-6 h-6 mr-3 text-gray-500" />
+              과거 기록
+            </h2>
+            <JointAnalysisHistoryList records={pastHistory} />
+          </div>
+        )}
+      </>
+    );
   };
 
-  if (isLoadingDogs) {
-    return (
-      <div className="container mx-auto p-4 md:p-8 max-w-4xl">
-        <JointAnalysisHistorySkeleton />
-      </div>
-    );
-  }
-
-  if (isErrorDogs) {
-    return (
-      <div className="container mx-auto p-4 md:p-8 max-w-4xl">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>오류 발생</AlertTitle>
-          <AlertDescription>
-            강아지 목록을 불러오는 데 실패했습니다.
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
-  if (!dogs || dogs.length === 0) {
-    return (
-        <div className="container mx-auto p-4 md:p-8 max-w-4xl">
-            <EmptyJointAnalysisHistory />
-        </div>
-    );
-  }
-
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="container mx-auto p-4 md:p-8 max-w-4xl"
-    >
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-        <div className="text-left">
-            <h1 className="text-3xl font-bold text-gray-800 flex items-center">
-              <History className="w-8 h-8 mr-3 text-orange-500" />
-              자세 분석 기록
-            </h1>
-            <p className="text-gray-600 mt-2">
-              과거에 분석했던 기록들을 확인하고 자세의 변화를 추적해보세요.
-            </p>
+    <>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="container mx-auto p-4 md:p-8 max-w-4xl"
+      >
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+          <div className="text-left">
+              <h1 className="text-3xl font-bold text-gray-800 flex items-center">
+                <History className="w-8 h-8 mr-3 text-orange-500" />
+                자세 분석 기록
+              </h1>
+              <p className="text-gray-600 mt-2">
+                과거에 분석했던 기록들을 확인하고 자세의 변화를 추적해보세요.
+              </p>
+          </div>
+          <Button onClick={() => navigate('/app/posture-analysis')} className="w-full sm:w-auto">
+              <BarChart className="w-4 h-4 mr-2" />
+              새 분석 시작하기
+          </Button>
         </div>
-        <Button onClick={() => navigate('/app/posture-analysis')} className="w-full sm:w-auto">
-            <BarChart className="w-4 h-4 mr-2" />
-            새 분석 시작하기
-        </Button>
-      </div>
 
-      {/* activeDogId가 null이 아닐 때만 Tabs를 렌더링 */}
-      {activeDogId && (
-        <Tabs value={activeDogId} onValueChange={setActiveDogId} className="w-full">
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-            {dogs.map(dog => (
-              <TabsTrigger key={dog.id} value={dog.id}>{dog.name}</TabsTrigger>
-            ))}
-          </TabsList>
-          <TabsContent value={activeDogId}>
-            <div className="mt-6">
-              {renderContent()}
-            </div>
-          </TabsContent>
-        </Tabs>
-      )}
-    </motion.div>
+        {isLoadingDogs && <JointAnalysisHistorySkeleton />}
+        
+        {isErrorDogs && (
+           <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>오류 발생</AlertTitle>
+            <AlertDescription>
+              강아지 목록을 불러오는 데 실패했습니다.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {!isLoadingDogs && !isErrorDogs && (!dogs || dogs.length === 0) && (
+          <EmptyJointAnalysisHistory />
+        )}
+
+        {activeDogId && dogs && dogs.length > 0 && (
+          <Tabs value={activeDogId} onValueChange={setActiveDogId} className="w-full">
+            <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+              {dogs.map(dog => (
+                <TabsTrigger key={dog.id} value={dog.id}>{dog.name}</TabsTrigger>
+              ))}
+            </TabsList>
+            
+            <TabsContent value={activeDogId} forceMount>
+               <div className="mt-6">
+                  {renderContent()}
+                </div>
+            </TabsContent>
+          </Tabs>
+        )}
+      </motion.div>
+    </>
   );
 };
 

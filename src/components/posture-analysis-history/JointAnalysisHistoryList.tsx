@@ -1,13 +1,13 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { AnalysisRecord } from '@/hooks/useJointAnalysisHistory';
+import { JointAnalysisRecord } from '@/types/analysis';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Video, BadgeCheck } from 'lucide-react';
 
 interface JointAnalysisHistoryListProps {
-  records: AnalysisRecord[];
+  records: JointAnalysisRecord[];
 }
 
 const JointAnalysisHistoryList: React.FC<JointAnalysisHistoryListProps> = ({ records }) => {
@@ -51,9 +51,9 @@ const JointAnalysisHistoryList: React.FC<JointAnalysisHistoryListProps> = ({ rec
                   원본 영상: {record.original_video_filename}
                 </p>
                 <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-                  <span><strong>안정성:</strong> {record.analysis_results.stability}점</span>
-                  <span><strong>대칭성:</strong> {record.analysis_results.symmetry}%</span>
-                  <span><strong>보폭:</strong> {record.analysis_results.stride_length}cm</span>
+                  <span><strong>안정성:</strong> {record.analysis_results?.scores?.stability}점</span>
+                  {/* <span><strong>대칭성:</strong> {record.analysis_results.symmetry}%</span>
+                  <span><strong>보폭:</strong> {record.analysis_results.stride_length}cm</span> */}
                 </div>
               </div>
               <a href={record.processed_video_url} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">

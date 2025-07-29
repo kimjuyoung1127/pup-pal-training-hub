@@ -2,6 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import type { JointAnalysisRecord } from '@/types/analysis';
 
 export interface AnalysisRecord {
   id: number;
@@ -34,14 +35,14 @@ const fetchJointAnalysisHistory = async (dogId: string | undefined, userId: stri
     throw new Error(error.message);
   }
 
-  return data as AnalysisRecord[];
+  return data as JointAnalysisRecord[];
 };
 
 export const useJointAnalysisHistory = (dogId: string | undefined) => {
   const { session } = useAuth();
   const user = session?.user;
   
-  return useQuery<AnalysisRecord[], Error>({
+  return useQuery<JointAnalysisRecord[], Error>({
     queryKey: ['jointAnalysisHistory', dogId],
     queryFn: () => fetchJointAnalysisHistory(dogId, user?.id),
     enabled: !!user && !!dogId,
