@@ -350,6 +350,15 @@ export default function PostureAnalysisPage() {
       {status === 'completed' && analysisResult && videoUrl && (
         <div className="mt-8">
           <h2 className="text-2xl font-semibold mb-4 text-center">분석 결과</h2>
+          
+          {/* === 안정성 점수 표시 UI 추가 시작 === */}
+          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg text-center">
+            <h3 className="text-lg font-semibold text-amber-800">자세 안정성 점수</h3>
+            <p className="text-5xl font-bold text-amber-600 mt-2">{analysisResult.stability_score}점</p>
+            <p className="text-sm text-muted-foreground mt-1">점수가 높을수록 자세가 안정적입니다.</p>
+          </div>
+          {/* === 안정성 점수 표시 UI 추가 끝 === */}
+
           <div className="relative w-full max-w-2xl mx-auto border rounded-lg overflow-hidden">
             <video ref={videoRef} src={videoUrl} controls playsInline crossOrigin="anonymous" className="w-full h-auto aspect-video" />
             <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
