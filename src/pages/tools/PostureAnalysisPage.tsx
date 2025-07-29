@@ -37,7 +37,7 @@ export default function PostureAnalysisPage() {
   const animationFrameId = useRef<number>();
   const pollingTimer = useRef<NodeJS.Timeout>();
 
-  // --- 핸들러 함수 ---
+  // --- 핸들러 함수 (이전과 동일) ---
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setFile(event.target.files[0]);
@@ -81,7 +81,7 @@ export default function PostureAnalysisPage() {
     }
   };
 
-  // --- 폴링 로직 ---
+  // --- 폴링 로직 (이전과 동일) ---
   const pollJobStatus = useCallback(async () => {
     if (!jobId) return;
     try {
@@ -119,7 +119,7 @@ export default function PostureAnalysisPage() {
     return () => clearTimeout(pollingTimer.current);
   }, [status, pollJobStatus]);
 
-  // ★★★★★ 디버깅을 위해 렌더링 로직을 수정합니다 ★★★★★
+  // ★★★★★ 최종 수정: 완벽한 좌표 변환 렌더링 로직 ★★★★★
   useEffect(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -128,71 +128,57 @@ export default function PostureAnalysisPage() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const handleMetadataLoaded = () => {
-      // --- 1. 디버깅 정보 출력 ---
-      console.log("--- 디버깅 정보 (메타데이터 로드됨) ---");
-      console.log("원본 영상 크기 (videoWidth/Height):", video.videoWidth, "x", video.videoHeight);
-      console.log("화면 표시 크기 (clientWidth/Height):", video.clientWidth, "x", video.clientHeight);
-      
-      // 캔버스 크기를 비디오의 원본 크기와 맞춥니다.
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      console.log("캔버스 크기 설정:", canvas.width, "x", canvas.height);
-    };
-
-    video.addEventListener('loadedmetadata', handleMetadataLoaded);
-
     const drawSkeletons = () => {
       if (video.paused || video.ended) return;
 
+      // 1. 캔버스 크기를 화면에 표시되는 비디오의 크기와 정확히 일치시킴
+      canvas.width = video.clientWidth;
+      canvas.height = video.clientHeight;
+      
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      // 2. 정확한 축소 비율(scale) 계산
+      const scale = Math.min(
+        canvas.width / video.videoWidth,
+        canvas.height / video.videoHeight
+      );
+
+      // 3. 화면에 렌더링된 실제 비디오의 크기와 위치(여백) 계산
+      const renderedVideoWidth = video.videoWidth * scale;
+      const renderedVideoHeight = video.videoHeight * scale;
+      const offsetX = (canvas.width - renderedVideoWidth) / 2;
+      const offsetY = (canvas.height - renderedVideoHeight) / 2;
+
+      // 4. 현재 프레임의 좌표 데이터 가져오기
       const currentFrameIndex = Math.floor(video.currentTime * analysisResult.fps);
       if (currentFrameIndex >= analysisResult.keypoints_data.length) return;
-
       const frameKeypoints = analysisResult.keypoints_data[currentFrameIndex];
       if (!frameKeypoints || frameKeypoints.length === 0) return;
 
-      // --- 2. 첫 번째 좌표만 출력 (매 프레임마다) ---
-      if (frameKeypoints[0] && frameKeypoints[0][0]) {
-        // console.log("YOLO 원본 좌표 (예시):", frameKeypoints[0][0]);
-      }
-      // ---
-
-      // 비율 계산
-      const scaleX = video.clientWidth / video.videoWidth;
-      const scaleY = video.clientHeight / video.videoHeight;
-      
-      // 레터박스(검은 여백) 계산
-      const realVideoHeight = video.clientWidth * (video.videoHeight / video.videoWidth);
-      const paddingTop = (video.clientHeight - realVideoHeight) / 2;
-
+      // 5. 변환된 좌표를 사용하여 캔버스에 그리기
       frameKeypoints.forEach((dogKeypoints: number[][]) => {
+        // 점 그리기
         dogKeypoints.forEach(point => {
           const [originalX, originalY] = point;
-
-          // 변환된 좌표 계산
-          const transformedX = originalX * scaleX;
-          const transformedY = (originalY * scaleX) + paddingTop; // Y축은 X축 비율과 패딩을 함께 고려
-
+          const transformedX = originalX * scale + offsetX;
+          const transformedY = originalY * scale + offsetY;
+          
           ctx.beginPath();
           ctx.arc(transformedX, transformedY, 5, 0, 2 * Math.PI);
           ctx.fillStyle = POINT_COLOR;
           ctx.fill();
         });
 
+        // 선 그리기
         SKELETON.forEach(pair => {
           const [startIdx, endIdx] = pair;
           const startPoint = dogKeypoints[startIdx];
           const endPoint = dogKeypoints[endIdx];
           if (startPoint && endPoint && startPoint.length > 0 && endPoint.length > 0) {
-            const [startX, startY] = startPoint;
-            const [endX, endY] = endPoint;
-
-            const transformedStartX = startX * scaleX;
-            const transformedStartY = (startY * scaleX) + paddingTop;
-            const transformedEndX = endX * scaleX;
-            const transformedEndY = (endY * scaleX) + paddingTop;
+            const transformedStartX = startPoint[0] * scale + offsetX;
+            const transformedStartY = startPoint[1] * scale + offsetY;
+            const transformedEndX = endPoint[0] * scale + offsetX;
+            const transformedEndY = endPoint[1] * scale + offsetY;
 
             ctx.beginPath();
             ctx.moveTo(transformedStartX, transformedStartY);
@@ -226,7 +212,6 @@ export default function PostureAnalysisPage() {
     video.addEventListener('ended', stopRenderLoop);
     
     return () => {
-      video.removeEventListener('loadedmetadata', handleMetadataLoaded);
       video.removeEventListener('play', startRenderLoop);
       video.removeEventListener('playing', startRenderLoop);
       video.removeEventListener('seeked', drawSkeletons);
