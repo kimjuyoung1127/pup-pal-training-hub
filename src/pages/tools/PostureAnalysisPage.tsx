@@ -119,7 +119,7 @@ export default function PostureAnalysisPage() {
     return () => clearTimeout(pollingTimer.current);
   }, [status, pollJobStatus]);
 
-  // ★★★★★ 최종 수정: 완벽한 좌표 변환 렌더링 로직 ★★★★★
+  // ★★★★★ 최종 수정: 완벽한 좌표 변환 렌더링 로직 (경쟁 상태 해결) ★★★★★
   useEffect(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -129,7 +129,10 @@ export default function PostureAnalysisPage() {
     if (!ctx) return;
 
     const drawSkeletons = () => {
-      if (video.paused || video.ended) return;
+      // [안전 장치] 비디오 메타데이터가 로드되지 않았거나, 재생이 멈춘 상태면 아무것도 그리지 않음
+      if (video.videoWidth === 0 || video.videoHeight === 0 || video.paused || video.ended) {
+        return;
+      }
 
       // 1. 캔버스 크기를 화면에 표시되는 비디오의 크기와 정확히 일치시킴
       canvas.width = video.clientWidth;
@@ -137,7 +140,7 @@ export default function PostureAnalysisPage() {
       
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // 2. 정확한 축소 비율(scale) 계산
+      // 2. 정확한 축소 비율(scale) 계산 (가로/세로 비율 유지)
       const scale = Math.min(
         canvas.width / video.videoWidth,
         canvas.height / video.videoHeight
@@ -211,12 +214,16 @@ export default function PostureAnalysisPage() {
     video.addEventListener('pause', stopRenderLoop);
     video.addEventListener('ended', stopRenderLoop);
     
+    // 메타데이터가 로드된 후 첫 프레임을 바로 그리기 위한 이벤트 리스너
+    video.addEventListener('loadedmetadata', drawSkeletons);
+
     return () => {
       video.removeEventListener('play', startRenderLoop);
       video.removeEventListener('playing', startRenderLoop);
       video.removeEventListener('seeked', drawSkeletons);
       video.removeEventListener('pause', stopRenderLoop);
       video.removeEventListener('ended', stopRenderLoop);
+      video.removeEventListener('loadedmetadata', drawSkeletons);
       cancelAnimationFrame(animationFrameId.current!);
     };
   }, [analysisResult]);
