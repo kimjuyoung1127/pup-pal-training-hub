@@ -119,7 +119,7 @@ export default function PostureAnalysisPage() {
     return () => clearTimeout(pollingTimer.current);
   }, [status, pollJobStatus]);
 
-  // ★★★★★ 최종 수정: 비어있던 캔버스 렌더링 로직을 완벽하게 복원 ★★★★★
+  // ★★★★★ 디버깅을 위해 렌더링 로직을 수정합니다 ★★★★★
   useEffect(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -127,6 +127,20 @@ export default function PostureAnalysisPage() {
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    const handleMetadataLoaded = () => {
+      // --- 1. 디버깅 정보 출력 ---
+      console.log("--- 디버깅 정보 (메타데이터 로드됨) ---");
+      console.log("원본 영상 크기 (videoWidth/Height):", video.videoWidth, "x", video.videoHeight);
+      console.log("화면 표시 크기 (clientWidth/Height):", video.clientWidth, "x", video.clientHeight);
+      
+      // 캔버스 크기를 비디오의 원본 크기와 맞춥니다.
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      console.log("캔버스 크기 설정:", canvas.width, "x", canvas.height);
+    };
+
+    video.addEventListener('loadedmetadata', handleMetadataLoaded);
 
     const drawSkeletons = () => {
       if (video.paused || video.ended) return;
@@ -139,16 +153,30 @@ export default function PostureAnalysisPage() {
       const frameKeypoints = analysisResult.keypoints_data[currentFrameIndex];
       if (!frameKeypoints || frameKeypoints.length === 0) return;
 
-      if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+      // --- 2. 첫 번째 좌표만 출력 (매 프레임마다) ---
+      if (frameKeypoints[0] && frameKeypoints[0][0]) {
+        // console.log("YOLO 원본 좌표 (예시):", frameKeypoints[0][0]);
       }
+      // ---
+
+      // 비율 계산
+      const scaleX = video.clientWidth / video.videoWidth;
+      const scaleY = video.clientHeight / video.videoHeight;
+      
+      // 레터박스(검은 여백) 계산
+      const realVideoHeight = video.clientWidth * (video.videoHeight / video.videoWidth);
+      const paddingTop = (video.clientHeight - realVideoHeight) / 2;
 
       frameKeypoints.forEach((dogKeypoints: number[][]) => {
         dogKeypoints.forEach(point => {
-          const [x, y] = point;
+          const [originalX, originalY] = point;
+
+          // 변환된 좌표 계산
+          const transformedX = originalX * scaleX;
+          const transformedY = (originalY * scaleX) + paddingTop; // Y축은 X축 비율과 패딩을 함께 고려
+
           ctx.beginPath();
-          ctx.arc(x, y, 5, 0, 2 * Math.PI);
+          ctx.arc(transformedX, transformedY, 5, 0, 2 * Math.PI);
           ctx.fillStyle = POINT_COLOR;
           ctx.fill();
         });
@@ -158,9 +186,17 @@ export default function PostureAnalysisPage() {
           const startPoint = dogKeypoints[startIdx];
           const endPoint = dogKeypoints[endIdx];
           if (startPoint && endPoint && startPoint.length > 0 && endPoint.length > 0) {
+            const [startX, startY] = startPoint;
+            const [endX, endY] = endPoint;
+
+            const transformedStartX = startX * scaleX;
+            const transformedStartY = (startY * scaleX) + paddingTop;
+            const transformedEndX = endX * scaleX;
+            const transformedEndY = (endY * scaleX) + paddingTop;
+
             ctx.beginPath();
-            ctx.moveTo(startPoint[0], startPoint[1]);
-            ctx.lineTo(endPoint[0], endPoint[1]);
+            ctx.moveTo(transformedStartX, transformedStartY);
+            ctx.lineTo(transformedEndX, transformedEndY);
             ctx.strokeStyle = LINE_COLOR;
             ctx.lineWidth = 3;
             ctx.stroke();
@@ -190,6 +226,7 @@ export default function PostureAnalysisPage() {
     video.addEventListener('ended', stopRenderLoop);
     
     return () => {
+      video.removeEventListener('loadedmetadata', handleMetadataLoaded);
       video.removeEventListener('play', startRenderLoop);
       video.removeEventListener('playing', startRenderLoop);
       video.removeEventListener('seeked', drawSkeletons);
