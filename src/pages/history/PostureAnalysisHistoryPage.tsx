@@ -23,7 +23,7 @@ const PostureAnalysisHistoryPage: React.FC = () => {
   const [selectedRecord, setSelectedRecord] = useState<JointAnalysisRecord | null>(null);
 
   const handleSelectRecord = (record: JointAnalysisRecord) => {
-    setSelectedRecord({ ...record });
+    setSelectedRecord(JSON.parse(JSON.stringify(record)));
   };
 
   const handleShare = (record: JointAnalysisRecord) => {

@@ -27,7 +27,7 @@ const fetchJointAnalysisHistory = async (dogId: string | undefined, userId: stri
 
   const { data, error } = await supabase
     .from('joint_analysis_records')
-    .select('id, created_at, dog_name, original_video_filename, processed_video_url, analysis_results, notes')
+    .select('id, created_at, original_video_filename, processed_video_url, analysis_results, notes, dog_id')
     .eq('user_id', userId)
     .eq('dog_id', dogId)
     .order('created_at', { ascending: false });

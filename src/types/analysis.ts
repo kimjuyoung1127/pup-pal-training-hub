@@ -52,6 +52,7 @@ export interface FrameData {
  * 단일 관절(keypoint)의 좌표와 신뢰도를 나타냅니다.
  */
 export interface Keypoint {
+  confidence: number;
   x: number;
   y: number;
   score: number;
