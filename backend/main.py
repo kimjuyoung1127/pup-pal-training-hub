@@ -34,9 +34,17 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 # CORS 미들웨어 추가
+# 허용할 출처 목록 - 실제 운영 및 개발 환경을 명시적으로 지정합니다.
+origins = [
+    "https://mungai.co.kr",      # 실제 운영 도메인
+    "http://localhost:5173",     # Vite 로컬 개발 환경
+    "http://localhost:3000",     # Create React App 로컬 개발 환경
+    "http://127.0.0.1:8000",    # 백엔드 자체 접속 (필요시)
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
