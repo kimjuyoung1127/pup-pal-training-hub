@@ -50,33 +50,55 @@ const dataURLtoFile = (dataurl: string, filename: string) => {
   return new File([u8arr], filename, { type: mime });
 };
 
-const resizeImage = (file: File, maxWidth: number): Promise<string> => {
+const resizeImage = (file: File, p0: number): Promise<Blob> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = (readerEvent) => {
       const img = new Image();
       img.onload = () => {
-        if (img.width <= maxWidth) {
-          // If image is small enough, resolve with the original data URL
-          resolve(event.target?.result as string);
-          return;
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        let { width, height } = img;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = Math.round(height * (MAX_WIDTH / width));
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = Math.round(width * (MAX_HEIGHT / height));
+            height = MAX_HEIGHT;
+          }
         }
+
         const canvas = document.createElement('canvas');
-        const scale = maxWidth / img.width;
-        canvas.width = maxWidth;
-        canvas.height = img.height * scale;
+        canvas.width = width;
+        canvas.height = height;
+
         const ctx = canvas.getContext('2d');
         if (!ctx) {
           return reject(new Error('Could not get canvas context'));
         }
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/jpeg'));
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Canvas to Blob conversion failed'));
+            }
+          },
+          'image/jpeg',
+          0.95
+        );
       };
       img.onerror = (error) => reject(error);
-      if (!event.target?.result) {
+      if (!readerEvent.target?.result) {
         return reject(new Error("Failed to read file."));
       }
-      img.src = event.target.result as string;
+      img.src = readerEvent.target.result as string;
     };
     reader.onerror = (error) => reject(error);
     reader.readAsDataURL(file);
@@ -167,7 +189,11 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
       const file = event.target.files[0];
       try {
         const resizedImageDataUrl = await resizeImage(file, 800); // Resize to max 800px width
-        setPetImage(resizedImageDataUrl);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPetImage(reader.result as string);
+        };
+        reader.readAsDataURL(resizedImageDataUrl);
       } catch (error) {
         console.error("Image resizing failed:", error);
         alert('이미지 처리 중 오류가 발생했습니다. 다른 파일을 선택해주세요.');
