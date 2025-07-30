@@ -51,16 +51,26 @@ const PostureAnalysisHistoryPage: React.FC = () => {
     refetch();
   }, [refetch]);
 
-  // 최신 결과와 과거 기록을 분리
+  // 최신 결과와 과거 기록을 분리하고, 강아지 이름을 주입
   const { latestResult, pastHistory } = useMemo(() => {
-    if (!historyData || historyData.length === 0) {
+    if (!historyData || historyData.length === 0 || !dogs) {
       return { latestResult: null, pastHistory: [] };
     }
-    const sortedHistory = [...historyData].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    // 각 기록에 강아지 이름을 찾아 주입
+    const historyWithDogNames = historyData.map(record => {
+      const dog = dogs.find(d => d.id === record.dog_id);
+      return {
+        ...record,
+        dog_name: dog ? dog.name : '알 수 없는 강아지', // dogs 목록에서 찾은 실제 이름 주입
+      };
+    });
+
+    const sortedHistory = [...historyWithDogNames].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     const latest = sortedHistory[0];
     const past = sortedHistory.slice(1);
     return { latestResult: latest, pastHistory: past };
-  }, [historyData]);
+  }, [historyData, dogs]);
 
   // 최초 로드 시 또는 activeDogId 변경 시, 최신 결과를 기본으로 선택
   useEffect(() => {

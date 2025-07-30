@@ -122,36 +122,36 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record }) => {
   // 점수별 정보
   const getScoreInfo = (score: number) => {
     if (score >= 80) return { 
-      emoji: '🌟', 
-      message: '완벽한 자세입니다!', 
-      advice: '현재 자세를 잘 유지하고 계세요. 정기적인 산책으로 건강을 지켜주세요!',
+      emoji: '✅', 
+      message: '일관된 안정성', 
+      advice: '분석된 영상에서는 일관된 안정성을 보여줍니다. 하지만 이 결과는 보조적인 참고 자료이며, 건강에 대한 우려가 있으시면 반드시 수의사와 상담하세요.',
       color: 'text-green-600', 
       bgColor: 'bg-green-50',
       borderColor: 'border-green-200'
     };
     if (score >= 60) return { 
-      emoji: '👍', 
-      message: '좋은 자세예요!', 
-      advice: '전반적으로 안정적입니다. 꾸준한 운동으로 더욱 개선할 수 있어요!',
-      color: 'text-blue-600', 
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200'
-    };
-    if (score >= 40) return { 
-      emoji: '💪', 
-      message: '개선이 필요해요', 
-      advice: '규칙적인 운동과 스트레칭으로 자세를 개선해보세요. 수의사 상담도 고려해보세요.',
+      emoji: '🟡', 
+      message: '약간의 변동성 관찰', 
+      advice: '걸음걸이에서 약간의 변동성이 관찰됩니다. 주기적인 관찰을 통해 변화를 추적해보세요. 정확한 진단은 전문가의 도움이 필요합니다.',
       color: 'text-yellow-600', 
       bgColor: 'bg-yellow-50',
       borderColor: 'border-yellow-200'
     };
-    return { 
-      emoji: '🤗', 
-      message: '관리가 필요해요', 
-      advice: '수의사와 상담하여 전문적인 관리 방법을 알아보시는 것을 권장합니다.',
+    if (score >= 40) return { 
+      emoji: '⚠️', 
+      message: '불안정성 감지', 
+      advice: '자세에 눈에 띄는 불안정성이 감지되었습니다. 이는 일시적인 현상일 수도 있지만, 빠른 시일 내에 수의사에게 전문적인 검진을 받아보시는 것을 강력히 권장합니다.',
       color: 'text-orange-600', 
       bgColor: 'bg-orange-50',
       borderColor: 'border-orange-200'
+    };
+    return { 
+      emoji: '🆘', 
+      message: '지속적인 관찰 필요', 
+      advice: '지속적인 관찰이 필요한 수준의 불안정성이 확인되었습니다. 단순한 자세 문제가 아닐 수 있으니, 반드시 전문가와 상담하여 정확한 원인을 파악해주세요.',
+      color: 'text-red-600', 
+      bgColor: 'bg-red-50',
+      borderColor: 'border-red-200'
     };
   };
 

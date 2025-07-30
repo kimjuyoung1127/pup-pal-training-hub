@@ -359,7 +359,23 @@ export default function PostureAnalysisPage() {
                 className="border-2 border-purple-200 focus:border-purple-400 file:bg-gradient-to-r file:from-orange-400 file:to-pink-400 file:text-white file:border-0 file:rounded-md file:px-4 file:py-2 file:mr-4"
               />
               <p className="text-xs text-gray-500 mt-2">
-                💡 팁: 강아지가 자연스럽게 걸어다니는 모습을 옆에서 촬영한 영상이 가장 좋아요!
+                💡 팁: 강아지 옆에서 촬영한 영상을 권장해요!
+              </p>
+            </div>
+
+            {/* --- GIF 미리보기 --- */}
+            <div className="mt-6 p-4 border-2 border-dashed border-orange-200 rounded-xl bg-orange-50/50">
+              <p className="text-sm font-semibold text-center text-orange-700 mb-3 flex items-center justify-center">
+                <Sparkles className="inline-block mr-2 h-4 w-4 text-orange-500" />
+                AI 분석 미리보기
+              </p>
+              <img 
+                src="/posture/posture-analysis-demo.gif" 
+                alt="AI 자세 분석 시연" 
+                className="rounded-lg shadow-md w-full"
+              />
+              <p className="text-xs text-gray-500 mt-3 text-center">
+                💡 이렇게 자세를 분석하여 피드백을 해드려요
               </p>
             </div>
             
@@ -439,10 +455,10 @@ export default function PostureAnalysisPage() {
                 {/* 점수별 코멘트 */}
                 <div className="mt-4 p-3 bg-white/70 rounded-lg">
                   <p className="text-sm font-medium text-gray-700">
-                    {analysisResult.stability_score >= 80 ? "🌟 훌륭해요! 매우 안정적인 자세네요!" :
-                     analysisResult.stability_score >= 60 ? "👍 좋아요! 전반적으로 안정적이에요!" :
-                     analysisResult.stability_score >= 40 ? "💪 괜찮아요! 조금 더 개선할 수 있어요!" :
-                     "🤗 괜찮아요! 꾸준한 관리가 필요해 보여요!"}
+                    {analysisResult.stability_score >= 80 ? "✅ 분석된 영상에서는 일관된 안정성을 보여줍니다. 하지만 이 결과는 보조적인 참고 자료이며, 건강에 대한 우려가 있으시면 반드시 수의사와 상담하세요." :
+                     analysisResult.stability_score >= 60 ? "🟡 걸음걸이에서 약간의 변동성이 관찰됩니다. 주기적인 관찰을 통해 변화를 추적해보세요. 정확한 진단은 전문가의 도움이 필요합니다." :
+                     analysisResult.stability_score >= 40 ? "⚠️ 자세에 눈에 띄는 불안정성이 감지되었습니다. 이는 일시적인 현상일 수도 있지만, 빠른 시일 내에 수의사에게 전문적인 검진을 받아보시는 것을 강력히 권장합니다." :
+                     "🆘 지속적인 관찰이 필요한 수준의 불안정성이 확인되었습니다. 단순한 자세 문제가 아닐 수 있으니, 반드시 전문가와 상담하여 정확한 원인을 파악해주세요."}
                   </p>
                 </div>
               </div>

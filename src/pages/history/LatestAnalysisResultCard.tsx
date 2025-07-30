@@ -48,35 +48,22 @@ const LatestAnalysisResultCard: React.FC<LatestAnalysisResultCardProps> = ({ rec
       transition={{ duration: 0.5 }}
     >
       <Card className="overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 border-2 border-gradient-to-r from-orange-200 to-pink-200 bg-white/90 backdrop-blur-md">
-        <CardHeader className="p-0">
-          <div className="relative">
-            {/* TODO: 실제 영상 썸네일로 교체 예정 */}
-            <div className="w-full h-48 bg-gradient-to-br from-orange-100 via-pink-100 to-purple-100 flex items-center justify-center">
-              <div className="text-center">
-                <Video className="h-16 w-16 text-purple-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-600">영상 썸네일</p>
-                <p className="text-xs text-gray-500">(곧 실제 썸네일로 업데이트 예정)</p>
-              </div>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-            <div className="absolute bottom-0 left-0 p-4">
-              <div className="flex items-center space-x-2 mb-2">
-                <Badge className="bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold">
-                  <Sparkles className="mr-1 h-3 w-3" />
-                  최신 분석
-                </Badge>
-                {scoreInfo && (
-                  <Badge className={`${scoreInfo.bgColor} ${scoreInfo.color} border-0`}>
-                    {scoreInfo.emoji} {scoreInfo.message}
-                  </Badge>
-                )}
-              </div>
-              <CardTitle className="text-white text-2xl font-bold flex items-center">
-                <Heart className="mr-2 h-6 w-6 text-pink-300" />
-                {record.dog_name || '우리 강아지'}
-              </CardTitle>
-            </div>
+        <CardHeader className="bg-gradient-to-r from-orange-100 via-pink-100 to-purple-100 p-4">
+          <div className="flex items-center justify-between mb-2">
+            <Badge className="bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold">
+              <Sparkles className="mr-1 h-3 w-3" />
+              최신 분석
+            </Badge>
+            {scoreInfo && (
+              <Badge className={`${scoreInfo.bgColor} ${scoreInfo.color} border-0`}>
+                {scoreInfo.emoji} {scoreInfo.message}
+              </Badge>
+            )}
           </div>
+          <CardTitle className="text-gray-800 text-2xl font-bold flex items-center">
+            <Heart className="mr-2 h-6 w-6 text-pink-500" />
+            {record.dog_name || '우리 강아지'}
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
           <div className="flex items-center text-gray-600 mb-4">
