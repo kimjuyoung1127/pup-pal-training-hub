@@ -8,13 +8,9 @@ import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Loader2, Wand2, Star, CheckCircle, List, AlertTriangle } from 'lucide-react';
 import { TrainingProgram } from '@/lib/trainingData';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Badge } from './ui/badge';
-import { useAiRecommendations, useSaveAiRecommendations } from '@/hooks/useAiRecommendations';
-import { useDashboardData } from '@/hooks/useDashboardData'; // 데이터 훅 추가
-import { useDashboardStore } from '@/store/dashboardStore'; // 스토어 훅 추가
-import { Checkbox } from '@/components/ui/checkbox'; // 체크박스 추가
-import confetti from 'canvas-confetti'; // 색종이 효과 추가
+import { useAiRecommendations, useSaveAiRecommendations, AiRecommendation } from '@/hooks/useAiRecommendations';
 
 // 확장된 필드를 포함하도록 인터페이스 업데이트
 interface AiTrainingProgram {
@@ -39,42 +35,12 @@ const AiTrainingRecommender = ({ onSelectTraining, trainingGoals }: AiTrainingRe
   const [aiRecommendations, setAiRecommendations] = useState<AiTrainingProgram[]>([]);
   const [highlightedTitle, setHighlightedTitle] = useState<string | null>(null);
 
-  // --- DashboardContent에서 가져온 로직 ---
-  const { tip, mission } = useDashboardData();
-  const { missionCompleted, toggleMissionCompleted, resetMissionIfNeeded } = useDashboardStore();
-  const [showMission, setShowMission] = useState(true);
-
-  useEffect(() => {
-    resetMissionIfNeeded();
-    const lastCompletionDate = localStorage.getItem('missionCompletionDate');
-    const todayStr = new Date().toISOString().split('T')[0];
-    if (lastCompletionDate === todayStr) {
-      setShowMission(false);
-    } else {
-      setShowMission(true);
-    }
-  }, [resetMissionIfNeeded]);
-
-  const handleMissionComplete = () => {
-    toggleMissionCompleted();
-    toast.success('오늘의 미션 완료! 멋져요! 🎉');
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-    });
-    setShowMission(false);
-    const todayStr = new Date().toISOString().split('T')[0];
-    localStorage.setItem('missionCompletionDate', todayStr);
-  };
-  // --- 여기까지 ---
-
-
   const { data: savedRecommendations, isLoading: isLoadingRecommendations } = useAiRecommendations(dogInfo?.id ? dogInfo.id : null);
   const saveRecommendationsMutation = useSaveAiRecommendations();
 
   useEffect(() => {
     if (savedRecommendations && savedRecommendations.length > 0) {
+      // 가장 최근의 추천 기록만 사용합니다.
       const latestRecommendation = savedRecommendations[0];
       const parsedRecommendations = latestRecommendation.recommendations as unknown as AiTrainingProgram[];
       setAiRecommendations(parsedRecommendations || []);
@@ -93,47 +59,118 @@ const AiTrainingRecommender = ({ onSelectTraining, trainingGoals }: AiTrainingRe
       delete fullProfile.created_at;
       delete fullProfile.updated_at;
       
-      const prompt = `...`; // 프롬프트는 생략
+      // 확장된 프롬프트
+      const prompt = `당신은 반려견 행동 수정 전문가입니다.
+
+      다음 **핵심 훈련 목표**를 최우선으로 달성하기 위한 전문적이고 창의적인 맞춤형 훈련 2가지를 추천해주세요.
+      추천하는 훈련은 반드시 아래 **핵심 훈련 목표** 달성에 직접적으로 기여해야 합니다.
+      아래 **강아지 프로필**은 훈련 강도, 난이도, 주의사항 등을 설정할 때 참고용으로만 활용하세요.
+      훈련목표와 상관없는 추천은 금지
+      긍정강화, 부정강화, 긍정처벌, 부정처벌 등 복합적인 트레이닝 방법을 활용하여 훈련 계획을 세워주세요.
+
+      🎯 **핵심 훈련 목표 (가장 중요한 추천 기준):**
+      ${JSON.stringify(trainingGoals && trainingGoals.length > 0 ? trainingGoals : fullProfile.trainingGoals, null, 2)}
+
+      🐶 **강아지 프로필 (참고용):**
+      ${JSON.stringify(fullProfile, null, 2)}
       
+      📋 훈련 하나당 반드시 다음 구조를 따르세요:
+      {
+        "title": "훈련 이름 (예: '짖음 감소를 위한 훈련')",
+        "description": "훈련의 목적과 강아지에게 주는 효과를 간결하고 쉽게 설명",
+        "difficulty": "초급 | 중급 | 고급",
+        "duration": "예상 소요 시간 (15분 내외로')",
+        "benefits": ["훈련을 통해 얻을 수 있는 핵심 효과 3가지", "예: '짖음감소'", "예: '사회성 증가'"],
+        "equipment": ["필요한 도구 목록. 없으면 빈 배열 []", "예: '방석', '간식'"],
+        "caution": "훈련 중 주의할 점 또는 위험 요소",
+        "steps": [
+          {
+            "title": "단계 이름",
+            "instruction": "실행 방법 (짧고 명확하게)",
+            "tip": "부드러운 진행을 위한 팁 (없으면 null)"
+          },
+          ...최소 5단계 이상...
+        ]
+      }
+      
+      🎯 응답 전체는 반드시 아래와 같은 **JSON 배열 2개**로 구성된 **JSON만 반환**하세요.
+      (설명 없이 JSON만 제공해야 합니다):
+      
+      [
+        { ...훈련1 },
+        { ...훈련2 }
+      ]
+      `;
+      
+
       const { data, error } = await supabase.functions.invoke('gemini-chat', {
         body: { history: [{ role: 'user', parts: [{ text: prompt }] }] },
       });
 
       if (error) throw error;
-      // ... 이하 추천 로직 생략 ...
-      // 실제 코드에서는 이 부분이 모두 존재해야 합니다.
-      // 간결성을 위해 여기서는 생략합니다.
-      const responseData = Array.isArray(data) ? data : data?.response;
-      if (!responseData) throw new Error("AI 응답이 비어있거나 잘못된 형식입니다.");
-      const responseString = typeof responseData === 'string' ? responseData : JSON.stringify(responseData);
-      let cleanedResponse = responseString.replace(/```json/g, '').replace(/```/g, '').trim();
+
+      // 응답 데이터 구조 검증 및 파싱
+      if (!data || !data.content) throw new Error('AI 응답이 비어있거나 content 필드가 없습니다.');
+      
+      // 응답 데이터 로깅 (디버깅용)
+      console.log('Raw AI response:', data);
+      
+      // content 필드에서 JSON 문자열 추출
+      const responseString = data.content;
+
+      // JSON 배열 추출 및 정제
+      const cleanedResponse = responseString
+        .replace(/```json\n?/g, '')
+        .replace(/```/g, '')
+        .trim();
+
+      // JSON 배열 범위 찾기
       const startIndex = cleanedResponse.indexOf('[');
-      let lastIndex = cleanedResponse.lastIndexOf(']');
-      if (startIndex !== -1 && lastIndex > startIndex) {
-        let jsonString = cleanedResponse.substring(startIndex, lastIndex + 1);
-        if (!jsonString.endsWith('}')) {
-          const lastCompleteObjectEnd = jsonString.lastIndexOf('}');
-          if(lastCompleteObjectEnd !== -1) {
-            jsonString = jsonString.substring(0, lastCompleteObjectEnd + 1);
+      const endIndex = cleanedResponse.lastIndexOf(']');
+      
+      if (startIndex === -1 || endIndex === -1 || endIndex <= startIndex) {
+        console.error('Invalid JSON structure:', cleanedResponse);
+        throw new Error('AI 응답에서 유효한 JSON 배열을 찾을 수 없습니다.');
+      }
+
+      // JSON 배열 추출 및 파싱
+      let jsonString = cleanedResponse.substring(startIndex, endIndex + 1);
+      
+      try {
+        const parsedData = JSON.parse(jsonString) as AiTrainingProgram[];
+        
+        // 데이터 유효성 검증
+        if (!Array.isArray(parsedData) || parsedData.length === 0) {
+          throw new Error('AI 응답이 유효한 훈련 프로그램 배열이 아닙니다.');
+        }
+
+        // 각 훈련 프로그램의 필수 필드 검증
+        parsedData.forEach((program, index) => {
+          if (!program.title || !program.description || !program.difficulty) {
+            throw new Error(`훈련 프로그램 #${index + 1}에 필수 필드가 누락되었습니다.`);
           }
-        }
-        if (!jsonString.endsWith(']')) {
-          jsonString += ']';
-        }
-        return JSON.parse(jsonString) as AiTrainingProgram[];
-      } else {
-        throw new Error("Incomplete or invalid JSON array structure in AI response.");
+        });
+
+        return parsedData;
+
+      } catch (parseError: any) {
+        console.error('JSON parsing error:', parseError, '\nJSON string:', jsonString);
+        throw new Error(`AI 응답 파싱 실패: ${parseError.message}`);
       }
     },
     onSuccess: (data) => {
       toast.success('AI 훈련 추천을 생성했습니다!');
+      // 새로 생성된 추천으로 상태를 완전히 교체합니다.
       setAiRecommendations(data);
       if (dogInfo?.id) {
         saveRecommendationsMutation.mutate({ dogId: dogInfo.id, recommendations: data });
       }
     },
     onError: (error: any) => {
-      toast.error('AI 추천 생성에 실패했습니다.', { description: error.message });
+      console.error('AI recommendation error:', error);
+      toast.error('AI 추천 생성에 실패했습니다.', { 
+        description: error.message || '알 수 없는 오류가 발생했습니다.'
+      });
     },
   });
 
@@ -143,7 +180,7 @@ const AiTrainingRecommender = ({ onSelectTraining, trainingGoals }: AiTrainingRe
       id: `ai-${aiTraining.title}`,
       color: 'orange',
       Icon: Star,
-      iconName: 'Star'
+      iconName: 'Star' // iconName을 Star로 명시적으로 지정
     };
     onSelectTraining(trainingProgram);
   };
@@ -215,48 +252,6 @@ const AiTrainingRecommender = ({ onSelectTraining, trainingGoals }: AiTrainingRe
               <p className="text-sm text-gray-500 mt-2">버튼을 눌러 AI에게 훈련을 추천받아보세요!</p>
             </div>
           )}
-
-          {/* --- 추가된 카드 섹션 --- */}
-          <div className="space-y-4 pt-4 border-t border-sky-200/80">
-            <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }} className="training-tip-card">
-              <Card className="card-soft p-6 bg-gradient-to-r from-sky-100 to-blue-200">
-                <div className="flex items-start space-x-3">
-                  <div className="text-2xl">💡</div>
-                  <div>
-                    <h3 className="font-bold text-sky-900 mb-2">오늘의 팁</h3>
-                    <p className="text-sm text-sky-800 leading-relaxed">{tip?.tip}</p>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-
-            <AnimatePresence>
-              {mission && showMission && !missionCompleted && (
-                <motion.div
-                  variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}
-                  exit={{ opacity: 0, y: -20, transition: { duration: 0.5 } }}
-                  className="daily-mission-card"
-                >
-                  <Card className="card-soft p-6 bg-blue-100">
-                    <div className="flex items-start space-x-3">
-                      <div className="text-2xl">🎯</div>
-                      <div className="flex-1">
-                        <h3 className="font-bold text-sky-900 mb-2">오늘의 미션</h3>
-                        <p className="text-sm text-sky-800 leading-relaxed">{mission.mission}</p>
-                      </div>
-                      <Checkbox
-                        checked={missionCompleted}
-                        onCheckedChange={handleMissionComplete}
-                        className="w-6 h-6 border-sky-400 data-[state=checked]:bg-sky-600"
-                        id="daily-mission"
-                      />
-                    </div>
-                  </Card>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          {/* --- 여기까지 --- */}
 
           <Button 
             onClick={() => recommendTrainingMutation.mutate()} 
