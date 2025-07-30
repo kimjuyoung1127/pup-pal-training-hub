@@ -137,10 +137,25 @@ def analyze_video_in_background(job_id: str, video_path: str, user_id: str, dog_
         stability_score = calculate_stability_score(keypoints_data)
 
         # 3. 최종 결과 구성
+        # 기존 코드 (135-143번째 줄)
         analysis_results_json = {
             "keypoints_data": keypoints_data,
             "fps": fps,
             "stability_score": stability_score
+        }
+        
+        # 수정된 코드 (하위 호환성 유지)
+        analysis_results_json = {
+            "keypoints_data": keypoints_data,
+            "fps": fps,
+            "stability_score": stability_score,  # 기존 구조 유지
+            "scores": {
+                "stability": stability_score
+            },
+            "metadata": {
+                "fps": fps,
+                "frame_count": len(keypoints_data)
+            }
         }
         
         jobs[job_id]['result'] = analysis_results_json
