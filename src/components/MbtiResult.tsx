@@ -188,21 +188,12 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
       try {
-        const resizedImageDataUrl = await resizeImage(file, 800); // Resize to max 800px width
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setPetImage(reader.result as string);
-        };
-        reader.readAsDataURL(resizedImageDataUrl);
+        const resizedBlob = await resizeImage(file, 800);
+        const imageUrl = URL.createObjectURL(resizedBlob);
+        setPetImage(imageUrl);
       } catch (error) {
         console.error("Image resizing failed:", error);
         alert('이미지 처리 중 오류가 발생했습니다. 다른 파일을 선택해주세요.');
-        // Fallback to original file reader if resize fails for some reason
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setPetImage(reader.result as string);
-        };
-        reader.readAsDataURL(file);
       }
     }
   };
