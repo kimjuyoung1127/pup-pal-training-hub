@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 import { JointAnalysisRecord } from '@/types/analysis';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, Award, Share2, Eye } from 'lucide-react';
+import { Calendar, Award, Share2, Eye, Heart, Sparkles } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface JointAnalysisHistoryListProps {
   records: JointAnalysisRecord[];
@@ -28,6 +29,14 @@ const JointAnalysisHistoryList: React.FC<JointAnalysisHistoryListProps> = ({ rec
     visible: { y: 0, opacity: 1 },
   };
 
+  // 점수별 정보 가져오기
+  const getScoreInfo = (score: number) => {
+    if (score >= 80) return { emoji: '🌟', message: '완벽!', color: 'text-green-600', bgColor: 'bg-green-50' };
+    if (score >= 60) return { emoji: '👍', message: '좋음', color: 'text-blue-600', bgColor: 'bg-blue-50' };
+    if (score >= 40) return { emoji: '💪', message: '개선중', color: 'text-yellow-600', bgColor: 'bg-yellow-50' };
+    return { emoji: '🤗', message: '관리필요', color: 'text-orange-600', bgColor: 'bg-orange-50' };
+  };
+
   return (
     <motion.div
       variants={containerVariants}
@@ -35,34 +44,73 @@ const JointAnalysisHistoryList: React.FC<JointAnalysisHistoryListProps> = ({ rec
       animate="visible"
       className="space-y-4"
     >
-      {records.map((record) => (
-        <motion.div key={record.id} variants={itemVariants}>
-          <Card className="hover:shadow-md transition-shadow duration-200">
-            <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex-grow">
-                <div className="flex items-center text-sm text-gray-500 mb-2">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  <span>{new Date(record.created_at).toLocaleString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+      {records.map((record) => {
+        const stabilityScore = record.analysis_results?.scores?.stability;
+        const scoreInfo = stabilityScore ? getScoreInfo(stabilityScore) : null;
+        
+        return (
+          <motion.div key={record.id} variants={itemVariants}>
+            <Card className="hover:shadow-lg transition-all duration-200 border border-purple-200 bg-white/80 backdrop-blur-sm">
+              <CardContent className="p-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex-grow">
+                    <div className="flex items-center text-sm text-gray-500 mb-2">
+                      <Calendar className="w-4 h-4 mr-2 text-purple-400" />
+                      <span>{new Date(record.created_at).toLocaleString('ko-KR', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <Heart className="w-5 h-5 mr-2 text-pink-500" />
+                        <span className="font-bold text-lg text-gray-800">{record.dog_name || '강아지'}</span>
+                      </div>
+                      {scoreInfo && (
+                        <Badge className={`${scoreInfo.bgColor} ${scoreInfo.color} border-0 ml-2`}>
+                          {scoreInfo.emoji} {scoreInfo.message}
+                        </Badge>
+                      )}
+                    </div>
+                    {stabilityScore !== undefined && (
+                      <div className="flex items-center mt-2 bg-gradient-to-r from-amber-50 to-orange-50 p-2 rounded-lg">
+                        <Award className="w-5 h-5 mr-2 text-amber-600" />
+                        <span className="font-semibold text-gray-700">안정성:</span>
+                        <span className="ml-2 text-xl font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
+                          {stabilityScore.toFixed(1)}점
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center font-semibold text-lg">
-                  <Award className="w-5 h-5 mr-2 text-amber-600" />
-                  <span>안정��� 점수: {record.stability_score?.toFixed(1) ?? 'N/A'}점</span>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="bg-gray-50/50 p-3 flex justify-end items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={() => onShare(record)}>
-                <Share2 className="w-4 h-4 mr-2" />
-                공유
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => onDetailView(record)}>
-                <Eye className="w-4 h-4 mr-2" />
-                상세 보기
-              </Button>
-            </CardFooter>
-          </Card>
-        </motion.div>
-      ))}
+              </CardContent>
+              <CardFooter className="bg-gradient-to-r from-gray-50 to-purple-50 p-3 flex justify-end items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => onShare(record)}
+                  className="text-purple-600 hover:text-purple-700 hover:bg-purple-100"
+                >
+                  <Share2 className="w-4 h-4 mr-2" />
+                  🚀 공유
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => onDetailView(record)}
+                  className="border-purple-200 text-purple-600 hover:bg-purple-50"
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  📊 상세보기
+                </Button>
+              </CardFooter>
+            </Card>
+          </motion.div>
+        );
+      })}
     </motion.div>
   );
 };

@@ -2,8 +2,10 @@
 
 import React, { useRef, useEffect, useMemo } from 'react';
 import { JointAnalysisRecord, AnalysisData } from '@/types/analysis';
-import { Calendar, FileText, Hash, Award } from 'lucide-react';
+import { Calendar, FileText, Hash, Award, Heart, Sparkles, Share2, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 // --- 상수 정의 (PostureAnalysisPage와 동일하게 유지) ---
 const SKELETON = [
@@ -39,6 +41,44 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record }) => {
   }, [record?.analysis_results]);
 
   const stabilityScore = analysisResult?.scores?.stability;
+
+  // 점수별 정보
+  const getScoreInfo = (score: number) => {
+    if (score >= 80) return { 
+      emoji: '🌟', 
+      message: '완벽한 자세입니다!', 
+      advice: '현재 자세를 잘 유지하고 계세요. 정기적인 산책으로 건강을 지켜주세요!',
+      color: 'text-green-600', 
+      bgColor: 'bg-green-50',
+      borderColor: 'border-green-200'
+    };
+    if (score >= 60) return { 
+      emoji: '👍', 
+      message: '좋은 자세예요!', 
+      advice: '전반적으로 안정적입니다. 꾸준한 운동으로 더욱 개선할 수 있어요!',
+      color: 'text-blue-600', 
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-200'
+    };
+    if (score >= 40) return { 
+      emoji: '💪', 
+      message: '개선이 필요해요', 
+      advice: '규칙적인 운동과 스트레칭으로 자세를 개선해보세요. 수의사 상담도 고려해보세요.',
+      color: 'text-yellow-600', 
+      bgColor: 'bg-yellow-50',
+      borderColor: 'border-yellow-200'
+    };
+    return { 
+      emoji: '🤗', 
+      message: '관리가 필요해요', 
+      advice: '수의사와 상담하여 전문적인 관리 방법을 알아보시는 것을 권장합니다.',
+      color: 'text-orange-600', 
+      bgColor: 'bg-orange-50',
+      borderColor: 'border-orange-200'
+    };
+  };
+
+  const scoreInfo = stabilityScore ? getScoreInfo(stabilityScore) : null;
 
   useEffect(() => {
     const video = videoRef.current;
@@ -146,61 +186,129 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record }) => {
   });
 
   return (
-    <Card className="sticky top-24 shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">분석 상세 결과</CardTitle>
-          <CardDescription>
-            선택하신 자세 분석 기록의 상세 정보와 영상 리플레이입니다.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            {stabilityScore !== undefined && (
-                <div className="flex items-center text-gray-800">
-                <Award className="w-10 h-10 mr-4 text-orange-500" />
+    <Card className="sticky top-24 shadow-xl border-2 border-purple-200 bg-white/90 backdrop-blur-md">
+      <CardHeader className="bg-gradient-to-r from-purple-100 to-pink-100">
+        <CardTitle className="text-2xl font-bold text-gray-800 flex items-center">
+          <Sparkles className="mr-3 h-6 w-6 text-purple-500" />
+          📊 상세 분석 결과
+        </CardTitle>
+        <CardDescription className="flex items-center text-gray-600">
+          <Heart className="mr-2 h-4 w-4 text-pink-500" />
+          {record.dog_name || '우리 강아지'}의 자세 분석 리포트
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="p-6">
+        {/* 안정성 점수 섹션 */}
+        {stabilityScore !== undefined && scoreInfo && (
+          <div className={`${scoreInfo.bgColor} ${scoreInfo.borderColor} border-2 p-6 rounded-2xl mb-6`}>
+            <div className="text-center mb-4">
+              <div className="flex items-center justify-center mb-2">
+                <Award className="w-8 h-8 mr-3 text-amber-500" />
+                <h3 className="text-xl font-bold text-gray-800">자세 안정성 점수</h3>
+              </div>
+              <div className="flex items-center justify-center space-x-2 mb-3">
+                <span className="text-5xl font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
+                  {stabilityScore.toFixed(1)}
+                </span>
+                <div className="text-left">
+                  <div className="text-xl font-bold text-amber-600">점</div>
+                  <div className="text-sm text-gray-500">/ 100점</div>
+                </div>
+              </div>
+              <Badge className={`${scoreInfo.bgColor} ${scoreInfo.color} border-0 text-lg px-4 py-1`}>
+                {scoreInfo.emoji} {scoreInfo.message}
+              </Badge>
+            </div>
+            <div className="bg-white/70 p-4 rounded-lg">
+              <h4 className="font-semibold text-gray-800 mb-2 flex items-center">
+                <Sparkles className="mr-2 h-4 w-4" />
+                AI 추천 사항
+              </h4>
+              <p className="text-sm text-gray-700">{scoreInfo.advice}</p>
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* 정보 섹션 */}
+          <div className="space-y-4">
+            <div className="bg-purple-50 p-4 rounded-xl border border-purple-200">
+              <div className="flex items-start">
+                <Calendar className="w-5 h-5 mr-3 text-purple-500 mt-1" />
                 <div>
-                    <p className="text-lg font-semibold text-gray-700">자세 안정성 점수</p>
-                    <p className="text-4xl font-bold text-orange-600">{stabilityScore.toFixed(1)}점</p>
+                  <p className="font-semibold text-gray-800">분석 일시</p>
+                  <p className="text-gray-700">{formattedDate}</p>
                 </div>
-                </div>
-            )}
-            <div className="flex items-start">
-              <Calendar className="w-5 h-5 mr-4 text-gray-500 mt-1" />
-              <div>
-                <p className="font-semibold">분석 일시</p>
-                <p className="text-gray-700">{formattedDate}</p>
               </div>
             </div>
-            <div className="flex items-start">
-              <FileText className="w-5 h-5 mr-4 text-gray-500 mt-1" />
-              <div>
-                <p className="font-semibold">원본 파일명</p>
-                <p className="truncate text-gray-700">{record.original_video_filename}</p>
+            
+            {/* 공유 기능 버튼들 */}
+            <div className="bg-gradient-to-r from-orange-50 to-pink-50 p-4 rounded-xl border border-orange-200">
+              <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
+                <Share2 className="mr-2 h-4 w-4 text-orange-500" />
+                결과 공유하기
+              </h4>
+              <div className="space-y-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full border-orange-200 text-orange-600 hover:bg-orange-50"
+                  onClick={() => alert('SNS 공유 기능 구현 예정')}
+                >
+                  📱 SNS에 공유하기
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full border-purple-200 text-purple-600 hover:bg-purple-50"
+                  onClick={() => alert('썸네일 다운로드 기능 구현 예정')}
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  🖼️ 썸네일 다운로드
+                </Button>
               </div>
             </div>
-             <div className="flex items-start">
-              <Hash className="w-5 h-5 mr-4 text-gray-500 mt-1" />
-              <div>
-                <p className="font-semibold">분석 ID</p>
-                <p className="text-xs text-gray-600">{record.id}</p>
+
+            {/* 향후 추가될 점수들을 위한 공간 */}
+            <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+              <h4 className="font-semibold text-gray-800 mb-2 flex items-center">
+                <Sparkles className="mr-2 h-4 w-4 text-gray-500" />
+                추가 분석 항목 (곧 출시!)
+              </h4>
+              <div className="space-y-2 text-sm text-gray-600">
+                <div className="flex justify-between">
+                  <span>🚶 보폭 분석</span>
+                  <span className="text-gray-400">준비 중...</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>⚖️ 대칭성 분석</span>
+                  <span className="text-gray-400">준비 중...</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>🏃 활동성 분석</span>
+                  <span className="text-gray-400">준비 중...</span>
+                </div>
               </div>
             </div>
           </div>
-          <div className="relative w-full max-w-2xl mx-auto border-2 border-gray-200 rounded-xl overflow-hidden shadow-md aspect-video">
+
+          {/* 영상 플레이어 */}
+          <div className="relative w-full border-2 border-purple-200 rounded-xl overflow-hidden shadow-lg aspect-video">
             <video 
-                ref={videoRef} 
-                src={record.processed_video_url} 
-                controls 
-                playsInline 
-                crossOrigin="anonymous" 
-                className="absolute top-0 left-0 w-full h-full"
+              ref={videoRef} 
+              src={record.processed_video_url} 
+              controls 
+              playsInline 
+              crossOrigin="anonymous" 
+              className="absolute top-0 left-0 w-full h-full"
             />
             <canvas 
-                ref={canvasRef} 
-                className="absolute top-0 left-0 w-full h-full pointer-events-none" 
+              ref={canvasRef} 
+              className="absolute top-0 left-0 w-full h-full pointer-events-none" 
             />
           </div>
-        </CardContent>
+        </div>
+      </CardContent>
     </Card>
   );
 };

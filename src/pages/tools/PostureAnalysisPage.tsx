@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Terminal, Video, Loader2, History, Dog, BarChart } from "lucide-react"; // Dog 아이콘 추가
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Select 컴포넌트 추가
-import { useUser } from '@supabase/auth-helpers-react'; // 사용자 정보를 가져오기 위한 훅
-import { useUserDogs } from '@/pages/history/useUserDogs'; // 강아지 목록을 가져오기 위한 훅
+import { Terminal, Video, Loader2, History, Dog, BarChart, Heart, Sparkles, Camera, Award } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useUser } from '@supabase/auth-helpers-react';
+import { useUserDogs } from '@/pages/history/useUserDogs';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 // --- 상수 정의 ---
 const SKELETON = [
@@ -292,106 +294,179 @@ export default function PostureAnalysisPage() {
   }, [analysisResult]);
 
   return (
-    <div className="container mx-auto p-4 max-w-4xl">
-      <div className="flex flex-col items-center text-center mb-8">
-        <h1 className="text-4xl font-bold tracking-tight">AI 강아지 자세 분석 (비동기)</h1>
-        <p className="mt-2 text-lg text-muted-foreground">
-          대용량 영상도 안정적으로! AI가 강아지의 관절 움직임을 분석하는 동안 다른 작업을 하실 수 있습니다.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-purple-50">
+      <div className="container mx-auto p-4 max-w-4xl">
+        <div className="flex flex-col items-center text-center mb-8">
+          <div className="flex items-center justify-center mb-4">
+            <Dog className="h-8 w-8 text-purple-500 mr-3" />
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+              <span className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
+                🐕 AI 자세 분석
+              </span>
+            </h1>
+            <Sparkles className="h-8 w-8 text-purple-500 ml-3" />
+          </div>
+          <p className="mt-2 text-lg text-gray-600 font-light leading-relaxed max-w-2xl">
+            🌟 우리 강아지의 자세를 AI가 똑똑하게 분석해드려요! 🌟
+          </p>
+        </div>
 
-      <div className="bg-card border rounded-lg p-6 shadow-sm">
-        <div className="space-y-4">
-          <div>
-            <label className="font-semibold text-sm mb-2 block"><Dog className="inline-block mr-2 h-4 w-4" />분석할 강아지 선택</label>
-            <Select onValueChange={setSelectedDogId} value={selectedDogId || ''} disabled={isLoadingDogs || !dogs || dogs.length === 0}>
-              <SelectTrigger>
-                <SelectValue placeholder={isLoadingDogs ? "강아지 목록을 불러오는 중..." : "강아지를 선택해주세요"} />
-              </SelectTrigger>
-              <SelectContent>
-                {dogs && dogs.map(dog => (
-                  <SelectItem key={dog.id} value={dog.id}>{dog.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {!isLoadingDogs && (!dogs || dogs.length === 0) && (
-              <p className="text-xs text-muted-foreground mt-1">
-                등록된 강아지가 없습니다. 먼저 강아지를 등록해주세요.
+        <Card className="overflow-hidden shadow-xl border-2 border-orange-200 bg-white/90 backdrop-blur-md">
+          <CardHeader className="bg-gradient-to-r from-orange-100 to-pink-100 pb-6">
+            <CardTitle className="text-xl font-bold text-gray-800 flex items-center">
+              <Camera className="mr-2 h-5 w-5 text-orange-500" />
+              분석 준비하기
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 space-y-6">
+            <div>
+              <label className="font-semibold text-sm mb-3 block flex items-center">
+                <Heart className="inline-block mr-2 h-4 w-4 text-pink-500" />
+                어떤 강아지를 분석할까요?
+              </label>
+              <Select onValueChange={setSelectedDogId} value={selectedDogId || ''} disabled={isLoadingDogs || !dogs || dogs.length === 0}>
+                <SelectTrigger className="border-2 border-orange-200 focus:border-orange-400">
+                  <SelectValue placeholder={isLoadingDogs ? "🐕 강아지 목록을 불러오는 중..." : "🐾 분석할 강아지를 선택해주세요"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {dogs && dogs.map(dog => (
+                    <SelectItem key={dog.id} value={dog.id}>
+                      <span className="flex items-center">
+                        🐕 {dog.name}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {!isLoadingDogs && (!dogs || dogs.length === 0) && (
+                <p className="text-xs text-gray-500 mt-2 flex items-center">
+                  <Dog className="mr-1 h-3 w-3" />
+                  등록된 강아지가 없어요. 먼저 강아지를 등록해주세요!
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="font-semibold text-sm mb-3 block flex items-center">
+                <Video className="inline-block mr-2 h-4 w-4 text-purple-500" />
+                걸어다니는 영상을 올려주세요
+              </label>
+              <Input 
+                type="file" 
+                accept="video/*" 
+                onChange={handleFileChange} 
+                disabled={status === 'processing' || status === 'uploading'}
+                className="border-2 border-purple-200 focus:border-purple-400 file:bg-gradient-to-r file:from-orange-400 file:to-pink-400 file:text-white file:border-0 file:rounded-md file:px-4 file:py-2 file:mr-4"
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                💡 팁: 강아지가 자연스럽게 걸어다니는 모습을 옆에서 촬영한 영상이 가장 좋아요!
               </p>
-            )}
-          </div>
-
-          <div>
-            <label className="font-semibold text-sm mb-2 block"><Video className="inline-block mr-2 h-4 w-4" />분석할 동영상 업로드</label>
-            <Input 
-              type="file" 
-              accept="video/*" 
-              onChange={handleFileChange} 
-              disabled={status === 'processing' || status === 'uploading'} 
-            />
-          </div>
-          
-          <Button 
-            onClick={handleAnalyzeClick} 
-            disabled={!file || !selectedDogId || status === 'processing' || status === 'uploading'} 
-            className="w-full"
-          >
-            {(status === 'processing' || status === 'uploading') ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <BarChart className="mr-2 h-4 w-4" />
-            )}
+            </div>
             
-            {status === 'idle' && '자세 분석 시작'}
-            {status === 'uploading' && '업로드 중...'}
-            {status === 'processing' && '분석 중...'}
-            {status === 'completed' && '분석 완료!'}
-            {status === 'failed' && '다시 시도'}
-          </Button>
-        </div>
+            <Button 
+              onClick={handleAnalyzeClick} 
+              disabled={!file || !selectedDogId || status === 'processing' || status === 'uploading'} 
+              className="w-full bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 hover:from-orange-500 hover:via-pink-600 hover:to-purple-600 text-white font-bold py-3 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all duration-200"
+              size="lg"
+            >
+              {(status === 'processing' || status === 'uploading') ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  {status === 'uploading' ? '🚀 업로드 중...' : '🔍 AI가 열심히 분석 중...'}
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-5 w-5" />
+                  ✨ 자세 분석 시작하기
+                </>
+              )}
+            </Button>
+          </CardContent>
 
-        {(status === 'processing' || status === 'uploading') && (
-          <div className="mt-4">
-            <Progress value={progress} className="w-full" />
-            <p className="text-center text-sm text-muted-foreground mt-2">
-              {progress}% 진행 중... (이 페이지를 벗어나도 분석은 계속됩니다)
-            </p>
-          </div>
-        )}
-        
-        {error && (
-          <Alert variant="destructive" className="mt-4">
-            <Terminal className="h-4 w-4" />
-            <AlertTitle>오류가 발생했습니다</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
+          {(status === 'processing' || status === 'uploading') && (
+            <CardContent className="px-6 pb-6">
+              <div className="bg-gradient-to-r from-orange-100 to-purple-100 p-4 rounded-xl">
+                <Progress value={progress} className="w-full h-3 mb-3" />
+                <p className="text-center text-sm text-gray-700 font-medium">
+                  🎯 {progress}% 완료! AI가 우리 강아지를 꼼꼼히 살펴보고 있어요
+                </p>
+                <p className="text-center text-xs text-gray-500 mt-1">
+                  💫 이 페이지를 벗어나도 분석은 계속돼요!
+                </p>
+              </div>
+            </CardContent>
+          )}
+          
+          {error && (
+            <CardContent className="px-6 pb-6">
+              <Alert variant="destructive" className="border-red-200">
+                <Terminal className="h-4 w-4" />
+                <AlertTitle>앗, 문제가 생겼어요! 😅</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            </CardContent>
+          )}
+        </Card>
+
+        {status === 'completed' && analysisResult && videoUrl && (
+          <Card className="mt-8 overflow-hidden shadow-xl border-2 border-green-200 bg-white/90 backdrop-blur-md">
+            <CardHeader className="bg-gradient-to-r from-green-100 to-blue-100 text-center">
+              <CardTitle className="text-2xl font-bold text-gray-800 flex items-center justify-center">
+                <Sparkles className="mr-2 h-6 w-6 text-green-500" />
+                🎉 분석 완료!
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              {/* 안정성 점수 표시 */}
+              <div className="mb-6 p-6 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl text-center">
+                <div className="flex items-center justify-center mb-3">
+                  <Award className="h-8 w-8 text-amber-500 mr-3" />
+                  <h3 className="text-xl font-bold text-amber-800">자세 안정성 점수</h3>
+                </div>
+                <div className="flex items-center justify-center space-x-2">
+                  <span className="text-6xl font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
+                    {analysisResult.stability_score}
+                  </span>
+                  <div className="text-left">
+                    <div className="text-2xl font-bold text-amber-600">점</div>
+                    <div className="text-sm text-gray-500">/ 100점</div>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-600 mt-3 flex items-center justify-center">
+                  <Heart className="mr-1 h-4 w-4 text-pink-500" />
+                  점수가 높을수록 우리 강아지의 자세가 안정적이에요!
+                </p>
+                {/* 점수별 코멘트 */}
+                <div className="mt-4 p-3 bg-white/70 rounded-lg">
+                  <p className="text-sm font-medium text-gray-700">
+                    {analysisResult.stability_score >= 80 ? "🌟 훌륭해요! 매우 안정적인 자세네요!" :
+                     analysisResult.stability_score >= 60 ? "👍 좋아요! 전반적으로 안정적이에요!" :
+                     analysisResult.stability_score >= 40 ? "💪 괜찮아요! 조금 더 개선할 수 있어요!" :
+                     "🤗 괜찮아요! 꾸준한 관리가 필요해 보여요!"}
+                  </p>
+                </div>
+              </div>
+
+              {/* 영상 플레이어 */}
+              <div className="relative w-full max-w-2xl mx-auto border-2 border-gray-200 rounded-xl overflow-hidden shadow-lg">
+                <video ref={videoRef} src={videoUrl} controls playsInline crossOrigin="anonymous" className="w-full h-auto aspect-video" />
+                <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
+              </div>
+              
+              <div className="text-center mt-6">
+                <Button 
+                  onClick={handleGoToHistory}
+                  className="bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-500 hover:to-pink-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all duration-200"
+                  size="lg"
+                >
+                  <History className="mr-2 h-5 w-5" />
+                  📊 상세 결과 보러가기
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
-
-      {status === 'completed' && analysisResult && videoUrl && (
-        <div className="mt-8">
-          <h2 className="text-2xl font-semibold mb-4 text-center">분석 결과</h2>
-          
-          {/* === 안정성 점수 표시 UI 추가 시작 === */}
-          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg text-center">
-            <h3 className="text-lg font-semibold text-amber-800">자세 안정성 점수</h3>
-            <p className="text-5xl font-bold text-amber-600 mt-2">{analysisResult.stability_score}점</p>
-            <p className="text-sm text-muted-foreground mt-1">점수가 높을수록 자세가 안정적입니다.</p>
-          </div>
-          {/* === 안정성 점수 표시 UI 추가 끝 === */}
-
-          <div className="relative w-full max-w-2xl mx-auto border rounded-lg overflow-hidden">
-            <video ref={videoRef} src={videoUrl} controls playsInline crossOrigin="anonymous" className="w-full h-auto aspect-video" />
-            <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
-          </div>
-          <div className="text-center mt-4">
-            <Button onClick={handleGoToHistory}>
-              <History className="mr-2 h-4 w-4" />
-              결과 저장 및 기록 보기
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
