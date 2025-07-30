@@ -18,9 +18,9 @@ import { Home, Users, Sparkles, UserCircle, BookOpen, Compass, HeartHandshake, B
 
 // --- 데이터 정의 ---
 const aiSolutions = [
-  { name: '견종 백과', icon: BookOpen, path: '/breeds', isProtected: true },
-  { name: '견종 MBTI', icon: Compass, path: '/mbti-test', isProtected: true },
-  { name: '댕댕이 궁합 테스트', icon: HeartHandshake, path: '/filter-wizard', isProtected: true },
+  { name: '견종 백과', icon: BookOpen, path: '/breeds' },
+  { name: '견종 MBTI', icon: Compass, path: '/mbti-test' },
+  { name: '댕댕이 궁합 테스트', icon: HeartHandshake, path: '/filter-wizard' },
   { name: '전문가 영상', icon: Film, path: '/training/videos' },
 ];
 
