@@ -76,7 +76,7 @@ const MbtiResultCard = React.forwardRef<HTMLDivElement, { result: any, petName: 
           {result?.description}
         </p>
         <div className="text-center mt-4 text-xs font-bold text-purple-600">
-          mungai.co.kr
+          puppyvill.com
         </div>
       </div>
     </div>
@@ -214,11 +214,16 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">사진 업로드 (선택)</label>
-                <Input id="petImage" type="file" accept="image/*" ref={imageInputRef} onChange={handleImageUpload} className="hidden" />
-                <Button onClick={handleUploadButtonClick} variant="outline" className="w-full border-purple-300 text-purple-700 hover:bg-purple-100 hover:text-purple-800">
-                  <Upload className="mr-2 h-4 w-4" />
-                  사진 선택
-                </Button>
+                <input
+                type="file"
+                ref={imageInputRef}
+                onChange={handleImageUpload}
+                className="hidden"
+                accept="image/*"
+              />
+              <Button onClick={handleUploadButtonClick} className="w-full sm:w-auto bg-gradient-to-r from-orange-400 to-pink-500 text-white font-bold hover:scale-105 transition-transform duration-300 shadow-lg">
+                <Upload className="mr-2 h-4 w-4" /> 사진 올리기
+              </Button>
               </div>
               <div className="flex flex-col sm:flex-row gap-2 mt-4">
                 <Button onClick={handleDownloadImage} className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">

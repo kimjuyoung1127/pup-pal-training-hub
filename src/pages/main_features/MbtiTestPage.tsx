@@ -103,7 +103,7 @@ const QuestionCard = ({ question, onAnswer, index }: { question: any, onAnswer: 
   <div className="bg-white/90 backdrop-blur-md border-2 border-orange-200 rounded-3xl shadow-2xl p-8 w-full max-w-2xl mx-auto transform hover:scale-[1.02] transition-all duration-300">
     <div className="flex items-center justify-center mb-6">
       <Sparkles className="h-6 w-6 text-orange-400 mr-2" />
-      <h2 className="text-center text-xl md:text-2xl font-bold text-gray-800">
+      <h2 className="text-center text-xl md:text-2xl font-bold text-gray-800 break-keep">
         Q{index + 1}. {question.question}
       </h2>
       <Sparkles className="h-6 w-6 text-orange-400 ml-2" />
@@ -115,7 +115,7 @@ const QuestionCard = ({ question, onAnswer, index }: { question: any, onAnswer: 
         onClick={() => onAnswer(question.choiceA.type)}
       >
         <Heart className="h-5 w-5 mr-2 text-pink-500 flex-shrink-0" />
-        <span>{question.choiceA.text}</span>
+        <span className="break-keep">{question.choiceA.text}</span>
       </Button>
       <Button
         size="lg"
@@ -123,7 +123,7 @@ const QuestionCard = ({ question, onAnswer, index }: { question: any, onAnswer: 
         onClick={() => onAnswer(question.choiceB.type)}
       >
         <Heart className="h-5 w-5 mr-2 text-purple-500 flex-shrink-0" />
-        <span>{question.choiceB.text}</span>
+        <span className="break-keep">{question.choiceB.text}</span>
       </Button>
     </div>
   </div>
@@ -134,13 +134,13 @@ const IntroScreen = ({ onStart }: { onStart: () => void }) => (
         <div className="flex items-center justify-center mb-6">
             <PawPrint className="h-12 w-12 text-orange-500 mr-4 animate-pulse" />
             <h1 className="text-3xl md:text-4xl font-extrabold">
-                <span className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent break-keep">
                     우리 강아지 성향 분석하기
                 </span>
             </h1>
             <PawPrint className="h-12 w-12 text-purple-500 ml-4 animate-pulse" />
         </div>
-        <p className="text-gray-600 text-lg mb-8 leading-relaxed">
+        <p className="text-gray-600 text-lg mb-8 leading-relaxed break-keep">
             🐾 12가지 간단한 질문으로 우리 강아지의 진짜 성향을 알아보고, <br className="hidden sm:block" />
             💕 더 깊이 이해하는 시간을 가져보세요!
         </p>
