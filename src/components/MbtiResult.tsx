@@ -189,10 +189,13 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
       const file = event.target.files[0];
       try {
         const resizedBlob = await resizeImage(file, 800);
-        const imageUrl = URL.createObjectURL(resizedBlob);
-        setPetImage(imageUrl);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPetImage(reader.result as string);
+        };
+        reader.readAsDataURL(resizedBlob);
       } catch (error) {
-        console.error("Image resizing failed:", error);
+        console.error("Image processing failed:", error);
         alert('이미지 처리 중 오류가 발생했습니다. 다른 파일을 선택해주세요.');
       }
     }

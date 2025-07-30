@@ -34,7 +34,7 @@ const questions = [
     {
         question: "새로운 장난감을 줬을 때?",
         choiceA: { text: "냄새, 소리, 질감을 꼼꼼히 살핀다.", type: "S" },
-        choiceB: { text: "새로운 놀이법을 상상하며 재밌게 논다.", type: "N" }
+        choiceB: { text: "새로운 장난감과도 재밌게 논다.", type: "N" }
     },
     {
         question: "'산책 갈까?'라는 말을 들으면?",
@@ -54,7 +54,7 @@ const questions = [
         choiceB: { text: "주인의 기분을 살피며 시무룩해진다.", type: "F" }
     },
     {
-        question: "주인이 슬퍼 보일 때?",
+        question: "주인이 화나 보일 때?",
         choiceA: { text: "이상함은 느끼지만 거리를 두고 본다.", type: 'T' },
         choiceB: { text: "다정하게 다가와 기대거나 핥는다.", type: 'F' }
     },
@@ -73,7 +73,7 @@ const questions = [
     {
         question: "'기다려' 훈련을 할 때?",
         choiceA: { text: "'먹어' 신호가 올 때까지 참는다.", type: "J" },
-        choiceB: { text: "참지 못하고 간식만 바라본다.", type: "P" }
+        choiceB: { text: "참지 못하고 간식을 먹으려한다다.", type: "P" }
     },
     {
         question: "잠자리가 정해져 있나요?",
