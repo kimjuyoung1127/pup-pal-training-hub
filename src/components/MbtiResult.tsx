@@ -53,16 +53,12 @@ const dataURLtoFile = (dataurl: string, filename: string) => {
 const resizeImage = (file: File, maxWidth: number): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.readAsDataURL(file);
     reader.onload = (event) => {
       const img = new Image();
-      if (!event.target?.result) {
-        return reject(new Error("Failed to read file."));
-      }
-      img.src = event.target.result as string;
       img.onload = () => {
         if (img.width <= maxWidth) {
-          resolve(img.src);
+          // If image is small enough, resolve with the original data URL
+          resolve(event.target?.result as string);
           return;
         }
         const canvas = document.createElement('canvas');
@@ -77,8 +73,13 @@ const resizeImage = (file: File, maxWidth: number): Promise<string> => {
         resolve(canvas.toDataURL('image/jpeg'));
       };
       img.onerror = (error) => reject(error);
+      if (!event.target?.result) {
+        return reject(new Error("Failed to read file."));
+      }
+      img.src = event.target.result as string;
     };
     reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
   });
 };
 
