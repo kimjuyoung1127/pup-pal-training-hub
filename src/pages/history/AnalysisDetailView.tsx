@@ -1,11 +1,15 @@
 // src/pages/history/AnalysisDetailView.tsx
 
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, useState, useCallback } from 'react';
 import { JointAnalysisRecord, AnalysisData } from '@/types/analysis';
-import { Calendar, FileText, Hash, Award, Heart, Sparkles, Share2, Download } from 'lucide-react';
+import { Calendar, Award, Heart, Sparkles, Share2, Download, Upload, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import AnalysisResultCard from './AnalysisResultCard';
+import { downloadImage, shareToKakao } from '@/lib/shareUtils';
+import { useToast } from '@/hooks/use-toast';
 
 // --- 상수 정의 (PostureAnalysisPage와 동일하게 유지) ---
 const SKELETON = [
@@ -27,18 +31,91 @@ interface AnalysisDetailViewProps {
 const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const shareCardRef = useRef<HTMLDivElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const animationFrameId = useRef<number>();
+  
+  // 공유 기능 상태
+  const [petName, setPetName] = useState('');
+  const [petImage, setPetImage] = useState<string | null>(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [showShareCard, setShowShareCard] = useState(false);
+  
+  const { toast } = useToast();
+
+  // 이미지 업로드 핸들러
+  const handleImageUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPetImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
+  const handleUploadButtonClick = useCallback(() => {
+    imageInputRef.current?.click();
+  }, []);
+
+  // 이미지 다운로드 핸들러
+  const handleDownloadImage = useCallback(async () => {
+    try {
+      await downloadImage(shareCardRef, `${petName || 'mungai'}-analysis-result.png`);
+      toast({
+        title: "다운로드 완료",
+        description: "분석 결과 이미지가 저장되었습니다.",
+      });
+    } catch (error) {
+      toast({
+        title: "다운로드 실패",
+        description: "이미지 저장에 실패했습니다. 다시 시도해주세요.",
+        variant: "destructive",
+      });
+    }
+  }, [petName, toast]);
+
+  // 카카오톡 공유 핸들러
+  const handleShareToKakao = useCallback(async () => {
+    setIsSharing(true);
+    try {
+      const stabilityScore = record.analysis_results?.scores?.stability || record.stability_score || 0;
+      await shareToKakao(shareCardRef, {
+        title: `${petName || '우리 강아지'}의 자세 분석 결과: ${stabilityScore.toFixed(1)}점!`,
+        description: 'AI가 분석한 우리 강아지의 자세 안정성을 확인해보세요!',
+        petName: petName || '우리 강아지',
+        filename: 'analysis-result.png'
+      });
+      toast({
+        title: "공유 완료",
+        description: "카카오톡으로 공유되었습니다.",
+      });
+    } catch (error) {
+      toast({
+        title: "공유 실패",
+        description: "공유에 실패했습니다. 다시 시도해주세요.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSharing(false);
+    }
+  }, [record, petName, toast]);
 
   const analysisResult = useMemo(() => {
     if (!record?.analysis_results) return null;
     let parsedData: any;
     if (typeof record.analysis_results === 'string') {
-      try { parsedData = JSON.parse(record.analysis_results); } catch (e) { return null; }
+      try { 
+        parsedData = JSON.parse(record.analysis_results); 
+      } catch (e) { 
+        return null; 
+      }
     } else {
       parsedData = record.analysis_results;
     }
     return parsedData as AnalysisDataWithKeypoints;
-  }, [record?.analysis_results]);
+  }, [record]);
 
   const stabilityScore = analysisResult?.scores?.stability;
 
@@ -90,7 +167,6 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record }) => {
 
     const drawSkeletons = () => {
       if (video.videoWidth === 0 || video.videoHeight === 0) {
-        // 비디오 크기가 0이면 캔버스 클리어만 수행
         if(canvas.width > 0 && canvas.height > 0) ctx.clearRect(0, 0, canvas.width, canvas.height);
         return;
       }
@@ -105,7 +181,7 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record }) => {
       const offsetX = (canvas.width - renderedVideoWidth) / 2;
       const offsetY = (canvas.height - renderedVideoHeight) / 2;
 
-      if (video.paused || video.ended) return; // 정지/종료 시에는 그리지 않음
+      if (video.paused || video.ended) return;
 
       const fps = analysisResult.metadata?.fps || 30;
       const currentFrameIndex = Math.floor(video.currentTime * fps);
@@ -153,9 +229,7 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record }) => {
     const startRenderLoop = () => { cancelAnimationFrame(animationFrameId.current!); renderLoop(); };
     const stopRenderLoop = () => { cancelAnimationFrame(animationFrameId.current!); };
     
-    // ✅ 전체화면 변경 시 다시 그리기 위한 핸들러
     const handleFullscreenChange = () => {
-        // 전체화면 변경 시 캔버스 크기를 재조정하고 다시 그리기 위해 약간의 딜레이 후 실행
         setTimeout(() => {
             drawSkeletons();
         }, 100);
@@ -198,7 +272,6 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record }) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="p-6">
-        {/* 안정성 점수 섹션 */}
         {stabilityScore !== undefined && scoreInfo && (
           <div className={`${scoreInfo.bgColor} ${scoreInfo.borderColor} border-2 p-6 rounded-2xl mb-6`}>
             <div className="text-center mb-4">
@@ -230,7 +303,6 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record }) => {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* 정보 섹션 */}
           <div className="space-y-4">
             <div className="bg-purple-50 p-4 rounded-xl border border-purple-200">
               <div className="flex items-start">
@@ -242,34 +314,124 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record }) => {
               </div>
             </div>
             
-            {/* 공유 기능 버튼들 */}
-            <div className="bg-gradient-to-r from-orange-50 to-pink-50 p-4 rounded-xl border border-orange-200">
-              <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
-                <Share2 className="mr-2 h-4 w-4 text-orange-500" />
-                결과 공유하기
-              </h4>
-              <div className="space-y-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full border-orange-200 text-orange-600 hover:bg-orange-50"
-                  onClick={() => alert('SNS 공유 기능 구현 예정')}
-                >
-                  📱 SNS에 공유하기
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full border-purple-200 text-purple-600 hover:bg-purple-50"
-                  onClick={() => alert('썸네일 다운로드 기능 구현 예정')}
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  🖼️ 썸네일 다운로드
-                </Button>
-              </div>
-            </div>
+            {/* 공유 기능 섹션 */}
+            <Card className="bg-gradient-to-r from-orange-50 to-pink-50 border-orange-200">
+              <CardHeader>
+                <CardTitle className="text-orange-800 flex items-center">
+                  <Share2 className="mr-2 h-5 w-5" />
+                  결과 공유하기
+                </CardTitle>
+                <CardDescription>
+                  분석 결과를 이미지로 저장하거나 SNS에 공유해보세요!
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {!showShareCard ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full border-orange-200 text-orange-600 hover:bg-orange-50"
+                        onClick={() => setShowShareCard(true)}
+                      >
+                        📱 SNS에 공유하기
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full border-purple-200 text-purple-600 hover:bg-purple-50"
+                        onClick={() => setShowShareCard(true)}
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        🖼️ 썸네일 다운로드
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <div>
+                          <label htmlFor="petName" className="block text-sm font-medium text-gray-700 mb-1">
+                            강아지 이름
+                          </label>
+                          <Input 
+                            id="petName" 
+                            type="text" 
+                            placeholder="예: 몽이" 
+                            value={petName} 
+                            onChange={(e) => setPetName(e.target.value)} 
+                            className="border-orange-300 focus:ring-orange-500 focus:border-orange-500" 
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            사진 업로드 (선택)
+                          </label>
+                          <Input 
+                            id="petImage" 
+                            type="file" 
+                            accept="image/*" 
+                            ref={imageInputRef} 
+                            onChange={handleImageUpload} 
+                            className="hidden" 
+                          />
+                          <Button 
+                            onClick={handleUploadButtonClick} 
+                            variant="outline" 
+                            className="w-full border-orange-300 text-orange-700 hover:bg-orange-100"
+                          >
+                            <Upload className="mr-2 h-4 w-4" />
+                            컴퓨터에서 사진 선택
+                          </Button>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <Button 
+                            onClick={handleDownloadImage} 
+                            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                          >
+                            <Download className="mr-2 h-4 w-4" /> 
+                            이미지로 저장하기
+                          </Button>
+                          <Button 
+                            onClick={handleShareToKakao} 
+                            disabled={isSharing} 
+                            className="w-full bg-yellow-400 text-yellow-900 hover:bg-yellow-500"
+                          >
+                            {isSharing ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <Share2 className="mr-2 h-4 w-4" />
+                            )}
+                            {isSharing ? '공유 준비중...' : '카카오톡으로 공유'}
+                          </Button>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => setShowShareCard(false)}
+                          className="w-full text-gray-500"
+                        >
+                          취소
+                        </Button>
+                      </div>
+                      
+                      <div className="flex flex-col items-center">
+                        <p className="text-sm font-medium text-gray-700 mb-2">미리보기</p>
+                        <AnalysisResultCard 
+                          ref={shareCardRef} 
+                          record={record} 
+                          petName={petName} 
+                          petImage={petImage} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
-            {/* 향후 추가될 점수들을 위한 공간 */}
             <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
               <h4 className="font-semibold text-gray-800 mb-2 flex items-center">
                 <Sparkles className="mr-2 h-4 w-4 text-gray-500" />
@@ -292,7 +454,6 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record }) => {
             </div>
           </div>
 
-          {/* 영상 플레이어 */}
           <div className="relative w-full border-2 border-purple-200 rounded-xl overflow-hidden shadow-lg aspect-video">
             <video 
               ref={videoRef} 
