@@ -269,10 +269,6 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
   }, [petName, result, description]);
 
   if (isLoadingDesc || isLoadingBreeds) {
-    function handleUploadButtonClick(event: React.MouseEvent<HTMLButtonElement>): void {
-      throw new Error('Function not implemented.');
-    }
-
     return (
       <div ref={ref} className="w-full max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
         <Card className="bg-white/80 backdrop-blur-lg border-2 border-purple-200/50 shadow-2xl rounded-3xl overflow-hidden">
@@ -294,7 +290,7 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
                 className="hidden"
                 accept="image/*"
               />
-              <Button onClick={handleUploadButtonClick} className="w-full sm:w-auto bg-gradient-to-r from-orange-400 to-pink-500 text-white font-bold hover:scale-105 transition-transform duration-300 shadow-lg">
+              <Button onClick={() => imageInputRef.current?.click()} className="w-full sm:w-auto bg-gradient-to-r from-orange-400 to-pink-500 text-white font-bold hover:scale-105 transition-transform duration-300 shadow-lg">
                 <Upload className="mr-2 h-4 w-4" /> 사진 올리기
               </Button>
               </div>
@@ -318,10 +314,6 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
         </Card>
       </div>
     );
-  }
-
-  function handleUploadButtonClick(event: React.MouseEvent<HTMLButtonElement>): void {
-    throw new Error('Function not implemented.');
   }
 
   return (
@@ -351,7 +343,7 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">사진 업로드 (선택)</label>
               <Input id="petImage" type="file" accept="image/*" ref={imageInputRef} onChange={handleImageUpload} className="hidden" />
-              <Button onClick={handleUploadButtonClick} variant="outline" className="w-full border-purple-300 text-purple-700 hover:bg-purple-100 hover:text-purple-800">
+              <Button onClick={() => imageInputRef.current?.click()} variant="outline" className="w-full border-purple-300 text-purple-700 hover:bg-purple-100 hover:text-purple-800">
                 <Upload className="mr-2 h-4 w-4" />
                 사진 선택
               </Button>
