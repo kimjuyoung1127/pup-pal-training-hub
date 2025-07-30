@@ -25,7 +25,7 @@ const Step1_BasicInfo: React.FC<Props> = ({ dogInfo, setDogInfo }) => {
             id="name"
             value={dogInfo.name}
             onChange={(e) => setDogInfo(prev => ({ ...prev, name: e.target.value }))}
-            placeholder="예: 바둑이"
+            placeholder="예: 몽이"
             className="mt-2 bg-white border-2 border-sky-200 focus:border-sky-300 focus:ring-2 focus:ring-sky-100 rounded-xl text-gray-900 placeholder:text-gray-500"
           />
         </div>

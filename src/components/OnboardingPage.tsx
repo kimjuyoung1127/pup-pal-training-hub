@@ -28,9 +28,11 @@ const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
   ];
 
   const nextSlide = () => {
+    console.log('nextSlide function called. Current slide:', currentSlide);
     if (currentSlide < slides.length - 1) {
       setCurrentSlide(currentSlide + 1);
     } else {
+      console.log('Last slide. Calling onComplete...');
       onComplete();
     }
   };

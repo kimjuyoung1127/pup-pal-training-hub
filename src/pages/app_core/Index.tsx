@@ -64,12 +64,18 @@ const AppCore: React.FC = () => {
 
   if (session) {
     if (!profileDogInfo && !location.pathname.startsWith('/app/dog-info') && !location.pathname.startsWith('/app/test-nav')) {
-      return <DogInfoPage onComplete={() => window.location.reload()} dogInfoToEdit={null} />;
+      return <DogInfoPage onComplete={() => navigate('/app')} dogInfoToEdit={null} />;
     }
   } else {
     if (!location.pathname.startsWith('/app/login') && !location.pathname.startsWith('/app/onboarding') && !location.pathname.startsWith('/app/test-nav')) {
       const onboardingComplete = localStorage.getItem('onboardingComplete');
-      return onboardingComplete ? <LoginPage onLogin={() => {}} /> : <OnboardingPage onComplete={() => {}} />;
+      return onboardingComplete 
+        ? <LoginPage onLogin={() => navigate('/app')} /> 
+        : <OnboardingPage onComplete={() => {
+            console.log('onComplete received in AppCore. Navigating to /app/login...');
+            localStorage.setItem('onboardingComplete', 'true'); // 온보딩 완료 상태 저장
+            navigate('/app/login');
+          }} />;
     }
   }
 
@@ -79,7 +85,7 @@ const AppCore: React.FC = () => {
       <main className="p-4">
         <Routes>
           <Route index element={<DashboardPage runTour={runTour} setRunTour={setRunTour} startTour={startTour} />} />
-          <Route path="dog-info" element={<DogInfoPage onComplete={() => window.location.reload()} dogInfoToEdit={null} />} />
+          <Route path="dog-info" element={<DogInfoPage onComplete={() => navigate('/app')} dogInfoToEdit={null} />} />
           <Route path="my-page" element={<DogProfilePage onNavigate={(page, params) => navigate(page, { state: params })} />} />
           <Route path="history" element={<TrainingHistoryPage onNavigate={(page, params) => navigate(page, { state: params })} />} />
           <Route path="settings" element={<SettingsPage />} />
@@ -90,11 +96,15 @@ const AppCore: React.FC = () => {
           <Route path="posture-analysis-history" element={<PostureAnalysisHistoryPage />} />
           
           {/* 훈련 시작 페이지 라우트 추가 */}
-          <Route path="training-start/:trainingId" element={<TrainingStartPage />} />
+          <Route path="training-start/:trainingId" element={<TrainingStartPage onNavigate={(path) => navigate(path)} />} />
 
           {/* Auth routes */}
-          <Route path="onboarding" element={<OnboardingPage onComplete={() => {}} />} />
-          <Route path="login" element={<LoginPage onLogin={() => {}} />} />
+          <Route path="onboarding" element={<OnboardingPage onComplete={() => {
+            console.log('onComplete received in AppCore Route. Navigating to /app/login...');
+            localStorage.setItem('onboardingComplete', 'true'); // 온보딩 완료 상태 저장
+            navigate('/app/login');
+          }} />} />
+          <Route path="login" element={<LoginPage onLogin={() => navigate('/app')} />} />
 
           {/* Fallback Route */}
           <Route path="*" element={<DashboardPage runTour={runTour} setRunTour={setRunTour} startTour={startTour} />} />
