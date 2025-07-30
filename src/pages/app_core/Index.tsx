@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'; // useNavigate 추가
 import OnboardingPage from '@/components/OnboardingPage';
 import LoginPage from '@/components/LoginPage';
 import DashboardPage from '@/components/DashboardPage';
@@ -15,12 +15,14 @@ import AppCoreHeader from '@/components/AppCoreHeader';
 import PostureAnalysisPage from '@/pages/tools/PostureAnalysisPage';
 import PostureAnalysisHistoryPage from '@/pages/history/PostureAnalysisHistoryPage';
 import { TrainingProgram } from '@/lib/trainingData';
+import TrainingStartPage from '@/components/TrainingStartPage';
 
 const AppCore: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { dogInfo: profileDogInfo, isLoading: isDogInfoLoading } = useDogProfile();
   const location = useLocation();
+  const navigate = useNavigate(); // useNavigate 사용
   
   // 투어 관련 상태 추가
   const [runTour, setRunTour] = useState(false);
@@ -78,21 +80,17 @@ const AppCore: React.FC = () => {
         <Routes>
           <Route index element={<DashboardPage runTour={runTour} setRunTour={setRunTour} startTour={startTour} />} />
           <Route path="dog-info" element={<DogInfoPage onComplete={() => window.location.reload()} dogInfoToEdit={null} />} />
-          <Route path="my-page" element={<DogProfilePage onNavigate={function (page: string, params?: any): void {
-            throw new Error('Function not implemented.');
-          } } />} />
-          <Route path="history" element={<TrainingHistoryPage onNavigate={function (page: string, params?: any): void {
-            throw new Error('Function not implemented.');
-          } } />} />
+          <Route path="my-page" element={<DogProfilePage onNavigate={(page, params) => navigate(page, { state: params })} />} />
+          <Route path="history" element={<TrainingHistoryPage onNavigate={(page, params) => navigate(page, { state: params })} />} />
           <Route path="settings" element={<SettingsPage />} />
           
           {/* Extra pages, not in header but accessible */}
-          <Route path="training-recommender" element={<AiTrainingRecommender onSelectTraining={function (training: TrainingProgram): void {
-            throw new Error('Function not implemented.');
-          } } selectedTrainingTitle={''} />} />
+          <Route path="training-recommender" element={<AiTrainingRecommender onSelectTraining={(training) => navigate(`/app/training-start/${training.id}`)} selectedTrainingTitle={''} />} />
           <Route path="posture-analysis" element={<PostureAnalysisPage />} />
           <Route path="posture-analysis-history" element={<PostureAnalysisHistoryPage />} />
           
+          {/* 훈련 시작 페이지 라우트 추가 */}
+          <Route path="training-start/:trainingId" element={<TrainingStartPage />} />
 
           {/* Auth routes */}
           <Route path="onboarding" element={<OnboardingPage onComplete={() => {}} />} />
