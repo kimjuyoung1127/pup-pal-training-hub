@@ -13,18 +13,73 @@ import { ArrowLeft } from 'lucide-react';
 type MbtiDimension = 'E' | 'I' | 'S' | 'N' | 'T' | 'F' | 'J' | 'P';
 
 const questions = [
-    { question: "산책 중 낯선 사람이나 강아지를 만나면?", choiceA: { text: "“친구다!” 일단 꼬리부터 흔들고 본다.", type: 'E' }, choiceB: { text: "“누구세요?” 일단 거리를 두고 상황을 살핀다.", type: 'I' } },
-    { question: "새로운 산책길에 대한 반응은?", choiceA: { text: "“킁킁킁!” 익숙한 길의 냄새를 맡으며 안정감을 느낀다.", type: 'S' }, choiceB: { text: "“여긴 어디?” 새로운 길로 가자고 주인을 이끈다.", type: 'N' } },
-    { question: "주인이 “안돼!”라고 단호하게 말했을 때?", choiceA: { text: "“왜 안되지?” 잠시 멈칫하지만, 다시 시도할 궁리를 한다.", type: 'T' }, choiceB: { text: "“내가 뭘 잘못했나...” 금방 시무룩해져서 눈치를 본다.", type: 'F' } },
-    { question: "하루 일과(밥, 산책 시간)가 조금 달라지면?", choiceA: { text: "“시간 됐다!” 정확한 시간에 보채며 루틴을 지키려 한다.", type: 'J' }, choiceB: { text: "“주면 먹고, 나가면 걷는다~” 크게 신경 쓰지 않는다.", type: 'P' } },
-    { question: "집에 혼자 있을 때, 창밖 구경하는 것을 즐기나요?", choiceA: { text: "“세상 구경이 제일 재밌어!” 창밖 사람, 차에 관심이 많다.", type: 'E' }, choiceB: { text: "“내 집이 최고.” 창밖보다는 자기 자리에 엎드려 있는다.", type: 'I' } },
-    { question: "장난감을 가지고 놀 때, 주로 어떻게 노나요?", choiceA: { text: "“냠냠쩝쩝” 입으로 물고 빨고, 질감을 느끼는 데 집중한다.", type: 'S' }, choiceB: { text: "“이리 던지고 저리 던지고!” 상상력을 발휘해 다양한 방법으로 논다.", type: 'N' } },
-    { question: "주인이 외출했다가 돌아왔을 때?", choiceA: { text: "“왔는가.” 꼬리를 흔들지만, 하던 일(잠자기 등)을 마저 한다.", type: 'T' }, choiceB: { text: "“보고 싶었어!” 온몸으로 격하게 반가움을 표현해야 직성이 풀린다.", type: 'F' } },
-    { question: "간식을 줄 때, “기다려” 훈련을 하면?", choiceA: { text: "“먹으랄 때까지...” 힘들어하지만, 지시를 따르려고 노력한다.", type: 'J' }, choiceB: { text: "“에이, 그냥 먹자!” 기다리는 것을 유독 힘들어한다.", type: 'P' } },
-    { question: "집에 손님이 방문했을 때, 아이의 첫 반응은?", choiceA: { text: "“새로운 집사인가?” 꼬리를 흔들며 먼저 다가가 아는 척을 한다.", type: 'E' }, choiceB: { text: "“수상한 사람이다!” 구석에 숨거나, 멀리서 경계하며 짖는다.", type: 'I' } },
-    { question: "‘노즈워크’ 놀이를 할 때, 간식을 찾는 방식은?", choiceA: { text: "“하나만 판다!” 한 구역을 꼼꼼히 뒤져서 찾아낸다.", type: 'S' }, choiceB: { text: "“대충 킁킁!” 전체를 빠르게 훑으며 감으로 찾아낸다.", type: 'N' } },
-    { question: "주인이 아프거나 슬퍼 보일 때, 옆에 와서 핥아주거나 기대나요?", choiceA: { text: "“음... 평소랑 다른데?” 어색해하며 주변을 맴돈다.", type: 'T' }, choiceB: { text: "“내가 지켜줄게!” 기가 막히게 감정을 알아채고 위로해준다.", type: 'F' } },
-    { question: "잠자리가 정해져 있나요, 아니면 아무 데서나 잘 자나요?", choiceA: { text: "“내 자리는 여기!” 자기 쿠션이나 정해진 장소에서만 자려고 한다.", type: 'J' }, choiceB: { text: "“여기가 침대요, 저기가 소파로다.” 피곤하면 어디서든 잘 잔다.", type: 'P' } },
+    // E vs I
+    {
+        question: "산책 중 다른 강아지를 만났을 때?",
+        choiceA: { text: "반갑게 꼬리를 흔들며 먼저 다가간다.", type: "E" },
+        choiceB: { text: "거리를 두고 조용히 상대를 살핀다.", type: "I" }
+    },
+    {
+        question: "집에 손님이 왔을 때, 첫 반응은?",
+        choiceA: { text: "신나서 뛰어가 반긴다.", type: "E" },
+        choiceB: { text: "낯설어 구석으로 피하거나 보호자 옆에 있다.", type: "I" }
+    },
+    {
+        question: "혼자 있을 때 주로 하는 행동은?",
+        choiceA: { text: "집안을 돌아다니며 활동한다.", type: "E" },
+        choiceB: { text: "조용히 자기 자리에서 쉰다.", type: "I" }
+    },
+
+    // S vs N
+    {
+        question: "새로운 장난감을 줬을 때?",
+        choiceA: { text: "냄새, 소리, 질감을 꼼꼼히 살핀다.", type: "S" },
+        choiceB: { text: "새로운 놀이법을 상상하며 재밌게 논다.", type: "N" }
+    },
+    {
+        question: "'산책 갈까?'라는 말을 들으면?",
+        choiceA: { text: "목줄 소리, 문 앞 신호에 즉각 반응!", type: "S" },
+        choiceB: { text: "주인의 말투와 분위기를 먼저 살핀다.", type: "N" }
+    },
+    {
+        question: "처음 가는 산책길에서?",
+        choiceA: { text: "발 아래 냄새 맡고 현재 길을 탐색한다.", type: "S" },
+        choiceB: { text: "앞으로 뭐가 나올지 기대하며 앞장선다.", type: "N" }
+    },
+
+    // T vs F
+    {
+        question: "주인이 단호하게 '안돼!'라고 말했을 때?",
+        choiceA: { text: "왜 안 되는지 멈춰서 고민한다.", type: "T" },
+        choiceB: { text: "주인의 기분을 살피며 시무룩해진다.", type: "F" }
+    },
+    {
+        question: "주인이 슬퍼 보일 때?",
+        choiceA: { text: "이상함은 느끼지만 거리를 두고 본다.", type: 'T' },
+        choiceB: { text: "다정하게 다가와 기대거나 핥는다.", type: 'F' }
+    },
+    {
+        question: "칭찬받을 때 반응은?",
+        choiceA: { text: "다음 보상을 기대하며 차분히 행동.", type: "T" },
+        choiceB: { text: "그 순간이 좋아서 온몸으로 표현.", type: "F" }
+    },
+
+    // J vs P
+    {
+        question: "하루 루틴(밥, 산책)이 바뀌면?",
+        choiceA: { text: "불안해하며 제 시간에 하길 원한다.", type: "J" },
+        choiceB: { text: "별 신경 안 쓰고 바로 적응한다.", type: "P" }
+    },
+    {
+        question: "'기다려' 훈련을 할 때?",
+        choiceA: { text: "'먹어' 신호가 올 때까지 참는다.", type: "J" },
+        choiceB: { text: "참지 못하고 간식만 바라본다.", type: "P" }
+    },
+    {
+        question: "잠자리가 정해져 있나요?",
+        choiceA: { text: "항상 같은 자리에서 잔다.", type: "J" },
+        choiceB: { text: "편한 곳이면 아무 데서나 잔다.", type: "P" }
+    }
 ];
 
 interface TestState {

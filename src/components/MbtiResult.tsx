@@ -198,9 +198,19 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
     }
   };
 
-  const handleUploadButtonClick = () => imageInputRef.current?.click();
+  const UploadButton = () => (
+    <Button 
+      variant="outline"
+      className="w-full border-dashed border-gray-400 hover:border-gray-600 hover:bg-gray-50 transition-all duration-200 py-6 flex flex-col items-center justify-center"
+      onClick={() => imageInputRef.current?.click()}
+    >
+      <Upload className="h-8 w-8 text-gray-500 mb-2" />
+      <span className="text-gray-600 font-semibold">강아지 사진 올리기</span>
+      <p className="text-xs text-gray-400 mt-1">결과를 더 예쁘게 꾸며보세요!</p>
+    </Button>
+  );
 
-  const handleDownloadImage = useCallback(() => {
+  const handleDownloadImage = useCallback(async () => {
     if (!cardRef.current) return;
     toPng(cardRef.current, { cacheBust: true, pixelRatio: 2 })
       .then((dataUrl) => {
@@ -259,6 +269,10 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
   }, [petName, result, description]);
 
   if (isLoadingDesc || isLoadingBreeds) {
+    function handleUploadButtonClick(event: React.MouseEvent<HTMLButtonElement>): void {
+      throw new Error('Function not implemented.');
+    }
+
     return (
       <div ref={ref} className="w-full max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
         <Card className="bg-white/80 backdrop-blur-lg border-2 border-purple-200/50 shadow-2xl rounded-3xl overflow-hidden">
@@ -304,6 +318,10 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
         </Card>
       </div>
     );
+  }
+
+  function handleUploadButtonClick(event: React.MouseEvent<HTMLButtonElement>): void {
+    throw new Error('Function not implemented.');
   }
 
   return (
