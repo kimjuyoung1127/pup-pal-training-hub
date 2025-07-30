@@ -163,17 +163,30 @@ def analyze_video_in_background(job_id: str, video_path: str, user_id: str, dog_
         # 4. Supabase에 저장
         if supabase:
             try:
-                # 4-1. 이 강아지의 첫 분석인지 확인 (is_baseline)
+                # 4-1. 원본 영상을 Supabase Storage에 업로드
+                storage_file_path = f"{user_id}/{job_id}_{original_filename}"
+                with open(video_path, 'rb') as f:
+                    supabase.storage.from_("processed-videos").upload(
+                        file=f,
+                        path=storage_file_path,
+                        file_options={"content-type": "video/mp4"}
+                    )
+                
+                # 4-2. 업로드된 영상의 공개 URL 가져오기
+                public_url = supabase.storage.from_("processed-videos").get_public_url(storage_file_path)
+                logger.info(f"영상을 Supabase Storage에 업로드했습니다. URL: {public_url}")
+
+                # 4-3. 이 강아지의 첫 분석인지 확인 (is_baseline)
                 count_res = supabase.table('joint_analysis_records').select('id', count='exact').eq('dog_id', dog_id).execute()
                 is_baseline = count_res.count == 0
 
-                # 4-2. 저장할 데이터 준비
+                # 4-4. 저장할 데이터 준비 (영구 URL 사용)
                 record_to_insert = {
                     "user_id": user_id,
                     "dog_id": dog_id,
                     "is_baseline": is_baseline,
                     "original_video_filename": original_filename,
-                    "processed_video_url": jobs[job_id]['original_video_url'],
+                    "processed_video_url": public_url, # 임시 URL 대신 영구 URL 사용
                     "analysis_results": analysis_results_json,
                     "notes": f"Stability Score: {stability_score}"
                 }
@@ -182,7 +195,9 @@ def analyze_video_in_background(job_id: str, video_path: str, user_id: str, dog_
                 logger.info(f"작업 {job_id}의 분석 결과를 Supabase에 저장했습니다.")
 
             except Exception as db_error:
-                logger.error(f"Supabase 저장 실패: {db_error}", exc_info=True)
+                logger.error(f"Supabase 저장 또는 업로드 실패: {db_error}", exc_info=True)
+                # 업로드/저장 실패 시에도 작업 상태는 계속 진행될 수 있으므로, 에러를 기록하고 넘어감
+                jobs[job_id]['error'] = f"DB/Storage Error: {db_error}"
 
         jobs[job_id]['status'] = 'completed'
         logger.info(f"작업 {job_id} 완료.")
