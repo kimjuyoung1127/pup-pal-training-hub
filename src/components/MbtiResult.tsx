@@ -50,6 +50,38 @@ const dataURLtoFile = (dataurl: string, filename: string) => {
   return new File([u8arr], filename, { type: mime });
 };
 
+const resizeImage = (file: File, maxWidth: number): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      if (!event.target?.result) {
+        return reject(new Error("Failed to read file."));
+      }
+      img.src = event.target.result as string;
+      img.onload = () => {
+        if (img.width <= maxWidth) {
+          resolve(img.src);
+          return;
+        }
+        const canvas = document.createElement('canvas');
+        const scale = maxWidth / img.width;
+        canvas.width = maxWidth;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          return reject(new Error('Could not get canvas context'));
+        }
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg'));
+      };
+      img.onerror = (error) => reject(error);
+    };
+    reader.onerror = (error) => reject(error);
+  });
+};
+
 // --- 공유용 결과 카드 ---
 const MbtiResultCard = React.forwardRef<HTMLDivElement, { result: any, petName: string, petImage: string | null }>(({ result, petName, petImage }, ref) => {
   return (
@@ -129,13 +161,22 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPetImage(reader.result as string);
-      };
-      reader.readAsDataURL(event.target.files[0]);
+      const file = event.target.files[0];
+      try {
+        const resizedImageDataUrl = await resizeImage(file, 800); // Resize to max 800px width
+        setPetImage(resizedImageDataUrl);
+      } catch (error) {
+        console.error("Image resizing failed:", error);
+        alert('이미지 처리 중 오류가 발생했습니다. 다른 파일을 선택해주세요.');
+        // Fallback to original file reader if resize fails for some reason
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPetImage(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
