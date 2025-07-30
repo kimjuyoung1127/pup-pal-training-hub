@@ -13,7 +13,7 @@ import EmptyJointAnalysisHistory from '@/components/posture-analysis-history/Emp
 import JointAnalysisHistoryList from '@/components/posture-analysis-history/JointAnalysisHistoryList';
 import LatestAnalysisResultCard from './LatestAnalysisResultCard';
 import { JointAnalysisRecord } from '@/types/analysis';
-import AnalysisDetailView from './AnalysisDetailView';
+import AnalysisDetailModal from './AnalysisDetailModal'; // AnalysisDetailModal 임포트
 
 const PostureAnalysisHistoryPage: React.FC = () => {
   const navigate = useNavigate();
@@ -21,9 +21,16 @@ const PostureAnalysisHistoryPage: React.FC = () => {
   
   const [activeDogId, setActiveDogId] = useState<string | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<JointAnalysisRecord | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 추가
 
   const handleSelectRecord = (record: JointAnalysisRecord) => {
     setSelectedRecord(JSON.parse(JSON.stringify(record)));
+    setIsModalOpen(true); // 모달 열기
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedRecord(null);
   };
 
   const handleShare = (record: JointAnalysisRecord) => {
@@ -58,7 +65,8 @@ const PostureAnalysisHistoryPage: React.FC = () => {
   // 최초 로드 시 또는 activeDogId 변경 시, 최신 결과를 기본으로 선택
   useEffect(() => {
     if (latestResult) {
-      setSelectedRecord(latestResult);
+      // 기본으로 상세 뷰를 보여주지 않도록 이 부분을 주석 처리하거나 삭제합니다.
+      // setSelectedRecord(latestResult);
     } else {
       setSelectedRecord(null); // 기록이 없으면 선택 해제
     }
@@ -150,26 +158,18 @@ const PostureAnalysisHistoryPage: React.FC = () => {
           </TabsList>
           
           <TabsContent value={activeDogId} forceMount>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
-              {/* Left Column: History List */}
-              <div className="lg:max-h-[calc(100vh-200px)] lg:overflow-y-auto pr-4">
-                {renderHistoryList()}
-              </div>
-
-              {/* Right Column: Detail View */}
-              <div>
-                {selectedRecord ? (
-                  <AnalysisDetailView record={selectedRecord} />
-                ) : (
-                  <div className="sticky top-24 flex items-center justify-center h-full bg-gray-50 rounded-lg">
-                    <p className="text-gray-500">목록에서 분석 기록을 선택하세요.</p>
-                  </div>
-                )}
-              </div>
+            <div className="mt-6">
+              {renderHistoryList()}
             </div>
           </TabsContent>
         </Tabs>
       )}
+
+      <AnalysisDetailModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        record={selectedRecord} // 'analysisResult'를 'record'로 변경
+      />
     </motion.div>
   );
 };

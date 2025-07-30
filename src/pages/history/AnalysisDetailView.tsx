@@ -332,19 +332,20 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record }) => {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="w-full border-orange-200 text-orange-600 hover:bg-orange-50"
+                        className="w-full border-orange-200 text-orange-600 hover:bg-orange-50 flex items-center justify-center whitespace-nowrap"
                         onClick={() => setShowShareCard(true)}
                       >
-                        📱 SNS에 공유하기
+                        <Share2 className="mr-1 h-4 w-4" />
+                        SNS에 공유하기
                       </Button>
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="w-full border-purple-200 text-purple-600 hover:bg-purple-50"
+                        className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 flex items-center justify-center whitespace-nowrap"
                         onClick={() => setShowShareCard(true)}
                       >
-                        <Download className="mr-2 h-4 w-4" />
-                        🖼️ 썸네일 다운로드
+                        <Download className="mr-1 h-4 w-4" />
+                        이미지 저장하기
                       </Button>
                     </div>
                   </div>
