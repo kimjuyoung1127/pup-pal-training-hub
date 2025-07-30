@@ -21,7 +21,7 @@ const MbtiHubPage: React.FC = () => {
             <PawPrint className="h-8 w-8 text-purple-500 mr-3" />
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">
               <span className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
-                견종 성향 테스트 (MBTI)
+                성향 테스트 (MBTI)
               </span>
             </h1>
             <PawPrint className="h-8 w-8 text-purple-500 ml-3" />
@@ -68,7 +68,7 @@ const MbtiHubPage: React.FC = () => {
                   <User className="h-12 w-12 mb-3 text-purple-500 mx-auto" />
                   나와 잘 맞는
                   <br />
-                  견종 찾기
+                  강아지 찾기
                 </div>
               </Button>
             </Link>

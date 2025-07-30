@@ -199,8 +199,51 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
     }
   }, [petName, result, description]);
 
+  if (isLoadingDesc || isLoadingBreeds) {
+    return (
+      <div ref={ref} className="w-full max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
+        <Card className="bg-white/80 backdrop-blur-lg border-2 border-purple-200/50 shadow-2xl rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 p-6 border-b-2 border-purple-200/50">
+            <CardTitle className="text-xl text-purple-800">나만의 결과 카드 만들기 🐾</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col md:flex-row md:items-start md:gap-6">
+            <div className="flex-grow mb-6 md:mb-0">
+              <div className="mb-4">
+                <label htmlFor="petName" className="block text-sm font-medium text-gray-700 mb-1">강아지 이름</label>
+                <Input id="petName" type="text" placeholder="예: 몽이" value={petName} onChange={(e) => setPetName(e.target.value)} className="border-purple-300 focus:ring-purple-500 focus:border-purple-500" />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">사진 업로드 (선택)</label>
+                <Input id="petImage" type="file" accept="image/*" ref={imageInputRef} onChange={handleImageUpload} className="hidden" />
+                <Button onClick={handleUploadButtonClick} variant="outline" className="w-full border-purple-300 text-purple-700 hover:bg-purple-100 hover:text-purple-800">
+                  <Upload className="mr-2 h-4 w-4" />
+                  사진 선택
+                </Button>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2 mt-4">
+                <Button onClick={handleDownloadImage} className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                  <Download className="mr-2 h-4 w-4" /> 이미지 저장하기
+                </Button>
+                <Button onClick={handleShareToKakao} disabled={isSharing} className="w-full bg-yellow-400 text-yellow-900 hover:bg-yellow-500">
+                  {isSharing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
+                  {isSharing ? '공유 준비중...' : '카카오톡으로 공유'}
+                </Button>
+              </div>
+            </div>
+            <div className="flex flex-col items-center justify-center w-full md:w-auto md:flex-shrink-0">
+              <p className="text-center text-sm font-medium text-gray-700 mb-2">미리보기</p>
+              <div className="flex justify-center">
+                <MbtiResultCard ref={cardRef} result={description} petName={petName} petImage={petImage} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div ref={ref} className="bg-white/80 backdrop-blur-md p-6 md:p-8 rounded-3xl shadow-2xl border-2 border-purple-200">
+    <div className="bg-white/80 backdrop-blur-md p-6 md:p-8 rounded-3xl shadow-2xl border-2 border-purple-200">
       <div className="text-center">
         <h2 className="text-lg font-bold text-gray-600 mb-1">우리 강아지 성향은...</h2>
         {isLoadingDesc ? <Loader2 className="mx-auto h-10 w-10 animate-spin text-purple-500" /> : (
@@ -228,12 +271,12 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
               <Input id="petImage" type="file" accept="image/*" ref={imageInputRef} onChange={handleImageUpload} className="hidden" />
               <Button onClick={handleUploadButtonClick} variant="outline" className="w-full border-purple-300 text-purple-700 hover:bg-purple-100 hover:text-purple-800">
                 <Upload className="mr-2 h-4 w-4" />
-                컴퓨터에서 사진 선택
+                사진 선택
               </Button>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 mt-4">
               <Button onClick={handleDownloadImage} className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-                <Download className="mr-2 h-4 w-4" /> 이미지로 저장하기
+                <Download className="mr-2 h-4 w-4" /> 이미지 저장하기
               </Button>
               <Button onClick={handleShareToKakao} disabled={isSharing} className="w-full bg-yellow-400 text-yellow-900 hover:bg-yellow-500">
                 {isSharing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
