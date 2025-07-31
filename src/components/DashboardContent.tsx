@@ -150,7 +150,7 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
             <div className="bg-white/20 p-1.5 sm:p-2 rounded-lg flex-shrink-0">
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <span className="text-sm sm:text-lg font-semibold truncate">AI 훈련 추천</span>
+            <span className="text-sm sm:text-lg font-semibold truncate">AI 맞춤 훈련</span>
           </div>
           <div className="text-xl sm:text-2xl flex-shrink-0">✨</div>
         </Button>
@@ -163,7 +163,7 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
             <div className="bg-white/20 p-1.5 sm:p-2 rounded-lg flex-shrink-0">
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <span className="text-sm sm:text-lg font-semibold truncate">AI 훈련 코치와 대화하기</span>
+            <span className="text-sm sm:text-lg font-semibold truncate">AI 챗봇과 대화하기</span>
           </div>
           <div className="text-xl sm:text-2xl flex-shrink-0">🤖</div>
         </Button>
@@ -202,7 +202,7 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
             <div className="bg-white/20 p-1.5 sm:p-2 rounded-lg flex-shrink-0">
               <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <span className="text-sm sm:text-lg font-semibold truncate">오프라인 훈련 받아보기</span>
+            <span className="text-sm sm:text-lg font-semibold truncate">오프라인 훈련</span>
           </div>
           <div className="text-xl sm:text-2xl flex-shrink-0">🎓</div>
         </Button>
