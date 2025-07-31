@@ -71,6 +71,7 @@ const App = () => (
               <Routes>
                 {/* Pet-Life Magazine & Woofpedia 기능 */}
                 <Route path="/" element={<HomePage />} />
+                <Route path="/articles/:slug" element={<ArticlePage />} />
                 <Route path="/community" element={<CommunityPage />} />
                 <Route path="/community/new" element={<PostEditorPage />} />
                 <Route path="/community/edit/:postId" element={<PostEditorPage />} /> {/* 수정 페이지 라우트 추가 */}
