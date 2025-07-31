@@ -20,7 +20,7 @@ const navItems = [
       key: "training-process",
       components: [
         { path: "/app/training-recommender", title: "AI 훈련 추천", description: "AI가 우리 아이에게 맞는 훈련 계획을 짜드려요." },
-        { path: "/app/posture-analysis", title: "AI 자세 분석", description: "걷는 모습을 분석하여 자세 균형을 확인해보세요." },
+        { path: "/app/posture-analysis", title: "AI 자세 분석", description: "AI가 우리 아이의 자세를 분석해드려요." },
       ] 
     },
     { 

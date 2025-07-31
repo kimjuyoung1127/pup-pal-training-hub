@@ -261,7 +261,7 @@ const AiTrainingRecommender = ({ onSelectTraining, trainingGoals }: AiTrainingRe
             {recommendTrainingMutation.isPending ? (
               <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> 추천 생성 중...</>
             ) : (
-              <><Wand2 className="mr-2 h-4 w-4" /> AI 추천 다시 받기</>
+              <><Wand2 className="mr-2 h-4 w-4" /> AI 추천 받기</>
             )}
           </Button>
 

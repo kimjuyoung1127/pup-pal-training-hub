@@ -1,21 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 
 const HeroSection: React.FC = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const highResImageSrc = "/hero/images/1.png";
+  const lowResImageSrc = "/hero/images/1-placeholder.png"; // 가정: 작고 흐린 버전의 이미지
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = highResImageSrc;
+    img.onload = () => {
+      setIsLoaded(true);
+    };
+  }, [highResImageSrc]);
+
   return (
     <section className="relative h-[75vh] min-h-[500px] w-full flex items-center justify-center text-center text-white overflow-hidden">
-      {/* Background Video/Image */}
-      <div className="absolute inset-0 z-0">
+      {/* Background Image Container */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${lowResImageSrc})` }}
+      >
         <img 
-          src="/hero/images/1.png" 
+          src={highResImageSrc}
           alt="행복한 강아지와 주인" 
-          className="w-full h-full object-cover"
+          className={`w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
         />
-        {/* Solid overlay for perfect text readability */}
-        <div className="absolute inset-0 bg-black/50"></div>
       </div>
+      {/* Solid overlay for perfect text readability */}
+      <div className="absolute inset-0 bg-black/50"></div>
       
       {/* Content */}
       <motion.div 
