@@ -64,7 +64,7 @@ const AboutUsPage: React.FC = () => {
             <div>
               <h2 className="text-2xl font-bold text-gray-800 mb-4">함께하는 팀</h2>
               <p className="text-gray-600 leading-relaxed mb-6">
-                멍멍트레이너는 반려동물을 사랑하는 개발자, 수의사, 행동 전문가, 디자이너들이 모여 만들었습니다.
+                Mung-Ai는 반려동물을 사랑하는 개발자, 수의사, 행동 전문가, 디자이너들이 모여 만들었습니다.
                 우리는 모든 반려견이 행복한 삶을 살 수 있도록 최선을 다하고 있습니다.
               </p>
               

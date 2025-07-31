@@ -272,6 +272,15 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record }) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="p-6">
+        {/* ★★★ 책임 한계 조항 추가 ★★★ */}
+        <Alert variant="destructive" className="bg-yellow-50 border-yellow-400 text-yellow-800 mb-6">
+          <Terminal className="h-4 w-4 !text-yellow-800" />
+          <AlertTitle className="font-bold">중요 안내: 책임 한계 조항</AlertTitle>
+          <AlertDescription className="text-xs">
+            본 AI 자세 분석 기능은 의료적 진단이나 전문적인 수의학적 소견을 대체할 수 없습니다. 분석 결과는 참고용 보조 지표이며, 반려동물의 건강에 이상이 의심될 경우 반드시 전문 수의사와 상담하시기 바랍니다.
+          </AlertDescription>
+        </Alert>
+        
         {stabilityScore !== undefined && scoreInfo && (
           <div className={`${scoreInfo.bgColor} ${scoreInfo.borderColor} border-2 p-6 rounded-2xl mb-6`}>
             <div className="text-center mb-4">

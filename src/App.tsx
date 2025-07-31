@@ -34,6 +34,7 @@ import NotFound from "./pages/legal_and_info/NotFound";
 import PrivacyPolicyPage from './pages/legal_and_info/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/legal_and_info/TermsOfServicePage';
 import AboutUsPage from './pages/legal_and_info/AboutUsPage';
+import ContactUsPage from './pages/legal_and_info/ContactUsPage'; // 추가
 import PricingPage from './pages/legal_and_info/PricingPage';
 import SuccessPage from './pages/legal_and_info/SuccessPage';
 import FailPage from './pages/legal_and_info/FailPage';
@@ -99,6 +100,7 @@ const App = () => (
                 <Route path="/privacy" element={<PrivacyPolicyPage />} />
                 <Route path="/terms" element={<TermsOfServicePage />} />
                 <Route path="/about" element={<AboutUsPage />} />
+                <Route path="/contact" element={<ContactUsPage />} />
                 <Route path="/pricing" element={<PricingPage />} />
                 <Route path="/success" element={<SuccessPage />} />
                 <Route path="/fail" element={<FailPage />} />

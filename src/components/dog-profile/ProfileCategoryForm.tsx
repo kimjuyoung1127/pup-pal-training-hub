@@ -11,15 +11,16 @@ import { toast } from 'sonner';
 import { useMutation } from '@tanstack/react-query';
 import { Mission, MissionCategory } from '../../lib/missionData';
 import { Textarea } from '../ui/textarea';
-import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { Input } from '../ui/input';
-import { Pencil } from 'lucide-react'; // Pencil 아이콘 추가
+import { Edit3, Check, ChevronRight, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface ProfileCategoryFormProps {
     category: MissionCategory;
     dogId: string;
     extendedProfile: FullDogExtendedProfile | null;
     onUpdate: () => void;
+    index?: number;
 }
 
 const createFormSchema = (missions: Mission[]) => {
@@ -30,7 +31,7 @@ const createFormSchema = (missions: Mission[]) => {
     return z.object(shape);
 };
 
-const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: ProfileCategoryFormProps) => {
+const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate, index = 0 }: ProfileCategoryFormProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const formSchema = createFormSchema(category.missions);
     type FormValues = z.infer<typeof formSchema>;
@@ -62,13 +63,12 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
         onSuccess: () => {
             toast.success(`🎉 '${category.title}' 정보가 업데이트되었어요.`);
             onUpdate();
-            setIsEditing(false); // 저장 후 편집 모드 종료
+            setIsEditing(false);
         },
         onError: (error: any) => toast.error('정보 업데이트 실패', { description: error.message }),
     });
 
     const onSubmit = (values: FormValues) => {
-        console.log("Raw form values:", values);
         const processedValues: Partial<FullDogExtendedProfile> = {};
         Object.keys(values).forEach(key => {
             const mission = category.missions.find(m => m.key === key);
@@ -81,7 +81,6 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
                 processedValues[key] = value;
             }
         });
-        console.log("Processed values to be sent:", processedValues);
         updateProfileMutation.mutate(processedValues);
     };
 
@@ -93,103 +92,291 @@ const ProfileCategoryForm = ({ category, dogId, extendedProfile, onUpdate }: Pro
         return value !== null && value !== undefined && value !== '';
     }).length;
     const completionPercent = extendedProfile ? Math.round((completionCount / category.missions.length) * 100) : 0;
+    const isCompleted = completionPercent === 100;
+
+    // 카테고리별 색상 테마
+    const getThemeColors = () => {
+        const themes = [
+            { bg: 'from-blue-50 to-sky-50', border: 'border-blue-200', accent: 'text-blue-600', selected: 'bg-blue-100 border-blue-400' },
+            { bg: 'from-green-50 to-emerald-50', border: 'border-green-200', accent: 'text-green-600', selected: 'bg-green-100 border-green-400' },
+            { bg: 'from-purple-50 to-pink-50', border: 'border-purple-200', accent: 'text-purple-600', selected: 'bg-purple-100 border-purple-400' },
+            { bg: 'from-orange-50 to-yellow-50', border: 'border-orange-200', accent: 'text-orange-600', selected: 'bg-orange-100 border-orange-400' },
+        ];
+        return themes[index % themes.length];
+    };
+
+    const theme = getThemeColors();
 
     return (
-        <AccordionItem value={category.key}>
-            <div className="flex items-center w-full pr-2">
-                <AccordionTrigger className="flex-1">
-                    <div className="flex justify-between items-center w-full">
-                        <span className="text-sky-800 font-semibold">{category.icon} {category.title}</span>
-                        <span className="text-sm text-sky-800 font-semibold mr-2">완성도 {completionPercent}%</span>
-                    </div>
-                </AccordionTrigger>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="p-1 h-auto w-auto rounded-md hover:bg-gray-200 cursor-pointer"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setIsEditing(!isEditing);
-                    }}
-                >
-                    <Pencil className="h-4 w-4 text-gray-600" />
-                </Button>
+        <AccordionItem value={category.key} className="border-0">
+            <div className={`bg-gradient-to-r ${theme.bg} border-b ${theme.border} last:border-b-0`}>
+                <div className="flex items-center w-full px-6 py-4">
+                    <AccordionTrigger className="flex-1 hover:no-underline group">
+                        <div className="flex justify-between items-center w-full">
+                            <div className="flex items-center gap-3">
+                                <div className="text-2xl">{category.icon}</div>
+                                <div className="text-left">
+                                    <h3 className={`font-bold text-lg ${theme.accent}`}>
+                                        {category.title}
+                                    </h3>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <div className={`text-sm ${theme.accent} font-medium`}>
+                                            {completionCount}/{category.missions.length} 완료
+                                        </div>
+                                        {isCompleted && (
+                                            <div className="flex items-center gap-1 text-green-600">
+                                                <Check className="w-4 h-4" />
+                                                <span className="text-xs font-medium">완료!</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className={`text-2xl font-bold ${theme.accent}`}>
+                                    {completionPercent}%
+                                </div>
+                                <ChevronRight className={`w-5 h-5 ${theme.accent} group-data-[state=open]:rotate-90 transition-transform`} />
+                            </div>
+                        </div>
+                    </AccordionTrigger>
+                    
+                    <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <Button
+                            variant={isEditing ? "default" : "outline"}
+                            size="sm"
+                            className={`ml-4 px-4 py-2 font-medium transition-all duration-200 ${
+                                isEditing 
+                                    ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-md' 
+                                    : 'bg-white hover:bg-blue-50 text-blue-600 border-blue-200 hover:border-blue-300'
+                            }`}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsEditing(!isEditing);
+                            }}
+                        >
+                            <Edit3 className="w-4 h-4 mr-2" />
+                            {isEditing ? '취소' : '편집'}
+                        </Button>
+                    </motion.div>
+                </div>
             </div>
-            <AccordionContent>
+            
+            <AccordionContent className="px-6 py-6 bg-white">
                 {isEditing ? (
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-2">
-                            {category.missions.map(mission => (
-                                <FormField
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                            {category.missions.map((mission, missionIndex) => (
+                                <motion.div
                                     key={mission.key}
-                                    control={form.control}
-                                    name={mission.key as keyof FormValues & string}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-gray-800">{mission.question}</FormLabel>
-                                            <FormControl>
-                                                {mission.type === 'boolean' ? (
-                                                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-2">
-                                                        {['예', '아니오'].map(option => (
-                                                            <FormItem key={option} className="flex items-center space-x-2 space-y-0">
-                                                                <FormControl><RadioGroupItem value={option} className="bg-white border-gray-400 text-gray-900" /></FormControl>
-                                                                <FormLabel className="font-normal text-gray-800">{option}</FormLabel>
-                                                            </FormItem>
-                                                        ))}
-                                                    </RadioGroup>
-                                                ) : mission.options ? (
-                                                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex flex-wrap gap-x-4 gap-y-2">
-                                                        {mission.options.map(option => (
-                                                            <FormItem key={option} className="flex items-center space-x-3 space-y-0">
-                                                              <FormControl>
-                                                                <RadioGroupItem value={option} className="bg-white border-gray-400 text-gray-900" />
-                                                              </FormControl>
-                                                              <FormLabel className="font-normal text-gray-800">{option}</FormLabel>
-                                                            </FormItem>
-                                                          ))}
-                                                    </RadioGroup>
-                                                ) : mission.key === 'walk_satisfaction' ? (
-                                                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex flex-wrap gap-x-4 gap-y-2">
-                                                        {['매우 만족', '만족', '보통', '불만족', '매우 불만족'].map(option => (
-                                                            <FormItem key={option} className="flex items-center space-x-3 space-y-0">
-                                                                <FormControl><RadioGroupItem value={option} className="bg-white border-gray-400 text-gray-900" /></FormControl>
-                                                                <FormLabel className="font-normal text-gray-800">{option}</FormLabel>
-                                                            </FormItem>
-                                                        ))}
-                                                    </RadioGroup>
-                                                ) : mission.key === 'defecation_status' ? (
-                                                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex flex-wrap gap-x-4 gap-y-2">
-                                                        {['정상', '설사', '변비'].map(option => (
-                                                            <FormItem key={option} className="flex items-center space-x-3 space-y-0">
-                                                                <FormControl><RadioGroupItem value={option} className="bg-white border-gray-400 text-gray-900" /></FormControl>
-                                                                <FormLabel className="font-normal text-gray-800">{option}</FormLabel>
-                                                            </FormItem>
-                                                        ))}
-                                                    </RadioGroup>
-                                                ) : (
-                                                    <Textarea placeholder={mission.placeholder} {...field} className="bg-white text-gray-900 border-gray-300" />
-                                                )}
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: missionIndex * 0.1 }}
+                                >
+                                    <FormField
+                                        control={form.control}
+                                        name={mission.key as keyof FormValues & string}
+                                        render={({ field }) => (
+                                            <FormItem className="space-y-4">
+                                                <FormLabel className="text-gray-800 font-semibold text-base">
+                                                    {mission.question}
+                                                </FormLabel>
+                                                <FormControl>
+                                                    {mission.type === 'boolean' ? (
+                                                        <div className="flex gap-4">
+                                                            {['예', '아니오'].map(option => (
+                                                                <motion.div
+                                                                    key={option}
+                                                                    whileHover={{ scale: 1.02 }}
+                                                                    whileTap={{ scale: 0.98 }}
+                                                                    className={`flex-1 p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                                                                        field.value === option 
+                                                                            ? `${theme.selected} shadow-md` 
+                                                                            : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                                                                    }`}
+                                                                    onClick={() => field.onChange(option)}
+                                                                >
+                                                                    <div className="text-center">
+                                                                        <div className={`text-lg font-semibold ${
+                                                                            field.value === option ? theme.accent : 'text-gray-700'
+                                                                        }`}>
+                                                                            {option}
+                                                                        </div>
+                                                                        {field.value === option && (
+                                                                            <Check className={`w-5 h-5 mx-auto mt-2 ${theme.accent.replace('text-', 'text-')}`} />
+                                                                        )}
+                                                                    </div>
+                                                                </motion.div>
+                                                            ))}
+                                                        </div>
+                                                    ) : mission.options ? (
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                            {mission.options.map(option => (
+                                                                <motion.div
+                                                                    key={option}
+                                                                    whileHover={{ scale: 1.02 }}
+                                                                    whileTap={{ scale: 0.98 }}
+                                                                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                                                                        field.value === option 
+                                                                            ? `${theme.selected} shadow-md` 
+                                                                            : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                                                                    }`}
+                                                                    onClick={() => field.onChange(option)}
+                                                                >
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className={`font-medium ${
+                                                                            field.value === option ? theme.accent : 'text-gray-700'
+                                                                        }`}>
+                                                                            {option}
+                                                                        </span>
+                                                                        {field.value === option && (
+                                                                            <Check className={`w-5 h-5 ${theme.accent.replace('text-', 'text-')}`} />
+                                                                        )}
+                                                                    </div>
+                                                                </motion.div>
+                                                            ))}
+                                                        </div>
+                                                    ) : mission.key === 'walk_satisfaction' ? (
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                                            {['매우 만족', '만족', '보통', '불만족', '매우 불만족'].map(option => (
+                                                                <motion.div
+                                                                    key={option}
+                                                                    whileHover={{ scale: 1.02 }}
+                                                                    whileTap={{ scale: 0.98 }}
+                                                                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                                                                        field.value === option 
+                                                                            ? `${theme.selected} shadow-md` 
+                                                                            : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                                                                    }`}
+                                                                    onClick={() => field.onChange(option)}
+                                                                >
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className={`font-medium text-sm ${
+                                                                            field.value === option ? theme.accent : 'text-gray-700'
+                                                                        }`}>
+                                                                            {option}
+                                                                        </span>
+                                                                        {field.value === option && (
+                                                                            <Check className={`w-4 h-4 ${theme.accent.replace('text-', 'text-')}`} />
+                                                                        )}
+                                                                    </div>
+                                                                </motion.div>
+                                                            ))}
+                                                        </div>
+                                                    ) : mission.key === 'defecation_status' ? (
+                                                        <div className="flex gap-4">
+                                                            {['정상', '설사', '변비'].map(option => (
+                                                                <motion.div
+                                                                    key={option}
+                                                                    whileHover={{ scale: 1.02 }}
+                                                                    whileTap={{ scale: 0.98 }}
+                                                                    className={`flex-1 p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                                                                        field.value === option 
+                                                                            ? `${theme.selected} shadow-md` 
+                                                                            : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                                                                    }`}
+                                                                    onClick={() => field.onChange(option)}
+                                                                >
+                                                                    <div className="text-center">
+                                                                        <div className={`text-lg font-semibold ${
+                                                                            field.value === option ? theme.accent : 'text-gray-700'
+                                                                        }`}>
+                                                                            {option}
+                                                                        </div>
+                                                                        {field.value === option && (
+                                                                            <Check className={`w-5 h-5 mx-auto mt-2 ${theme.accent.replace('text-', 'text-')}`} />
+                                                                        )}
+                                                                    </div>
+                                                                </motion.div>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <Textarea 
+                                                            placeholder={mission.placeholder} 
+                                                            {...field} 
+                                                            className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 min-h-[100px] resize-none" 
+                                                        />
+                                                    )}
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </motion.div>
                             ))}
-                            <Button type="submit" disabled={updateProfileMutation.isPending}>
-                                {updateProfileMutation.isPending ? '저장 중...' : '저장하기'}
-                            </Button>
+                            
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.3 }}
+                                className="flex gap-3 pt-4"
+                            >
+                                <Button 
+                                    type="submit" 
+                                    disabled={updateProfileMutation.isPending}
+                                    className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+                                >
+                                    {updateProfileMutation.isPending ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                                            저장 중...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Sparkles className="w-4 h-4 mr-2" />
+                                            저장하기
+                                        </>
+                                    )}
+                                </Button>
+                                <Button 
+                                    type="button" 
+                                    variant="outline"
+                                    onClick={() => setIsEditing(false)}
+                                    className="px-6 py-3 font-semibold"
+                                >
+                                    취소
+                                </Button>
+                            </motion.div>
                         </form>
                     </Form>
                 ) : (
-                    <div className="p-2 space-y-2">
-                        {category.missions.map(mission => {
+                    <div className="space-y-4">
+                        {category.missions.map((mission, missionIndex) => {
                             const value = extendedProfile?.[mission.key];
                             const displayValue = Array.isArray(value) ? value.join(', ') : (value === true ? '예' : value === false ? '아니오' : value?.toString());
+                            const hasValue = displayValue && displayValue !== '';
+                            
                             return (
-                                <div key={mission.key} className="text-sm">
-                                    <p className="font-semibold text-gray-700">{mission.question}</p>
-                                    <p className="text-gray-600">{displayValue || '아직 기록이 없어요.'}</p>
-                                </div>
+                                <motion.div 
+                                    key={mission.key} 
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: missionIndex * 0.1 }}
+                                    className={`p-4 rounded-lg border-2 transition-all ${
+                                        hasValue 
+                                            ? 'border-green-200 bg-green-50' 
+                                            : 'border-gray-200 bg-gray-50'
+                                    }`}
+                                >
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex-1">
+                                            <p className="font-semibold text-gray-800 mb-2">
+                                                {mission.question}
+                                            </p>
+                                            <p className={`text-sm ${
+                                                hasValue ? 'text-gray-700 font-medium' : 'text-gray-500 italic'
+                                            }`}>
+                                                {displayValue || '아직 기록이 없어요.'}
+                                            </p>
+                                        </div>
+                                        {hasValue && (
+                                            <Check className="w-5 h-5 text-green-500 ml-3 flex-shrink-0" />
+                                        )}
+                                    </div>
+                                </motion.div>
                             );
                         })}
                     </div>
