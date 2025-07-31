@@ -46,10 +46,11 @@ async function main() {
     suggested_title_ko: article.suggested_title_ko,
     summary_ko: article.summary_ko,
     initial_draft_markdown: article.initial_draft_markdown,
-    original_url: article.url,
+    original_url: article.original_source_url, // analyzer가 반환한 명확한 출처 URL 사용
     image_url: article.imageUrl,
     category: article.category,
     source_name: article.source,
+    recommended_article_slug: article.recommended_article_slug, // 새로 추가된 필드
   }));
 
   console.log(`${dataToInsert.length}개의 데이터를 Supabase에 저장 시도...`);

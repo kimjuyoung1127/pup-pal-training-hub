@@ -17,7 +17,9 @@ interface InputArticle {
 interface AnalyzedArticle extends InputArticle {
   suggested_title_ko: string;
   summary_ko: string;
-  initial_draft_markdown: string; // 상세 초안을 저장할 필드 추가
+  initial_draft_markdown: string;
+  recommended_article_slug: string | null; // 추천 글 slug
+  original_source_url: string; // 원본 출처 URL
 }
 
 /**
@@ -34,7 +36,7 @@ export class ArticleAnalyzer {
   }
 
   /**
-   * 단일 아티클을 분석하여 한글 제목, 요약, 그리고 상세 초안을 생성합니다.
+   * 단일 아티클을 분석하여 한글 제목, 요약, 그리고 상세 초안 등을 생성합니다.
    * @param article - 분석할 원본 아티클 객체
    */
   private async analyzeSingleArticle(article: InputArticle): Promise<AnalyzedArticle | null> {
@@ -42,14 +44,16 @@ export class ArticleAnalyzer {
       const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
       const prompt = `
-        You are an expert assistant for 'Juyoung Kim', a professional dog trainer in Korea.
-        Analyze the following article and generate a blog post idea for her.
+        You are an expert content creator for 'Mung-AI Magazine', a Korean web magazine for dog owners.
+        Analyze the following article and generate a blog post idea.
         The article category is '${article.category}'.
-        Please respond ONLY in JSON format with three keys: "suggested_title_ko", "summary_ko", and "initial_draft_markdown".
+        Please respond ONLY in JSON format with the following 5 keys: "suggested_title_ko", "summary_ko", "initial_draft_markdown", "recommended_article_slug", and "original_source_url".
 
         - suggested_title_ko: Create a compelling, professional blog title in Korean.
-        - summary_ko: Summarize the key points of the article in three concise bullet points in Korean. This will be used for a brief overview.
-        - initial_draft_markdown: Create a detailed blog post draft in Korean Markdown format. It must have a clear structure with an introduction, a body with 3-4 subheadings, and a conclusion. This will be the starting point for the actual article.
+        - summary_ko: Summarize the key points of the article in three concise bullet points in Korean.
+        - initial_draft_markdown: Create a detailed blog post draft in Korean Markdown format. It must have a clear structure with an introduction, a body with 3-4 subheadings, and a conclusion.
+        - recommended_article_slug: Suggest ONE related article slug from our existing blog that readers might find helpful. The format should be like '/articles/example-slug'. If no suitable article is found, return null.
+        - original_source_url: Return the original article URL provided below.
 
         Article Title: ${article.title}
         Article URL: ${article.url}
@@ -65,7 +69,9 @@ export class ArticleAnalyzer {
         ...article,
         suggested_title_ko: parsed.suggested_title_ko,
         summary_ko: parsed.summary_ko,
-        initial_draft_markdown: parsed.initial_draft_markdown, // 파싱된 초안 추가
+        initial_draft_markdown: parsed.initial_draft_markdown,
+        recommended_article_slug: parsed.recommended_article_slug,
+        original_source_url: parsed.original_source_url,
       };
 
     } catch (error) {

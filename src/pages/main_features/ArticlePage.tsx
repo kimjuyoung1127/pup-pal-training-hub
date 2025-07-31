@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { supabase } from '@/lib/supabaseClient';
 import ReactMarkdown from 'react-markdown';
+import { Book, Link as LinkIcon } from 'lucide-react';
 
 // articles 테이블 스키마에 맞는 타입
 interface Article {
@@ -11,13 +12,15 @@ interface Article {
   content: string;
   category: string;
   cover_image_url: string;
-  tags: string[]; // tags는 text[] 타입이므로 string 배열로 처리
-  // author_name, review_info 등은 현재 스키마에 없으므로 UI에서 제거하거나 고정값 사용
+  tags: string[];
+  recommended_article_slug?: string; // 추천 글 slug (선택적)
+  original_source_url?: string; // 원본 출처 URL (선택적)
 }
 
 const ArticlePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [article, setArticle] = useState<Article | null>(null);
+  const [relatedArticleTitle, setRelatedArticleTitle] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,20 +28,37 @@ const ArticlePage: React.FC = () => {
       if (!slug) return;
       
       setLoading(true);
+      setArticle(null);
+      setRelatedArticleTitle(null);
+
       const { data, error } = await supabase
         .from('articles')
-        .select('*')
+        .select('*, recommended_article_slug, original_source_url')
         .eq('slug', slug)
-        .eq('is_published', true) // 발행된 글만 가져오도록 조건 추가
-        .single(); // slug는 유니크하므로 single() 사용
+        .eq('is_published', true)
+        .single();
 
       if (error) {
         console.error('Error fetching article:', error);
-        setArticle(null);
       } else {
         setArticle(data);
+        if (data?.recommended_article_slug) {
+          fetchRelatedArticleTitle(data.recommended_article_slug);
+        }
       }
       setLoading(false);
+    };
+
+    const fetchRelatedArticleTitle = async (relatedSlug: string) => {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('title')
+        .eq('slug', relatedSlug)
+        .single();
+      
+      if (!error && data) {
+        setRelatedArticleTitle(data.title);
+      }
     };
 
     fetchArticle();
@@ -81,16 +101,54 @@ const ArticlePage: React.FC = () => {
               </span>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{article.title}</h1>
-            {/* 저자 정보는 현재 없으므로 임시로 표시 */}
-            <p className="text-gray-600">By Pet-Life Magazine</p>
+            <p className="text-gray-600">By Mung-AI Magazine</p>
           </div>
         </div>
         
         <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6 md:mb-8">
           <div className="p-6 md:p-10">
             <article className="prose prose-lg max-w-none prose-indigo">
-              <ReactMarkdown>{article.content}</ReactMarkdown>
+              <ReactMarkdown
+                components={{
+                  p: ({node, ...props}) => <p {...props} className="mb-4 leading-relaxed" />,
+                }}
+              >
+                {article.content}
+              </ReactMarkdown>
             </article>
+          </div>
+        </div>
+
+        {/* --- 자동화된 아티클 정보 섹션 --- */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6 md:mb-8">
+          <div className="p-6 md:p-8 space-y-4">
+            {article.recommended_article_slug && relatedArticleTitle && (
+              <div className="flex items-start">
+                <Book className="h-5 w-5 text-indigo-500 mr-3 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-gray-800">함께 읽으면 좋은 글</h3>
+                  <Link to={`/articles/${article.recommended_article_slug}`} className="text-indigo-600 hover:underline">
+                    {relatedArticleTitle}
+                  </Link>
+                </div>
+              </div>
+            )}
+            
+            <p className="text-sm text-gray-500 font-medium">
+              By Mung-AI Magazine
+            </p>
+
+            {article.original_source_url && (
+               <div className="flex items-start">
+                <LinkIcon className="h-5 w-5 text-gray-400 mr-3 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-gray-800">출처</h3>
+                  <a href={article.original_source_url} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:underline break-all">
+                    {article.original_source_url}
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
         </div>
         
