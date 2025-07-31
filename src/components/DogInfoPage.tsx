@@ -52,9 +52,8 @@ const DogInfoPage = ({ onComplete, dogInfoToEdit }: DogInfoPageProps) => {
   const { mutate: saveDog, isPending: isSaving } = useSaveDogInfo({
     onSuccess: (savedDogInfo) => {
       setShowConfetti(true);
-      setTimeout(() => {
-        onComplete(savedDogInfo);
-      }, 3000); // 3초 후 페이지 전환
+      // setTimeout을 제거하고 즉시 onComplete를 호출하도록 변경
+      onComplete(savedDogInfo);
     },
   });
 

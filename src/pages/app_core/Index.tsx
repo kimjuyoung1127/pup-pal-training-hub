@@ -20,7 +20,7 @@ import TrainingStartPage from '@/components/TrainingStartPage';
 const AppCore: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const { dogInfo: profileDogInfo, isLoading: isDogInfoLoading } = useDogProfile();
+  const { dogInfo: profileDogInfo, isLoading: isDogInfoLoading, refetchDogProfile } = useDogProfile();
   const location = useLocation();
   const navigate = useNavigate(); // useNavigate 사용
   
@@ -29,6 +29,11 @@ const AppCore: React.FC = () => {
   
   const startTour = () => {
     setRunTour(true);
+  };
+
+  const handleProfileComplete = async () => {
+    await refetchDogProfile();
+    navigate('/app');
   };
 
   useEffect(() => {
@@ -64,7 +69,7 @@ const AppCore: React.FC = () => {
 
   if (session) {
     if (!profileDogInfo && !location.pathname.startsWith('/app/dog-info') && !location.pathname.startsWith('/app/test-nav')) {
-      return <DogInfoPage onComplete={() => navigate('/app')} dogInfoToEdit={null} />;
+      return <DogInfoPage onComplete={handleProfileComplete} dogInfoToEdit={null} />;
     }
   } else {
     if (!location.pathname.startsWith('/app/login') && !location.pathname.startsWith('/app/onboarding') && !location.pathname.startsWith('/app/test-nav')) {
@@ -85,7 +90,7 @@ const AppCore: React.FC = () => {
       <main className="p-4">
         <Routes>
           <Route index element={<DashboardPage runTour={runTour} setRunTour={setRunTour} startTour={startTour} />} />
-          <Route path="dog-info" element={<DogInfoPage onComplete={() => navigate('/app')} dogInfoToEdit={null} />} />
+          <Route path="dog-info" element={<DogInfoPage onComplete={handleProfileComplete} dogInfoToEdit={null} />} />
           <Route path="my-page" element={<DogProfilePage onNavigate={(page, params) => navigate(page, { state: params })} />} />
           <Route path="history" element={<TrainingHistoryPage onNavigate={(page, params) => navigate(page, { state: params })} />} />
           <Route path="settings" element={<SettingsPage />} />
