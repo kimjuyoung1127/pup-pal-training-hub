@@ -24,11 +24,10 @@ interface AnalysisDataWithKeypoints extends AnalysisData {
     keypoints_data?: number[][][][];
 }
 
-// ★★★ 최종 Props 인터페이스 ★★★
 interface AnalysisDetailViewProps {
   record: JointAnalysisRecord;
   baselineAnalysisId: number | null;
-  baselineRecord: JointAnalysisRecord | null; // 기준 분석 전체 데이터
+  baselineRecord: JointAnalysisRecord | null;
   onBaselineUpdate: () => void;
 }
 
@@ -56,7 +55,6 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record, baselin
       });
       onBaselineUpdate();
     } catch (error) {
-      // 에러 토스트는 API 함수 내에서 처리
     } finally {
       setIsUpdating(false);
     }
@@ -123,13 +121,106 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record, baselin
   const scoreInfo = stabilityScore ? getScoreInfo(stabilityScore) : null;
 
   useEffect(() => {
-    // ... (기존 렌더링 로직은 동일)
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas || !analysisResult) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const drawSkeletons = () => {
+      if (video.videoWidth === 0 || video.videoHeight === 0) {
+        if(canvas.width > 0 && canvas.height > 0) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+
+      canvas.width = video.clientWidth;
+      canvas.height = video.clientHeight;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const scale = Math.min(canvas.width / video.videoWidth, canvas.height / video.videoHeight);
+      const renderedVideoWidth = video.videoWidth * scale;
+      const renderedVideoHeight = video.videoHeight * scale;
+      const offsetX = (canvas.width - renderedVideoWidth) / 2;
+      const offsetY = (canvas.height - renderedVideoHeight) / 2;
+
+      if (video.paused || video.ended) return;
+
+      const fps = analysisResult.metadata?.fps || 30;
+      const currentFrameIndex = Math.floor(video.currentTime * fps);
+
+      if (!analysisResult.keypoints_data || currentFrameIndex >= analysisResult.keypoints_data.length) return;
+      const frameKeypoints = analysisResult.keypoints_data[currentFrameIndex];
+      if (!frameKeypoints || frameKeypoints.length === 0) return;
+
+      frameKeypoints.forEach((dogKeypoints: number[][]) => {
+        dogKeypoints.forEach(point => {
+          const [originalX, originalY] = point;
+          const transformedX = originalX * scale + offsetX;
+          const transformedY = originalY * scale + offsetY;
+          ctx.beginPath();
+          ctx.arc(transformedX, transformedY, 2, 0, 2 * Math.PI); // ★★★ 점 두께 수정 ★★★
+          ctx.fillStyle = POINT_COLOR;
+          ctx.fill();
+        });
+
+        SKELETON.forEach(pair => {
+          const [startIdx, endIdx] = pair;
+          const startPoint = dogKeypoints[startIdx];
+          const endPoint = dogKeypoints[endIdx];
+          if (startPoint && endPoint && startPoint.length > 0 && endPoint.length > 0) {
+            const transformedStartX = startPoint[0] * scale + offsetX;
+            const transformedStartY = startPoint[1] * scale + offsetY;
+            const transformedEndX = endPoint[0] * scale + offsetX;
+            const transformedEndY = endPoint[1] * scale + offsetY;
+            ctx.beginPath();
+            ctx.moveTo(transformedStartX, transformedStartY);
+            ctx.lineTo(transformedEndX, transformedEndY);
+            ctx.strokeStyle = LINE_COLOR;
+            ctx.lineWidth = 1.5; // ★★★ 선 두께 수정 ★★★
+            ctx.stroke();
+          }
+        });
+      });
+    };
+
+    const renderLoop = () => {
+      drawSkeletons();
+      animationFrameId.current = requestAnimationFrame(renderLoop);
+    };
+
+    const startRenderLoop = () => { cancelAnimationFrame(animationFrameId.current!); renderLoop(); };
+    const stopRenderLoop = () => { cancelAnimationFrame(animationFrameId.current!); };
+    
+    const handleFullscreenChange = () => {
+        setTimeout(() => {
+            drawSkeletons();
+        }, 100);
+    };
+
+    video.addEventListener('play', startRenderLoop);
+    video.addEventListener('playing', startRenderLoop);
+    video.addEventListener('seeked', drawSkeletons);
+    video.addEventListener('pause', stopRenderLoop);
+    video.addEventListener('ended', stopRenderLoop);
+    video.addEventListener('loadedmetadata', drawSkeletons);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+
+    return () => {
+      video.removeEventListener('play', startRenderLoop);
+      video.removeEventListener('playing', startRenderLoop);
+      video.removeEventListener('seeked', drawSkeletons);
+      video.removeEventListener('pause', stopRenderLoop);
+      video.removeEventListener('ended', stopRenderLoop);
+      video.removeEventListener('loadedmetadata', drawSkeletons);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      cancelAnimationFrame(animationFrameId.current!);
+    };
   }, [analysisResult]);
 
   const formattedDate = new Date(record.created_at).toLocaleString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   const isCurrentBaseline = record.id === baselineAnalysisId;
 
-  // ★★★ 점수 비교 컴포넌트 ★★★
   const renderScoreComparison = () => {
     if (stabilityScore === undefined) return null;
 
@@ -196,7 +287,7 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record, baselin
       <CardHeader className="bg-gradient-to-r from-purple-100 to-pink-100">
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle className="text-2xl font-bold text-gray-800 flex items-center"><Sparkles className="mr-3 h-6 w-6 text-purple-500" />📊 상세 분석 결과</CardTitle>
+            <CardTitle className="text-2xl font-bold text-gray-800 flex items-center"><Sparkles className="mr-3 h-6 w-6 text-purple-500" />📊 ���세 분석 결과</CardTitle>
             <CardDescription className="flex items-center text-gray-600 mt-1"><Heart className="mr-2 h-4 w-4 text-pink-500" />{record.dog_name || '우리 강아지'}의 자세 분석 리포트</CardDescription>
           </div>
           {isCurrentBaseline && (<Badge variant="secondary" className="bg-yellow-400 text-yellow-900 border-yellow-500"><Star className="mr-2 h-4 w-4" />현재 기준</Badge>)}
