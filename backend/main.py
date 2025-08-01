@@ -114,7 +114,7 @@ def analyze_video_in_background(job_id: str, video_path: str, user_id: str, dog_
         # 1. 비디오 분석
         cap = cv2.VideoCapture(video_path)
         if not cap.isOpened():
-            raise Exception("업로드된 비디오 파일을 열 수 없��니다.")
+            raise Exception("업로드된 비디오 파일을 열 수 없습니다.")
         fps = cap.get(cv2.CAP_PROP_FPS)
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         cap.release()
