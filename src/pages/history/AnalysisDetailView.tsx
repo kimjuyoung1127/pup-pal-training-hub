@@ -2,11 +2,12 @@
 
 import React, { useRef, useEffect, useMemo, useState, useCallback } from 'react';
 import { JointAnalysisRecord, AnalysisData } from '@/types/analysis';
-import { Calendar, Award, Heart, Sparkles, Share2, Download, Upload, Loader2 } from 'lucide-react';
+import { Calendar, Award, Heart, Sparkles, Share2, Download, Upload, Loader2, Terminal } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import AnalysisResultCard from './AnalysisResultCard';
 import { downloadImage, shareToKakao } from '@/lib/shareUtils';
 import { useToast } from '@/hooks/use-toast';
