@@ -144,7 +144,45 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record, baselin
       const offsetX = (canvas.width - renderedVideoWidth) / 2;
       const offsetY = (canvas.height - renderedVideoHeight) / 2;
 
-      if (video.paused || video.ended) return;
+      if (video.paused || video.ended) {
+        // 비디오가 멈췄을 때도 현재 프레임의 스켈레톤은 그려주도록 수정
+        const fps = analysisResult.metadata?.fps || 30;
+        const currentFrameIndex = Math.floor(video.currentTime * fps);
+        if (!analysisResult.keypoints_data || currentFrameIndex >= analysisResult.keypoints_data.length) return;
+        const frameKeypoints = analysisResult.keypoints_data[currentFrameIndex];
+        if (!frameKeypoints || frameKeypoints.length === 0) return;
+        
+        frameKeypoints.forEach((dogKeypoints: number[][]) => {
+            dogKeypoints.forEach(point => {
+              const [originalX, originalY] = point;
+              const transformedX = originalX * scale + offsetX;
+              const transformedY = originalY * scale + offsetY;
+              ctx.beginPath();
+              ctx.arc(transformedX, transformedY, 3, 0, 2 * Math.PI);
+              ctx.fillStyle = POINT_COLOR;
+              ctx.fill();
+            });
+    
+            SKELETON.forEach(pair => {
+              const [startIdx, endIdx] = pair;
+              const startPoint = dogKeypoints[startIdx];
+              const endPoint = dogKeypoints[endIdx];
+              if (startPoint && endPoint && startPoint.length > 0 && endPoint.length > 0) {
+                const transformedStartX = startPoint[0] * scale + offsetX;
+                const transformedStartY = startPoint[1] * scale + offsetY;
+                const transformedEndX = endPoint[0] * scale + offsetX;
+                const transformedEndY = endPoint[1] * scale + offsetY;
+                ctx.beginPath();
+                ctx.moveTo(transformedStartX, transformedStartY);
+                ctx.lineTo(transformedEndX, transformedEndY);
+                ctx.strokeStyle = LINE_COLOR;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+              }
+            });
+        });
+        return;
+      };
 
       const fps = analysisResult.metadata?.fps || 30;
       const currentFrameIndex = Math.floor(video.currentTime * fps);
@@ -159,28 +197,28 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record, baselin
           const transformedX = originalX * scale + offsetX;
           const transformedY = originalY * scale + offsetY;
           ctx.beginPath();
-          ctx.arc(transformedX, transformedY, 2, 0, 2 * Math.PI); // ★★★ 점 두께 수정 ★★★
+          ctx.arc(transformedX, transformedY, 3, 0, 2 * Math.PI);
           ctx.fillStyle = POINT_COLOR;
           ctx.fill();
         });
 
-        SKELETON.forEach(pair => {
-          const [startIdx, endIdx] = pair;
-          const startPoint = dogKeypoints[startIdx];
-          const endPoint = dogKeypoints[endIdx];
-          if (startPoint && endPoint && startPoint.length > 0 && endPoint.length > 0) {
-            const transformedStartX = startPoint[0] * scale + offsetX;
-            const transformedStartY = startPoint[1] * scale + offsetY;
-            const transformedEndX = endPoint[0] * scale + offsetX;
-            const transformedEndY = endPoint[1] * scale + offsetY;
-            ctx.beginPath();
-            ctx.moveTo(transformedStartX, transformedStartY);
-            ctx.lineTo(transformedEndX, transformedEndY);
-            ctx.strokeStyle = LINE_COLOR;
-            ctx.lineWidth = 1.5; // ★★★ 선 두께 수정 ★★★
-            ctx.stroke();
-          }
-        });
+        // SKELETON.forEach(pair => {
+        //   const [startIdx, endIdx] = pair;
+        //   const startPoint = dogKeypoints[startIdx];
+        //   const endPoint = dogKeypoints[endIdx];
+        //   if (startPoint && endPoint && startPoint.length > 0 && endPoint.length > 0) {
+        //     const transformedStartX = startPoint[0] * scale + offsetX;
+        //     const transformedStartY = startPoint[1] * scale + offsetY;
+        //     const transformedEndX = endPoint[0] * scale + offsetX;
+        //     const transformedEndY = endPoint[1] * scale + offsetY;
+        //     ctx.beginPath();
+        //     ctx.moveTo(transformedStartX, transformedStartY);
+        //     ctx.lineTo(transformedEndX, transformedEndY);
+        //     ctx.strokeStyle = LINE_COLOR;
+        //     ctx.lineWidth = 1.5; // ★★★ 선 두께 수정 ★★★
+        //     ctx.stroke();
+        //   }
+        // });
       });
     };
 
@@ -192,11 +230,15 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record, baselin
     const startRenderLoop = () => { cancelAnimationFrame(animationFrameId.current!); renderLoop(); };
     const stopRenderLoop = () => { cancelAnimationFrame(animationFrameId.current!); };
     
-    const handleFullscreenChange = () => {
+    const handleResize = () => {
+        // 크기 변경 시 잠시 후 다시 그리기
         setTimeout(() => {
             drawSkeletons();
-        }, 100);
+        }, 50);
     };
+
+    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(video);
 
     video.addEventListener('play', startRenderLoop);
     video.addEventListener('playing', startRenderLoop);
@@ -204,16 +246,15 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record, baselin
     video.addEventListener('pause', stopRenderLoop);
     video.addEventListener('ended', stopRenderLoop);
     video.addEventListener('loadedmetadata', drawSkeletons);
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-
+    
     return () => {
+      resizeObserver.unobserve(video);
       video.removeEventListener('play', startRenderLoop);
       video.removeEventListener('playing', startRenderLoop);
       video.removeEventListener('seeked', drawSkeletons);
       video.removeEventListener('pause', stopRenderLoop);
       video.removeEventListener('ended', stopRenderLoop);
       video.removeEventListener('loadedmetadata', drawSkeletons);
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
       cancelAnimationFrame(animationFrameId.current!);
     };
   }, [analysisResult]);
