@@ -11,13 +11,24 @@ import { JointAnalysisRecord } from '@/types/analysis';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
+// ★★★ Props 인터페이스 수정 ★★★
 interface AnalysisDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   record: JointAnalysisRecord | null;
+  baselineAnalysisId: number | null;
+  baselineRecord: JointAnalysisRecord | null; // baselineRecord 추가
+  onBaselineUpdate: () => void;
 }
 
-const AnalysisDetailModal: React.FC<AnalysisDetailModalProps> = ({ isOpen, onClose, record }) => {
+const AnalysisDetailModal: React.FC<AnalysisDetailModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  record, 
+  baselineAnalysisId, 
+  baselineRecord, // baselineRecord 받기
+  onBaselineUpdate 
+}) => {
   if (!record) return null;
 
   return (
@@ -30,7 +41,13 @@ const AnalysisDetailModal: React.FC<AnalysisDetailModalProps> = ({ isOpen, onClo
           </DialogDescription>
         </DialogHeader>
         <div className="flex-grow overflow-y-auto px-6 pb-6">
-          <AnalysisDetailView record={record} />
+          {/* ★★★ Props 전달 ★★★ */}
+          <AnalysisDetailView 
+            record={record} 
+            baselineAnalysisId={baselineAnalysisId}
+            baselineRecord={baselineRecord} // baselineRecord 전달
+            onBaselineUpdate={onBaselineUpdate}
+          />
         </div>
         <Button
           variant="ghost"

@@ -3,6 +3,30 @@ import { supabase } from '@/integrations/supabase/client';
 import { DogInfo } from '@/types/dog';
 import { toast } from "sonner";
 
+export const updateDogBaseline = async (dogId: string, analysisId: number | null) => {
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    toast.error("로그인이 필요합니다.");
+    throw new Error("User not logged in");
+  }
+
+  const { error } = await supabase
+    .from('dogs')
+    .update({ baseline_analysis_id: analysisId })
+    .eq('id', dogId)
+    .eq('user_id', user.id);
+
+  if (error) {
+    console.error('Error updating dog baseline:', error);
+    toast.error("기준 분석 정보 업데이트에 실패했습니다.");
+    throw error;
+  }
+
+  toast.success("기준 분석 정보가 성공적으로 업데이트되었습니다!");
+  return true;
+};
+
 export const saveDogInfo = async (dogInfo: DogInfo) => {
     const { data: { user } } = await supabase.auth.getUser();
 

@@ -1,37 +1,33 @@
 
+// src/pages/history/useUserDogs.ts
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
-import { Database } from '@/integrations/supabase/types';
+import { useUser } from '@supabase/auth-helpers-react';
 
-type Dog = Database['public']['Tables']['dogs']['Row'];
-
-const fetchUserDogs = async (userId: string | undefined): Promise<Dog[]> => {
-  if (!userId) {
-    return [];
-  }
-
+const fetchUserDogs = async (userId: string) => {
   const { data, error } = await supabase
     .from('dogs')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: true });
+    .select('id, name, age, gender, breed, weight, image_url, baseline_analysis_id') // ★★★ baseline_analysis_id 추가
+    .eq('user_id', userId);
 
   if (error) {
-    console.error('Error fetching user dogs:', error);
+    console.error("Error fetching user's dogs:", error);
     throw new Error(error.message);
   }
-
-  return data || [];
+  return data;
 };
 
 export const useUserDogs = () => {
-  const { session } = useAuth();
-  const user = session?.user;
-
-  return useQuery<Dog[], Error>({
+  const user = useUser();
+  return useQuery({
     queryKey: ['userDogs', user?.id],
-    queryFn: () => fetchUserDogs(user?.id),
+    queryFn: () => {
+      if (!user) throw new Error('User not authenticated');
+      return fetchUserDogs(user.id);
+    },
     enabled: !!user,
+    staleTime: 5 * 60 * 1000, // 5분
+    cacheTime: 10 * 60 * 1000, // 10분
   });
 };
+

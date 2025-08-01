@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { History, BarChart, AlertCircle, Sparkles, Share2 } from 'lucide-react';
+import { History, BarChart, AlertCircle, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -13,7 +13,7 @@ import EmptyJointAnalysisHistory from '@/components/posture-analysis-history/Emp
 import JointAnalysisHistoryList from '@/components/posture-analysis-history/JointAnalysisHistoryList';
 import LatestAnalysisResultCard from './LatestAnalysisResultCard';
 import { JointAnalysisRecord } from '@/types/analysis';
-import AnalysisDetailModal from './AnalysisDetailModal'; // AnalysisDetailModal 임포트
+import AnalysisDetailModal from './AnalysisDetailModal';
 
 const PostureAnalysisHistoryPage: React.FC = () => {
   const navigate = useNavigate();
@@ -21,11 +21,11 @@ const PostureAnalysisHistoryPage: React.FC = () => {
   
   const [activeDogId, setActiveDogId] = useState<string | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<JointAnalysisRecord | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 추가
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSelectRecord = (record: JointAnalysisRecord) => {
     setSelectedRecord(JSON.parse(JSON.stringify(record)));
-    setIsModalOpen(true); // 모달 열기
+    setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
@@ -33,11 +33,6 @@ const PostureAnalysisHistoryPage: React.FC = () => {
     setSelectedRecord(null);
   };
 
-  const handleShare = (record: JointAnalysisRecord) => {
-    alert(`공유 기능 구현 예정 (ID: ${record.id})`);
-  };
-
-  // dogs 데이터가 로드되면, activeDogId를 첫 번째 강아지로 설정
   useEffect(() => {
     if (dogs && dogs.length > 0 && !activeDogId) {
       setActiveDogId(dogs[0].id);
@@ -46,23 +41,32 @@ const PostureAnalysisHistoryPage: React.FC = () => {
 
   const { data: historyData, isLoading: isLoadingHistory, isError: isErrorHistory, refetch } = useJointAnalysisHistory(activeDogId || undefined);
 
-  // 페이지에 들어올 때마다 데이터를 새로고침하여 최신 상태를 반영
   useEffect(() => {
     refetch();
-  }, [refetch]);
+  }, [refetch, activeDogId]);
 
-  // 최신 결과와 과거 기록을 분리하고, 강아지 이름을 주입
+  const baselineAnalysisId = useMemo(() => {
+    if (!dogs || !activeDogId) return null;
+    const activeDog = dogs.find(d => d.id === activeDogId);
+    return activeDog?.baseline_analysis_id || null;
+  }, [dogs, activeDogId]);
+
+  // ★★★ 기준 기록(baselineRecord) 찾기 추가 ★★★
+  const baselineRecord = useMemo(() => {
+    if (!baselineAnalysisId || !historyData) return null;
+    return historyData.find(record => record.id === baselineAnalysisId) || null;
+  }, [baselineAnalysisId, historyData]);
+
   const { latestResult, pastHistory } = useMemo(() => {
     if (!historyData || historyData.length === 0 || !dogs) {
       return { latestResult: null, pastHistory: [] };
     }
 
-    // 각 기록에 강아지 이름을 찾아 주입
     const historyWithDogNames = historyData.map(record => {
       const dog = dogs.find(d => d.id === record.dog_id);
       return {
         ...record,
-        dog_name: dog ? dog.name : '알 수 없는 강아지', // dogs 목록에서 찾은 실제 이름 주입
+        dog_name: dog ? dog.name : '알 수 없는 강아지',
       };
     });
 
@@ -71,16 +75,6 @@ const PostureAnalysisHistoryPage: React.FC = () => {
     const past = sortedHistory.slice(1);
     return { latestResult: latest, pastHistory: past };
   }, [historyData, dogs]);
-
-  // 최초 로드 시 또는 activeDogId 변경 시, 최신 결과를 기본으로 선택
-  useEffect(() => {
-    if (latestResult) {
-      // 기본으로 상세 뷰를 보여주지 않도록 이 부분을 주석 처리하거나 삭제합니다.
-      // setSelectedRecord(latestResult);
-    } else {
-      setSelectedRecord(null); // 기록이 없으면 선택 해제
-    }
-  }, [latestResult]);
 
   const renderHistoryList = () => {
     if (!activeDogId || isLoadingHistory) {
@@ -115,7 +109,11 @@ const PostureAnalysisHistoryPage: React.FC = () => {
               <History className="w-5 h-5 mr-2 text-gray-500" />
               과거 기록
             </h3>
-            <JointAnalysisHistoryList records={pastHistory} onDetailView={handleSelectRecord} onShare={handleShare} />
+            <JointAnalysisHistoryList 
+              records={pastHistory} 
+              onDetailView={handleSelectRecord} 
+              baselineAnalysisId={baselineAnalysisId}
+            />
           </div>
         )}
       </div>
@@ -175,10 +173,14 @@ const PostureAnalysisHistoryPage: React.FC = () => {
         </Tabs>
       )}
 
+      {/* ★★★ baselineRecord 전달 추가 ★★★ */}
       <AnalysisDetailModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        record={selectedRecord} // 'analysisResult'를 'record'로 변경
+        record={selectedRecord}
+        baselineAnalysisId={baselineAnalysisId}
+        baselineRecord={baselineRecord}
+        onBaselineUpdate={() => refetch()}
       />
     </motion.div>
   );
