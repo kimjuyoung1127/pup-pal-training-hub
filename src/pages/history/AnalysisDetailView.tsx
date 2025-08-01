@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useMemo, useState, useCallback } from 'react';
 import { JointAnalysisRecord, AnalysisData } from '@/types/analysis';
-import { Calendar, Award, Heart, Sparkles, Share2, Download, Upload, Loader2, Terminal, Star, TrendingUp, TrendingDown, Minus, Info } from 'lucide-react';
+import { Calendar, Award, Heart, Sparkles, Share2, Download, Upload, Loader2, Terminal, Star, TrendingUp, TrendingDown, Minus, Info, Expand } from 'lucide-react'; // Expand 아이콘 추가
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,13 +37,23 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record, baselin
   const shareCardRef = useRef<HTMLDivElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const animationFrameId = useRef<number>();
-  
+  const videoContainerRef = useRef<HTMLDivElement>(null); // ★★★ 비디오 컨테이너 Ref 추가
+
   const [petName, setPetName] = useState('');
   const [petImage, setPetImage] = useState<string | null>(null);
   const [isSharing, setIsSharing] = useState(false);
   const [showShareCard, setShowShareCard] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const { toast } = useToast();
+
+  // ★★★ 커스텀 전체화면 핸들러 ★★★
+  const handleFullscreen = () => {
+    if (videoContainerRef.current) {
+      videoContainerRef.current.requestFullscreen().catch(err => {
+        alert(`전체 화면 모드를 시작할 수 없습니다: ${err.message}`);
+      });
+    }
+  };
 
   const handleSetBaseline = async () => {
     setIsUpdating(true);
@@ -144,45 +154,7 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record, baselin
       const offsetX = (canvas.width - renderedVideoWidth) / 2;
       const offsetY = (canvas.height - renderedVideoHeight) / 2;
 
-      if (video.paused || video.ended) {
-        // 비디오가 멈췄을 때도 현재 프레임의 스켈레톤은 그려주도록 수정
-        const fps = analysisResult.metadata?.fps || 30;
-        const currentFrameIndex = Math.floor(video.currentTime * fps);
-        if (!analysisResult.keypoints_data || currentFrameIndex >= analysisResult.keypoints_data.length) return;
-        const frameKeypoints = analysisResult.keypoints_data[currentFrameIndex];
-        if (!frameKeypoints || frameKeypoints.length === 0) return;
-        
-        frameKeypoints.forEach((dogKeypoints: number[][]) => {
-            dogKeypoints.forEach(point => {
-              const [originalX, originalY] = point;
-              const transformedX = originalX * scale + offsetX;
-              const transformedY = originalY * scale + offsetY;
-              ctx.beginPath();
-              ctx.arc(transformedX, transformedY, 3, 0, 2 * Math.PI);
-              ctx.fillStyle = POINT_COLOR;
-              ctx.fill();
-            });
-    
-            SKELETON.forEach(pair => {
-              const [startIdx, endIdx] = pair;
-              const startPoint = dogKeypoints[startIdx];
-              const endPoint = dogKeypoints[endIdx];
-              if (startPoint && endPoint && startPoint.length > 0 && endPoint.length > 0) {
-                const transformedStartX = startPoint[0] * scale + offsetX;
-                const transformedStartY = startPoint[1] * scale + offsetY;
-                const transformedEndX = endPoint[0] * scale + offsetX;
-                const transformedEndY = endPoint[1] * scale + offsetY;
-                ctx.beginPath();
-                ctx.moveTo(transformedStartX, transformedStartY);
-                ctx.lineTo(transformedEndX, transformedEndY);
-                ctx.strokeStyle = LINE_COLOR;
-                ctx.lineWidth = 2;
-                ctx.stroke();
-              }
-            });
-        });
-        return;
-      };
+      if (video.paused || video.ended) return;
 
       const fps = analysisResult.metadata?.fps || 30;
       const currentFrameIndex = Math.floor(video.currentTime * fps);
@@ -197,7 +169,7 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record, baselin
           const transformedX = originalX * scale + offsetX;
           const transformedY = originalY * scale + offsetY;
           ctx.beginPath();
-          ctx.arc(transformedX, transformedY, 3, 0, 2 * Math.PI);
+          ctx.arc(transformedX, transformedY, 2, 0, 2 * Math.PI);
           ctx.fillStyle = POINT_COLOR;
           ctx.fill();
         });
@@ -215,7 +187,7 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record, baselin
         //     ctx.moveTo(transformedStartX, transformedStartY);
         //     ctx.lineTo(transformedEndX, transformedEndY);
         //     ctx.strokeStyle = LINE_COLOR;
-        //     ctx.lineWidth = 1.5; // ★★★ 선 두께 수정 ★★★
+        //     ctx.lineWidth = 1.5;
         //     ctx.stroke();
         //   }
         // });
@@ -231,14 +203,13 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record, baselin
     const stopRenderLoop = () => { cancelAnimationFrame(animationFrameId.current!); };
     
     const handleResize = () => {
-        // 크기 변경 시 잠시 후 다시 그리기
-        setTimeout(() => {
+      setTimeout(() => {
+        drawSkeletons();
+        if (video.paused) {
             drawSkeletons();
-        }, 50);
+        }
+      }, 100);
     };
-
-    const resizeObserver = new ResizeObserver(handleResize);
-    resizeObserver.observe(video);
 
     video.addEventListener('play', startRenderLoop);
     video.addEventListener('playing', startRenderLoop);
@@ -247,14 +218,20 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record, baselin
     video.addEventListener('ended', stopRenderLoop);
     video.addEventListener('loadedmetadata', drawSkeletons);
     
+    window.addEventListener('resize', handleResize);
+    document.addEventListener('fullscreenchange', handleResize);
+
     return () => {
-      resizeObserver.unobserve(video);
       video.removeEventListener('play', startRenderLoop);
       video.removeEventListener('playing', startRenderLoop);
       video.removeEventListener('seeked', drawSkeletons);
       video.removeEventListener('pause', stopRenderLoop);
       video.removeEventListener('ended', stopRenderLoop);
       video.removeEventListener('loadedmetadata', drawSkeletons);
+      
+      window.removeEventListener('resize', handleResize);
+      document.removeEventListener('fullscreenchange', handleResize);
+      
       cancelAnimationFrame(animationFrameId.current!);
     };
   }, [analysisResult]);
@@ -328,7 +305,7 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record, baselin
       <CardHeader className="bg-gradient-to-r from-purple-100 to-pink-100">
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle className="text-2xl font-bold text-gray-800 flex items-center"><Sparkles className="mr-3 h-6 w-6 text-purple-500" />📊 ���세 분석 결과</CardTitle>
+            <CardTitle className="text-2xl font-bold text-gray-800 flex items-center"><Sparkles className="mr-3 h-6 w-6 text-purple-500" />📊 상세 분석 결과</CardTitle>
             <CardDescription className="flex items-center text-gray-600 mt-1"><Heart className="mr-2 h-4 w-4 text-pink-500" />{record.dog_name || '우리 강아지'}의 자세 분석 리포트</CardDescription>
           </div>
           {isCurrentBaseline && (<Badge variant="secondary" className="bg-yellow-400 text-yellow-900 border-yellow-500"><Star className="mr-2 h-4 w-4" />현재 기준</Badge>)}
@@ -379,9 +356,20 @@ const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({ record, baselin
             </div>
           </div>
 
-          <div className="relative w-full border-2 border-purple-200 rounded-xl overflow-hidden shadow-lg aspect-video">
-            <video ref={videoRef} src={record.processed_video_url} controls playsInline crossOrigin="anonymous" className="absolute top-0 left-0 w-full h-full" />
-            <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
+          <div>
+            {/* ★★★ 컨테이너에 Ref 할당 ★★★ */}
+            <div ref={videoContainerRef} className="relative w-full border-2 border-purple-200 rounded-xl overflow-hidden shadow-lg aspect-video">
+              <video ref={videoRef} src={record.processed_video_url} controls playsInline crossOrigin="anonymous" className="absolute top-0 left-0 w-full h-full" />
+              <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
+            </div>
+            {/* ★★★ 커스텀 전체화면 버튼 추가 ★★★ */}
+            <Button onClick={handleFullscreen} variant="outline" className="w-full mt-2">
+              <Expand className="mr-2 h-4 w-4" />
+              전체 화면으로 보기 (추적 유지)
+            </Button>
+            <p className="text-xs text-gray-500 mt-1 text-center">
+              자세 추적을 유지하려면 이 버튼으로 전체 화면을 실행하세요.
+            </p>
           </div>
         </div>
       </CardContent>
