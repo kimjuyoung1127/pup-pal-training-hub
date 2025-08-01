@@ -68,3 +68,16 @@ export interface VideoMetadata {
   frame_count: number;
   fps: number;
 }
+
+/**
+ * analysis_results에 keypoints_data가 있을 수 있음을 명시하는 확장된 타입
+ */
+export interface AnalysisDataWithKeypoints extends AnalysisData {
+    keypoints_data?: number[][][][];
+    metadata?: {
+        fps?: number;
+        width?: number;
+        height?: number;
+        frame_count?: number;
+    };
+}
