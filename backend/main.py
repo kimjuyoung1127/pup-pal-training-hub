@@ -60,50 +60,111 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 model = YOLO(MODEL_PATH)
 jobs: Dict[str, Dict] = {}
 
-# --- 안정성 점수 계산 함수 ---
+# --- 안정성 점수 계산 함수 (V2: 척추 안정성 기반) ---
 def calculate_stability_score(keypoints_data: List[List[List[List[float]]]]) -> int:
     """
-    관절 좌표 데이터의 표준편차를 기반으로 안정성 점수를 계산합니다.
-    점수가 높을수록 안정적입니다.
+    척추선(어깨 중심-엉덩이 중심)의 각도 변화를 기반으로 안정성 점수를 계산합니다.
+    점수가 높을수록 척추가 흔들림 없이 곧게 유지됨을 의미합니다.
     """
     if not keypoints_data:
         return 0
 
-    # 몸의 중심을 나타내는 주요 관절 인덱스 (YOLO 17-point model 기준)
-    # 5: l_shoulder, 6: r_shoulder, 11: l_hip, 12: r_hip
-    core_joint_indices = [5, 6, 11, 12]
+    # YOLO 17-point model 기준 관절 인덱스
+    l_shoulder_idx, r_shoulder_idx = 5, 6
+    l_hip_idx, r_hip_idx = 11, 12
     
-    all_core_joint_positions = []
+    spine_angles = []
 
     for frame_keypoints in keypoints_data:
-        if not frame_keypoints: continue
-        # 첫 번째 감지된 객체(강아지)만 사용
+        if not frame_keypoints:
+            continue
+        
+        # 첫 번째 감지된 객체(강아지)의 키포인트 사용
         dog_keypoints = frame_keypoints[0]
         
-        frame_core_positions = []
-        for idx in core_joint_indices:
-            if idx < len(dog_keypoints) and dog_keypoints[idx]:
-                frame_core_positions.append(dog_keypoints[idx])
-        
-        if frame_core_positions:
-            # 프레임 내 핵심 관절들의 평균 위치
-            avg_position_in_frame = np.mean(frame_core_positions, axis=0)
-            all_core_joint_positions.append(avg_position_in_frame)
+        # 필요한 모든 관절이 감지되었는지 확인
+        if not (len(dog_keypoints) > max(l_shoulder_idx, r_shoulder_idx, l_hip_idx, r_hip_idx) and
+                dog_keypoints[l_shoulder_idx] and dog_keypoints[r_shoulder_idx] and
+                dog_keypoints[l_hip_idx] and dog_keypoints[r_hip_idx]):
+            continue
 
-    if not all_core_joint_positions:
+        # 1. 어깨 중심점과 엉덩이 중심점 계산
+        l_shoulder = np.array(dog_keypoints[l_shoulder_idx])
+        r_shoulder = np.array(dog_keypoints[r_shoulder_idx])
+        shoulder_center = (l_shoulder + r_shoulder) / 2
+        
+        l_hip = np.array(dog_keypoints[l_hip_idx])
+        r_hip = np.array(dog_keypoints[r_hip_idx])
+        hip_center = (l_hip + r_hip) / 2
+        
+        # 2. 척추선의 각도 계산 (x축 기준)
+        # delta_y: y좌표 차이, delta_x: x좌표 차이
+        delta_y = shoulder_center[1] - hip_center[1]
+        delta_x = shoulder_center[0] - hip_center[0]
+        
+        # arctan2를 사용하여 -pi ~ +pi 범위의 각도(라디안) 계산
+        angle_rad = np.arctan2(delta_y, delta_x)
+        # 라디안을 도로 변환 (180/pi)
+        angle_deg = np.degrees(angle_rad)
+        
+        spine_angles.append(angle_deg)
+
+    if not spine_angles:
         return 0
 
-    # 모든 프레임에 걸친 평균 위치의 표준편차 계산
-    std_dev = np.std(all_core_joint_positions, axis=0)
-    
-    # 흔들림 정도 (x, y 표준편차의 평균)
-    shake_magnitude = np.mean(std_dev)
+    # 3. 모든 프레임에 걸친 척추 각도의 표준편차 계산
+    angle_std_dev = np.std(spine_angles)
 
-    # 점수화 (100점 만점, 흔들림이 클수록 점수 하락)
-    # 가중치는 실험을 통해 조정 가능
-    score = max(0, 100 - (shake_magnitude * 5))
+    # 4. 점수화 (100점 만점, 각도 변화가 클수록 점수 하락)
+    # 가중치(예: 10)는 실험을 통해 조정 가능. 값이 클수록 작은 각도 변화에 더 민감해짐.
+    score = max(0, 100 - (angle_std_dev * 10))
     
     return int(score)
+
+# --- 기존 안정성 점수 계산 함수 (V1) ---
+# def calculate_stability_score(keypoints_data: List[List[List[List[float]]]]) -> int:
+#     """
+#     관절 좌표 데이터의 표준편차를 기반으로 안정성 점수를 계산합니다.
+#     점수가 높을수록 안정적입니다.
+#     """
+#     if not keypoints_data:
+#         return 0
+
+#     # 몸의 중심을 나타내는 주요 관절 인덱스 (YOLO 17-point model 기준)
+#     # 5: l_shoulder, 6: r_shoulder, 11: l_hip, 12: r_hip
+#     core_joint_indices = [5, 6, 11, 12]
+    
+#     all_core_joint_positions = []
+
+#     for frame_keypoints in keypoints_data:
+#         if not frame_keypoints: continue
+#         # 첫 번째 감지된 객체(강아지)만 사용
+#         dog_keypoints = frame_keypoints[0]
+        
+#         frame_core_positions = []
+#         for idx in core_joint_indices:
+#             if idx < len(dog_keypoints) and dog_keypoints[idx]:
+#                 frame_core_positions.append(dog_keypoints[idx])
+        
+#         if frame_core_positions:
+#             # 프레임 내 핵심 관절들의 평균 위치
+#             avg_position_in_frame = np.mean(frame_core_positions, axis=0)
+#             all_core_joint_positions.append(avg_position_in_frame)
+
+#     if not all_core_joint_positions:
+#         return 0
+
+#     # 모든 프레임에 걸친 평균 위치의 표준편차 계산
+#     std_dev = np.std(all_core_joint_positions, axis=0)
+    
+#     # 흔���림 정도 (x, y 표준편차의 평균)
+#     shake_magnitude = np.mean(std_dev)
+
+#     # 점수화 (100점 만점, 흔들림이 클수록 점수 하락)
+#     # 가중치는 실험을 통해 조정 가능
+#     score = max(0, 100 - (shake_magnitude * 5))
+    
+#     return int(score)
 
 # --- 실제 분석 및 저장 로직 ---
 def analyze_video_in_background(job_id: str, video_path: str, user_id: str, dog_id: str, original_filename: str):
