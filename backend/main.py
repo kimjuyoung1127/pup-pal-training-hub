@@ -60,349 +60,133 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 model = YOLO(MODEL_PATH)
 jobs: Dict[str, Dict] = {}
 
-# --- 안정성 점수 계산 함수 (V2: 척추 안정성 기반) ---
+# --- 안정성 점수 계산 함수 ---
 def calculate_stability_score(keypoints_data: List[List[List[List[float]]]]) -> int:
-    """
-    척추선(어깨 중심-엉덩이 중심)의 각도 변화를 기반으로 안정성 점수를 계산합니다.
-    점수가 높을수록 척추가 흔들림 없이 곧게 유지됨을 의미합니다.
-    """
-    if not keypoints_data:
-        return 0
-
-    # YOLO 17-point model 기준 관절 인덱스
+    if not keypoints_data: return 0
     l_shoulder_idx, r_shoulder_idx = 5, 6
     l_hip_idx, r_hip_idx = 11, 12
-    
     spine_angles = []
-
     for frame_keypoints in keypoints_data:
-        if not frame_keypoints:
-            continue
-        
-        # 첫 번째 감지된 객체(강아지)의 키포인트 사용
+        if not frame_keypoints: continue
         dog_keypoints = frame_keypoints[0]
-        
-        # 필요한 모든 관절이 감지되었는지 확인
         if not (len(dog_keypoints) > max(l_shoulder_idx, r_shoulder_idx, l_hip_idx, r_hip_idx) and
                 dog_keypoints[l_shoulder_idx] and dog_keypoints[r_shoulder_idx] and
                 dog_keypoints[l_hip_idx] and dog_keypoints[r_hip_idx]):
             continue
-
-        # 1. 어깨 중심점과 엉덩이 중심점 계산
-        l_shoulder = np.array(dog_keypoints[l_shoulder_idx])
-        r_shoulder = np.array(dog_keypoints[r_shoulder_idx])
+        l_shoulder, r_shoulder = np.array(dog_keypoints[l_shoulder_idx]), np.array(dog_keypoints[r_shoulder_idx])
         shoulder_center = (l_shoulder + r_shoulder) / 2
-        
-        l_hip = np.array(dog_keypoints[l_hip_idx])
-        r_hip = np.array(dog_keypoints[r_hip_idx])
+        l_hip, r_hip = np.array(dog_keypoints[l_hip_idx]), np.array(dog_keypoints[r_hip_idx])
         hip_center = (l_hip + r_hip) / 2
-        
-        # 2. 척추선의 각도 계산 (x축 기준)
-        # delta_y: y좌표 차이, delta_x: x좌표 차이
-        delta_y = shoulder_center[1] - hip_center[1]
-        delta_x = shoulder_center[0] - hip_center[0]
-        
-        # arctan2를 사용하여 -pi ~ +pi 범위의 각도(라디안) 계산
+        delta_y, delta_x = shoulder_center[1] - hip_center[1], shoulder_center[0] - hip_center[0]
         angle_rad = np.arctan2(delta_y, delta_x)
-        # 라디안을 도로 변환 (180/pi)
-        angle_deg = np.degrees(angle_rad)
-        
-        spine_angles.append(angle_deg)
-
-    if not spine_angles:
-        return 0
-
-    # 3. 모든 프레임에 걸친 척추 각도의 표준편차 계산
+        spine_angles.append(np.degrees(angle_rad))
+    if not spine_angles: return 0
     angle_std_dev = np.std(spine_angles)
-
-    # 4. 점수화 (100점 만점, 각도 변화가 클수록 점수 하락)
-    # 가중치(예: 10)는 실험을 통해 조정 가능. 값이 클수록 작은 각도 변화에 더 민감해짐.
     score = max(0, 100 - (angle_std_dev * 10))
-    
     return int(score)
 
-# --- 척추 만곡 각도 계산 함수 (V3: 척추 만곡 분석) ---
+# --- 척추 만곡 각도 계산 함수 ---
 def calculate_spine_curvature(keypoints_data: List[List[List[List[float]]]]) -> float:
-    """
-    척추의 굽은 정도(만곡)를 계산합니다.
-    어깨-기갑-엉덩이를 잇는 각도를 측정하며, 180도에 가까울수록 곧게 펴진 상태를 의미합니다.
-    """
-    if not keypoints_data:
-        return 0.0
-
-    # Dog-Pose 24-point model 기준 관절 인덱스
+    if not keypoints_data: return 0.0
     l_shoulder_idx, r_shoulder_idx = 6, 7
-    withers_idx = 12  # 기갑 (등 중앙점)
+    withers_idx = 12
     l_hip_idx, r_hip_idx = 13, 14
-
     curvature_angles = []
-
     for frame_keypoints in keypoints_data:
-        if not frame_keypoints:
-            continue
-        
+        if not frame_keypoints: continue
         dog_keypoints = frame_keypoints[0]
-        
-        # 필요한 모든 관절이 감지되었는지 확인
         required_indices = [l_shoulder_idx, r_shoulder_idx, withers_idx, l_hip_idx, r_hip_idx]
         if not (len(dog_keypoints) > max(required_indices) and all(dog_keypoints[i] for i in required_indices)):
             continue
-
-        # 1. 어깨 중심점, 기갑, 엉덩이 중심점 좌표 추출
         shoulder_center = (np.array(dog_keypoints[l_shoulder_idx]) + np.array(dog_keypoints[r_shoulder_idx])) / 2
         withers = np.array(dog_keypoints[withers_idx])
         hip_center = (np.array(dog_keypoints[l_hip_idx]) + np.array(dog_keypoints[r_hip_idx])) / 2
-        
-        # 2. 세 점 사이의 각도 계산 (벡터 BA와 BC의 내적 이용)
-        # B: withers, A: shoulder_center, C: hip_center
-        vec_ba = shoulder_center - withers
-        vec_bc = hip_center - withers
-
-        # 벡터 내적 공식: a · b = |a| |b| cos(theta)
-        dot_product = np.dot(vec_ba, vec_bc)
-        norm_ba = np.linalg.norm(vec_ba)
-        norm_bc = np.linalg.norm(vec_bc)
-        
-        # 0으로 나누는 것을 방지
-        if norm_ba == 0 or norm_bc == 0:
-            continue
-
-        # cos(theta) 값 계산 및 클리핑 (-1과 1 사이로 보장)
-        cos_theta = np.clip(dot_product / (norm_ba * norm_bc), -1.0, 1.0)
-        
-        # 아크코사인을 사용하여 각도(라디안) 계산 후 도로 변환
-        angle_rad = np.arccos(cos_theta)
-        angle_deg = np.degrees(angle_rad)
-        
-        curvature_angles.append(angle_deg)
-
-    if not curvature_angles:
-        return 0.0
-
-    # 3. 영상 전체 프레임의 평��� 각도를 반환
+        vec_ba, vec_bc = shoulder_center - withers, hip_center - withers
+        if np.linalg.norm(vec_ba) == 0 or np.linalg.norm(vec_bc) == 0: continue
+        cos_theta = np.clip(np.dot(vec_ba, vec_bc) / (np.linalg.norm(vec_ba) * np.linalg.norm(vec_bc)), -1.0, 1.0)
+        curvature_angles.append(np.degrees(np.arccos(cos_theta)))
+    if not curvature_angles: return 0.0
     return float(np.mean(curvature_angles))
-
-# --- 기존 안정성 점수 계산 함수 (V1) ---
-# def calculate_stability_score(keypoints_data: List[List[List[List[float]]]]) -> int:
-#     """
-#     관절 좌표 데이터의 표준편차를 기반으로 안정성 점수를 계산합니다.
-#     점수가 높을수록 안정적입니다.
-#     """
-#     if not keypoints_data:
-#         return 0
-
-#     # 몸의 중심을 나타내는 주요 관절 인덱스 (YOLO 17-point model 기준)
-#     # 5: l_shoulder, 6: r_shoulder, 11: l_hip, 12: r_hip
-#     core_joint_indices = [5, 6, 11, 12]
-    
-#     all_core_joint_positions = []
-
-#     for frame_keypoints in keypoints_data:
-#         if not frame_keypoints: continue
-#         # 첫 번째 감지된 객체(강아지)만 사용
-#         dog_keypoints = frame_keypoints[0]
-        
-#         frame_core_positions = []
-#         for idx in core_joint_indices:
-#             if idx < len(dog_keypoints) and dog_keypoints[idx]:
-#                 frame_core_positions.append(dog_keypoints[idx])
-        
-#         if frame_core_positions:
-#             # 프레임 내 핵심 관절들의 평균 위치
-#             avg_position_in_frame = np.mean(frame_core_positions, axis=0)
-#             all_core_joint_positions.append(avg_position_in_frame)
-
-#     if not all_core_joint_positions:
-#         return 0
-
-#     # 모든 프레임에 걸친 평균 위치의 표준편차 계산
-#     std_dev = np.std(all_core_joint_positions, axis=0)
-    
-#     # 흔���림 정도 (x, y 표준편차의 평균)
-#     shake_magnitude = np.mean(std_dev)
-
-#     # 점수화 (100점 만점, 흔들림이 클수록 점수 하락)
-#     # 가중치는 실험을 통해 조정 가능
-#     score = max(0, 100 - (shake_magnitude * 5))
-    
-#     return int(score)
 
 # --- 실제 분석 및 저장 로직 ---
 def analyze_video_in_background(job_id: str, video_path: str, user_id: str, dog_id: str, original_filename: str):
-    """백그라운드에서 비디오 분석, 점수 계산, DB 저장을 수행합니다."""
     try:
         jobs[job_id]['status'] = 'processing'
         
-        # 1. 비디오 분석
         cap = cv2.VideoCapture(video_path)
-        if not cap.isOpened():
-            raise Exception("업로드된 비디오 파일을 열 수 없습니다.")
-        fps = cap.get(cv2.CAP_PROP_FPS)
-        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        if not cap.isOpened(): raise Exception("업로드된 비디오 파일을 열 수 없습니다.")
+        
+        fps, total_frames = (int(cap.get(p)) for p in [cv2.CAP_PROP_FPS, cv2.CAP_PROP_FRAME_COUNT])
         cap.release()
 
-        results = model.predict(source=video_path, save=False, stream=True, verbose=False)
+        results_generator = model.predict(source=video_path, save=False, stream=True, verbose=False)
 
         keypoints_data = []
-        processed_frames = 0
-        for r in results:
+        for r in results_generator:
             if r.keypoints and r.keypoints.xy.numel() > 0:
-                keypoints_for_frame = r.keypoints.xy.cpu().numpy().tolist()
-                keypoints_data.append(keypoints_for_frame)
+                keypoints_data.append(r.keypoints.xy.cpu().numpy().tolist())
             else:
                 keypoints_data.append([])
             
-            processed_frames += 1
-            jobs[job_id]['progress'] = int((processed_frames / total_frames) * 100)
-
-        # --- 💡 1단계: 가정 검증을 위한 로그 추가 ---
-        if keypoints_data and keypoints_data[0] and keypoints_data[0][0]:
-            first_frame_first_dog_keypoints = keypoints_data[0][0]
-            logger.info(f"✅ [검���] 첫 프레임의 키포인트 개수: {len(first_frame_first_dog_keypoints)}")
-            logger.info(f"✅ [검증] 키포인트 데이터 구조 (첫번째 객체): {np.array(first_frame_first_dog_keypoints).shape}")
-        # --- 💡 로그 추가 완료 ---
-
-        # 2. 안정성 및 만곡 점수 계산
+            jobs[job_id]['progress'] = int((len(keypoints_data) / total_frames) * 100)
+        
         stability_score = calculate_stability_score(keypoints_data)
         spine_curvature_angle = calculate_spine_curvature(keypoints_data)
 
-        # 3. 최종 결과 구성
         analysis_results_json = {
-            "keypoints_data": keypoints_data,
-            "fps": fps,
-            "scores": {
-                "stability": stability_score,
-                "curvature": spine_curvature_angle
-            },
-            "metadata": {
-                "fps": fps,
-                "frame_count": len(keypoints_data)
-            }
+            "keypoints_data": keypoints_data, "fps": fps,
+            "scores": {"stability": stability_score, "curvature": spine_curvature_angle},
+            "metadata": {"fps": fps, "frame_count": len(keypoints_data)}
         }
-        
         jobs[job_id]['result'] = analysis_results_json
         
-        # 4. Supabase에 저장
         if supabase:
             try:
-                # 4-1. 원본 영상을 Supabase Storage에 업로드
-                storage_file_path = f"{user_id}/{job_id}_{original_filename}"
-                with open(video_path, 'rb') as f:
-                    supabase.storage.from_("processed-videos").upload(
-                        file=f,
-                        path=storage_file_path,
-                        file_options={"content-type": "video/mp4"}
-                    )
+                storage_path = f"{user_id}/{job_id}_{original_filename}"
+                with open(video_path, 'rb') as f: supabase.storage.from_("processed-videos").upload(file=f, path=storage_path, file_options={"content-type": "video/mp4"})
+                public_url = supabase.storage.from_("processed-videos").get_public_url(storage_path)
                 
-                # 4-2. 업로드된 영상의 공개 URL 가져오기
-                public_url = supabase.storage.from_("processed-videos").get_public_url(storage_file_path)
-                logger.info(f"영상을 Supabase Storage에 업로드했습니다. URL: {public_url}")
-
-                # 4-3. 이 강아지의 첫 분석인지 확인 (is_baseline)
-                count_res = supabase.table('joint_analysis_records').select('id', count='exact').eq('dog_id', dog_id).execute()
-                is_baseline = count_res.count == 0
-
-                # 4-4. 저장할 데이터 준비 (새로운 점수 구조 반영)
+                is_baseline_res = supabase.table('joint_analysis_records').select('id', count='exact').eq('dog_id', dog_id).execute()
+                
                 record_to_insert = {
-                    "user_id": user_id,
-                    "dog_id": dog_id,
-                    "is_baseline": is_baseline,
-                    "original_video_filename": original_filename,
-                    "processed_video_url": public_url,
-                    "analysis_results": analysis_results_json, # JSONB 컬럼에 결과 전체 저장
-                    "notes": f"안정성: {analysis_results_json['scores']['stability']}점, 허리 곧음: {analysis_results_json['scores']['curvature']:.1f}°"
+                    "user_id": user_id, "dog_id": dog_id, "is_baseline": is_baseline_res.count == 0,
+                    "original_video_filename": original_filename, "processed_video_url": public_url,
+                    "analysis_results": analysis_results_json,
+                    "notes": f"안정성: {stability_score}점, 허리 곧음: {spine_curvature_angle:.1f}°"
                 }
-                
                 supabase.table('joint_analysis_records').insert(record_to_insert).execute()
                 logger.info(f"작업 {job_id}의 분석 결과를 Supabase에 저장했습니다.")
-
             except Exception as db_error:
-                logger.error(f"Supabase 저장 또는 업로드 실패: {db_error}", exc_info=True)
-                # 업로드/저장 실패 시에도 작업 상태는 계속 진행될 수 있으므로, 에러를 기록하고 넘어감
+                logger.error(f"Supabase 저장/업로드 실패: {db_error}", exc_info=True)
                 jobs[job_id]['error'] = f"DB/Storage Error: {db_error}"
 
         jobs[job_id]['status'] = 'completed'
-        logger.info(f"작업 {job_id} 완료.")
-
     except Exception as e:
         logger.error(f"작업 {job_id} 실패: {e}", exc_info=True)
-        jobs[job_id]['status'] = 'failed'
-        jobs[job_id]['error'] = str(e)
-    finally:
-        logger.info(f"작업 {job_id}의 백그라운드 처리가 종료되었습니다.")
-
+        jobs[job_id]['status'] = 'failed'; jobs[job_id]['error'] = str(e)
 
 @app.get("/")
-def read_root():
-    return {"message": "AI 관절 추적 API 서버 V6 (DB 저장 및 점수화 기능 추가)"}
+def read_root(): return {"message": "AI 관절 추적 API"}
 
-# --- 헬스 체크 엔드포인트 ---
 @app.get("/api/health")
-def health_check():
-    """서버가 활성 상태인지 확인하기 위한 간단한 엔드포인트."""
-    return {"status": "ok", "message": "AI server is ready."}
+def health_check(): return {"status": "ok"}
 
-
-# --- 1. 작업 생성 엔드포인트 ---
 @app.post("/api/jobs")
-async def create_analysis_job(
-    request: Request,
-    background_tasks: BackgroundTasks,
-    file: UploadFile = File(...),
-    user_id: str = Form(...),
-    dog_id: str = Form(...)
-):
+async def create_analysis_job(req: Request, bg: BackgroundTasks, file: UploadFile = File(...), user_id: str = Form(...), dog_id: str = Form(...)):
     job_id = str(uuid.uuid4())
-    unique_filename = f"{job_id}_{file.filename}"
-    upload_path = os.path.join(UPLOAD_DIR, unique_filename)
-
-    with open(upload_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    scheme = request.headers.get("x-forwarded-proto", "https")
-    host = request.headers.get("host", request.url.netloc)
-    base_url = f"{scheme}://{host}"
-    original_video_url = f"{base_url}/uploads/{unique_filename}"
+    upload_path = str(UPLOAD_DIR / f"{job_id}_{file.filename}")
+    with open(upload_path, "wb") as buffer: shutil.copyfileobj(file.file, buffer)
     
-    jobs[job_id] = {
-        'status': 'pending',
-        'progress': 0,
-        'original_video_url': original_video_url,
-        'user_id': user_id,
-        'dog_id': dog_id
-    }
+    scheme = req.headers.get("x-forwarded-proto", "http")
+    host = req.headers.get("host", req.url.netloc)
+    base_url = f"{scheme}://{host}"
 
-    background_tasks.add_task(analyze_video_in_background, job_id, upload_path, user_id, dog_id, file.filename)
+    jobs[job_id] = {'status': 'pending', 'progress': 0, 'base_url': base_url}
+    bg.add_task(analyze_video_in_background, job_id, upload_path, user_id, dog_id, file.filename)
+    return JSONResponse(status_code=202, content={"job_id": job_id})
 
-    return JSONResponse(
-        status_code=202,
-        content={
-            "message": "영상 분석 작업이 시작되었습니다.",
-            "job_id": job_id,
-            "status_url": f"{base_url}/api/jobs/{job_id}"
-        }
-    )
-
-# --- 2. 작업 상태 확인 엔드포인트 ---
 @app.get("/api/jobs/{job_id}")
 async def get_job_status(job_id: str):
     job = jobs.get(job_id)
-    if not job:
-        raise HTTPException(status_code=404, detail="작업을 찾을 수 없습니다.")
-
-    response_content = {
-        "job_id": job_id,
-        "status": job['status'],
-        "progress": job.get('progress', 0),
-        "original_video_url": job['original_video_url']
-    }
-    
-    if job['status'] == 'completed':
-        response_content['result'] = job.get('result')
-    elif job['status'] == 'failed':
-        response_content['error'] = job.get('error')
-        
-    return JSONResponse(content=response_content)
-
-# if __name__ == "__main__":
-#     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    if not job: raise HTTPException(status_code=404, detail="작업을 찾을 수 없습니다.")
+    return JSONResponse(content={"job_id": job_id, "status": job['status'], "progress": job.get('progress', 0), "result": job.get('result'), "error": job.get('error')})
