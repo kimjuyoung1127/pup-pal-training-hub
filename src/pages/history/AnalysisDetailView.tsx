@@ -37,9 +37,11 @@ const AnalysisDetailView: React.FC<{
   baselineAnalysisId: number | null;
   onBaselineUpdate: () => void;
 }> = ({ record, baselineAnalysisId, onBaselineUpdate }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationFrameId = useRef<number>();
+  // 모바일과 데스크톱용 별도 ref 생성
+  const mobileVideoRef = useRef<HTMLVideoElement>(null);
+  const mobileCanvasRef = useRef<HTMLCanvasElement>(null);
+  const desktopVideoRef = useRef<HTMLVideoElement>(null);
+  const desktopCanvasRef = useRef<HTMLCanvasElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
 
   const [isUpdating, setIsUpdating] = useState(false);
@@ -80,15 +82,14 @@ const AnalysisDetailView: React.FC<{
     }
   };
 
-  useEffect(() => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas || !analysisResult?.keypoints_data) return;
+  // 공통 스켈레톤 그리기 함수
+  const createDrawSkeletons = (video: HTMLVideoElement, canvas: HTMLCanvasElement) => {
+    return () => {
+      if (!video || !canvas || !analysisResult?.keypoints_data) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-    const drawSkeletons = () => {
       if (video.videoWidth === 0 || video.videoHeight === 0) {
         if(canvas.width > 0 && canvas.height > 0) ctx.clearRect(0, 0, canvas.width, canvas.height);
         return;
@@ -122,14 +123,25 @@ const AnalysisDetailView: React.FC<{
         });
       });
     };
+  };
+
+  // 공통 이벤트 리스너 설정 함수
+  const setupVideoEvents = (video: HTMLVideoElement, canvas: HTMLCanvasElement) => {
+    const animationFrameId = { current: 0 };
+    const drawSkeletons = createDrawSkeletons(video, canvas);
 
     const renderLoop = () => {
       drawSkeletons();
       animationFrameId.current = requestAnimationFrame(renderLoop);
     };
 
-    const startRenderLoop = () => { cancelAnimationFrame(animationFrameId.current!); renderLoop(); };
-    const stopRenderLoop = () => { cancelAnimationFrame(animationFrameId.current!); };
+    const startRenderLoop = () => { 
+      cancelAnimationFrame(animationFrameId.current); 
+      renderLoop(); 
+    };
+    const stopRenderLoop = () => { 
+      cancelAnimationFrame(animationFrameId.current); 
+    };
     
     const handleResize = () => {
       setTimeout(() => drawSkeletons(), 100);
@@ -154,8 +166,26 @@ const AnalysisDetailView: React.FC<{
       video.removeEventListener('loadedmetadata', drawSkeletons);
       window.removeEventListener('resize', handleResize);
       document.removeEventListener('fullscreenchange', handleResize);
-      cancelAnimationFrame(animationFrameId.current!);
+      cancelAnimationFrame(animationFrameId.current);
     };
+  };
+
+  // 모바일 비디오 이벤트 설정
+  useEffect(() => {
+    const mobileVideo = mobileVideoRef.current;
+    const mobileCanvas = mobileCanvasRef.current;
+    if (!mobileVideo || !mobileCanvas || !analysisResult?.keypoints_data) return;
+
+    return setupVideoEvents(mobileVideo, mobileCanvas);
+  }, [analysisResult]);
+
+  // 데스크톱 비디오 이벤트 설정
+  useEffect(() => {
+    const desktopVideo = desktopVideoRef.current;
+    const desktopCanvas = desktopCanvasRef.current;
+    if (!desktopVideo || !desktopCanvas || !analysisResult?.keypoints_data) return;
+
+    return setupVideoEvents(desktopVideo, desktopCanvas);
   }, [analysisResult]);
 
   const formattedDate = new Date(record.created_at).toLocaleString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -176,8 +206,8 @@ const AnalysisDetailView: React.FC<{
         {/* 모바일에서 영상을 최상단에 배치 */}
         <div className="block md:hidden mb-6">
           <div ref={videoContainerRef} className="relative w-full border-2 border-purple-200 rounded-xl overflow-hidden shadow-lg aspect-video">
-            <video ref={videoRef} src={record.processed_video_url} controls playsInline crossOrigin="anonymous" className="absolute top-0 left-0 w-full h-full" />
-            <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
+            <video ref={mobileVideoRef} src={record.processed_video_url} controls playsInline crossOrigin="anonymous" className="absolute top-0 left-0 w-full h-full" />
+            <canvas ref={mobileCanvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
           </div>
           <Button onClick={handleFullscreen} variant="outline" className="w-full mt-2"><Expand className="mr-2 h-4 w-4" /> 전체 화면으로 보기 (추적 유지)</Button>
           <p className="text-xs text-gray-500 mt-1 text-center">자세 추적을 유지하려면 이 버튼으로 전체 화면을 실행하세요.</p>
@@ -249,15 +279,15 @@ const AnalysisDetailView: React.FC<{
             <AnalysisShareController 
               record={record}
               analysisResult={analysisResult}
-              videoElement={videoRef.current}
+              videoElement={mobileVideoRef.current || desktopVideoRef.current}
             />
           </div>
 
           {/* 데스크톱에서만 영상 표시 */}
           <div className="hidden md:block">
-            <div ref={videoContainerRef} className="relative w-full border-2 border-purple-200 rounded-xl overflow-hidden shadow-lg aspect-video">
-              <video ref={videoRef} src={record.processed_video_url} controls playsInline crossOrigin="anonymous" className="absolute top-0 left-0 w-full h-full" />
-              <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
+            <div className="relative w-full border-2 border-purple-200 rounded-xl overflow-hidden shadow-lg aspect-video">
+              <video ref={desktopVideoRef} src={record.processed_video_url} controls playsInline crossOrigin="anonymous" className="absolute top-0 left-0 w-full h-full" />
+              <canvas ref={desktopCanvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
             </div>
             <Button onClick={handleFullscreen} variant="outline" className="w-full mt-2"><Expand className="mr-2 h-4 w-4" /> 전체 화면으로 보기 (추적 유지)</Button>
             <p className="text-xs text-gray-500 mt-1 text-center">자세 추적을 유지하려면 이 버튼으로 전체 화면을 실행하세요.</p>
