@@ -12,20 +12,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 // --- 상수 정의 ---
-const SKELETON = [
-  [15, 13], [13, 11], [16, 14], [14, 12], [11, 12], [5, 11], [6, 12], [5, 6],
-  [5, 7], [6, 8], [7, 9], [8, 10], [1, 2], [0, 1], [0, 2], [1, 3], [2, 4], [3, 5], [4, 6]
-];
-const POINT_COLOR = "#f59e0b";
-const LINE_COLOR = "#84cc16";
-const POLLING_INTERVAL = 2000;
+const HEALTH_CHECK_INTERVAL = 5000; // 서버 헬스 체크 간격 (5초)
+const POLLING_INTERVAL = 2000; // 작업 상태 폴링 간격 (2초)
 
 // --- 타입 정의 ---
-type JobStatus = 'idle' | 'uploading' | 'processing' | 'completed' | 'failed';
+type JobStatus = 'idle' | 'connecting' | 'waking_server' | 'uploading' | 'processing' | 'completed' | 'failed';
 type AnalysisResult = {
   keypoints_data: number[][][][];
   fps: number;
-  stability_score: number; // 점수 필드 추가
+  stability_score: number;
 };
 
 export default function PostureAnalysisPage() {
@@ -57,72 +52,53 @@ export default function PostureAnalysisPage() {
     }
   }, [dogs, selectedDogId]);
 
+  const resetState = () => {
+    setFile(null);
+    setJobId(null);
+    setStatus('idle');
+    setProgress(0);
+    setError(null);
+    setAnalysisResult(null);
+    setVideoUrl(null);
+    if (pollingTimer.current) clearTimeout(pollingTimer.current);
+  };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
+      resetState();
       setFile(event.target.files[0]);
-      setJobId(null);
-      setStatus('idle');
-      setProgress(0);
-      setError(null);
-      setAnalysisResult(null);
-      setVideoUrl(null);
-      if (pollingTimer.current) clearTimeout(pollingTimer.current);
     }
   };
 
   const handleGoToHistory = () => {
     if (analysisResult && videoUrl && user && selectedDogId) {
-      // JointAnalysisRecord 타입에 맞춰 데이터 재구성
       const resultToStore = {
-        id: Date.now(), // 임시 ID (DB의 실제 ID와는 다름)
+        id: Date.now(),
         user_id: user.id,
         dog_id: selectedDogId,
         created_at: new Date().toISOString(),
-        is_baseline: false, // 이 정보는 백엔드에서 결정되므로 기본값 설정
+        is_baseline: false,
         original_video_filename: file?.name || 'unknown_video',
         processed_video_url: videoUrl,
         analysis_results: {
-          frames: [], // 프론트에서는 전체 프레임 데이터가 없으므로 비워둠
-          metadata: { // fps만 사용 가능
-            fps: analysisResult.fps,
-            width: videoRef.current?.videoWidth || 0,
-            height: videoRef.current?.videoHeight || 0,
-            frame_count: 0,
-          },
-          scores: {
-            stability: analysisResult.stability_score,
-          }
+          metadata: { fps: analysisResult.fps },
+          scores: { stability: analysisResult.stability_score }
         },
-        // 프론트에서 가공해서 사용하는 추가 정보
         dog_name: dogs?.find(d => d.id === selectedDogId)?.name || 'Unknown Dog',
         stability_score: analysisResult.stability_score,
       };
-
       localStorage.setItem('latestAnalysisResult', JSON.stringify(resultToStore));
-      navigate('/app/posture-analysis-history'); // 올바른 경로로 수정
+      navigate('/app/posture-analysis-history');
     } else {
       setError("분석 결과가 없어 기록 페이지로 이동할 수 없습니다.");
     }
   };
 
-  const handleAnalyzeClick = async () => {
-    if (!file) {
-      setError("분석할 동영상 파일을 선택해주세요.");
-      return;
-    }
-    if (!user) {
-      setError("로그인이 필요합니다.");
-      return;
-    }
-    if (!selectedDogId) {
-      setError("분석할 강아지를 선택해주세요.");
-      return;
-    }
+  // ★★★ 2단계: 실제 파일 업로드 로직 분리 ★★★
+  const uploadFileAndStartJob = async () => {
+    if (!file || !user || !selectedDogId) return;
 
     setStatus('uploading');
-    setError(null);
-    setProgress(0);
-
     const formData = new FormData();
     formData.append('file', file);
     formData.append('user_id', user.id);
@@ -146,7 +122,53 @@ export default function PostureAnalysisPage() {
     }
   };
 
-  // --- 폴링 로직 (이전과 동일) ---
+  // ★★★ 1단계: 분석 시작 버튼 클릭 핸들러 수정 ★★★
+  const handleAnalyzeClick = async () => {
+    if (!file || !user || !selectedDogId) {
+      setError("필수 정보를 모두 선택해주세요.");
+      return;
+    }
+
+    setStatus('connecting');
+    setError(null);
+    setProgress(0);
+
+    try {
+      const healthApiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/health`;
+      const response = await fetch(healthApiUrl);
+      if (response.ok) {
+        // 서버가 즉시 응답하면 바로 업로드 시작
+        await uploadFileAndStartJob();
+      } else {
+        // 응답이 없거나 에러가 발생하면 서버를 깨우는 상태로 전환
+        setStatus('waking_server');
+      }
+    } catch (error) {
+      // 네트워크 에러 등 fetch 자체가 실패하면 서버를 깨우는 상태로 전환
+      setStatus('waking_server');
+    }
+  };
+
+  // ★★★ 3단계: 서버 상태 폴링 로직 ★★★
+  const pollServerHealth = useCallback(async () => {
+    try {
+      const healthApiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/health`;
+      const response = await fetch(healthApiUrl);
+      if (response.ok) {
+        // 서버가 깨어나면 폴링을 멈추고 파일 업로드 시작
+        clearTimeout(pollingTimer.current);
+        await uploadFileAndStartJob();
+      } else {
+        // 아직 자고 있으면 다시 폴링
+        pollingTimer.current = setTimeout(pollServerHealth, HEALTH_CHECK_INTERVAL);
+      }
+    } catch (error) {
+      // 아직 자고 있으면 다시 폴링
+      pollingTimer.current = setTimeout(pollServerHealth, HEALTH_CHECK_INTERVAL);
+    }
+  }, []);
+
+  // ★★★ 4단계: 작업 상태 폴링 로직 (기존과 유사) ★★★
   const pollJobStatus = useCallback(async () => {
     if (!jobId) return;
     try {
@@ -177,125 +199,55 @@ export default function PostureAnalysisPage() {
     }
   }, [jobId]);
 
+  // ★★★ 5단계: 상태에 따라 적절한 폴링 함수 호출 ★★★
   useEffect(() => {
-    if (status === 'processing') {
+    if (status === 'waking_server') {
+      pollServerHealth();
+    } else if (status === 'processing') {
       pollJobStatus();
     }
     return () => clearTimeout(pollingTimer.current);
-  }, [status, pollJobStatus]);
+  }, [status, pollServerHealth, pollJobStatus]);
 
-  // ★★★★★ 최종 수정: 완벽한 좌표 변환 렌더링 로직 (경쟁 상태 해결) ★★★★★
+  // ★★★ 6단계: 페이지 이탈 방지 ★★★
   useEffect(() => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas || !analysisResult) return;
+    const isProcessing = ['connecting', 'waking_server', 'uploading', 'processing'].includes(status);
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const drawSkeletons = () => {
-      // [안전 장치] 비디오 메타데이터가 로드되지 않았거나, 재생이 멈춘 상태면 아무것도 그리지 않음
-      if (video.videoWidth === 0 || video.videoHeight === 0 || video.paused || video.ended) {
-        return;
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (isProcessing) {
+        const message = "분석이 진행 중입니다. 페이지를 벗어나면 업로드가 중단될 수 있습니다. 정말로 나가시겠습니까?";
+        event.preventDefault();
+        event.returnValue = message;
+        return message;
       }
-
-      // 1. 캔버스 크기를 화면에 표시되는 비디오의 크기와 정확히 일치시킴
-      canvas.width = video.clientWidth;
-      canvas.height = video.clientHeight;
-      
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // 2. 정확한 축소 비율(scale) 계산 (가로/세로 비율 유지)
-      const scale = Math.min(
-        canvas.width / video.videoWidth,
-        canvas.height / video.videoHeight
-      );
-
-      // 3. 화면에 렌더링된 실제 비디오의 크기와 위치(여백) 계산
-      const renderedVideoWidth = video.videoWidth * scale;
-      const renderedVideoHeight = video.videoHeight * scale;
-      const offsetX = (canvas.width - renderedVideoWidth) / 2;
-      const offsetY = (canvas.height - renderedVideoHeight) / 2;
-
-      // 4. 현재 프레임의 좌표 데이터 가져오기
-      const currentFrameIndex = Math.floor(video.currentTime * analysisResult.fps);
-      if (currentFrameIndex >= analysisResult.keypoints_data.length) return;
-      const frameKeypoints = analysisResult.keypoints_data[currentFrameIndex];
-      if (!frameKeypoints || frameKeypoints.length === 0) return;
-
-      // 5. 변환된 좌표를 사용하여 캔버스에 그리기
-      frameKeypoints.forEach((dogKeypoints: number[][]) => {
-        // 점 그리기
-        dogKeypoints.forEach(point => {
-          const [originalX, originalY] = point;
-          const transformedX = originalX * scale + offsetX;
-          const transformedY = originalY * scale + offsetY;
-          
-          ctx.beginPath();
-          ctx.arc(transformedX, transformedY, 3, 0, 2 * Math.PI); // 점 반지름 수정 (5 -> 3)
-          ctx.fillStyle = POINT_COLOR;
-          ctx.fill();
-        });
-
-        // 선 그리기
-        SKELETON.forEach(pair => {
-          const [startIdx, endIdx] = pair;
-          const startPoint = dogKeypoints[startIdx];
-          const endPoint = dogKeypoints[endIdx];
-          if (startPoint && endPoint && startPoint.length > 0 && endPoint.length > 0) {
-            const transformedStartX = startPoint[0] * scale + offsetX;
-            const transformedStartY = startPoint[1] * scale + offsetY;
-            const transformedEndX = endPoint[0] * scale + offsetX;
-            const transformedEndY = endPoint[1] * scale + offsetY;
-
-            ctx.beginPath();
-            ctx.moveTo(transformedStartX, transformedStartY);
-            ctx.lineTo(transformedEndX, transformedEndY);
-            ctx.strokeStyle = LINE_COLOR;
-            ctx.lineWidth = 2; // 선 두께 수정 (3 -> 2)
-            ctx.stroke();
-          }
-        });
-      });
     };
 
-    const renderLoop = () => {
-      drawSkeletons();
-      animationFrameId.current = requestAnimationFrame(renderLoop);
-    };
-
-    const startRenderLoop = () => {
-      cancelAnimationFrame(animationFrameId.current!);
-      renderLoop();
-    };
-    
-    const stopRenderLoop = () => {
-      cancelAnimationFrame(animationFrameId.current!);
-    };
-
-    video.addEventListener('play', startRenderLoop);
-    video.addEventListener('playing', startRenderLoop);
-    video.addEventListener('seeked', drawSkeletons);
-    video.addEventListener('pause', stopRenderLoop);
-    video.addEventListener('ended', stopRenderLoop);
-    
-    // 메타데이터가 로드된 후 첫 프레임을 바로 그리기 위한 이벤트 리스너
-    video.addEventListener('loadedmetadata', drawSkeletons);
-
+    window.addEventListener('beforeunload', handleBeforeUnload);
     return () => {
-      video.removeEventListener('play', startRenderLoop);
-      video.removeEventListener('playing', startRenderLoop);
-      video.removeEventListener('seeked', drawSkeletons);
-      video.removeEventListener('pause', stopRenderLoop);
-      video.removeEventListener('ended', stopRenderLoop);
-      video.removeEventListener('loadedmetadata', drawSkeletons);
-      cancelAnimationFrame(animationFrameId.current!);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [analysisResult]);
+  }, [status]);
+
+  // ... (렌더링 로직은 동일) ...
+  const getStatusMessage = () => {
+    switch (status) {
+      case 'connecting':
+        return '🔗 서버에 연결하는 중...';
+      case 'waking_server':
+        return '💤 AI 서버를 깨우는 중... (최대 5분 소요)';
+      case 'uploading':
+        return '🚀 영상을 안전하게 전송하는 중...';
+      case 'processing':
+        return '🔍 AI가 열심히 분석 중...';
+      default:
+        return '✨ 자세 분석 시작하기';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-purple-50">
       <div className="container mx-auto p-4 max-w-4xl">
+        {/* ... (기존 헤더 UI) ... */}
         <div className="flex flex-col items-center text-center mb-8">
           <div className="flex items-center justify-center mb-4">
             <Dog className="h-8 w-8 text-purple-500 mr-3" />
@@ -306,7 +258,7 @@ export default function PostureAnalysisPage() {
             </h1>
             <Sparkles className="h-8 w-8 text-purple-500 ml-3" />
           </div>
-          <p className="mt-2 text-lg text-gray-600 font-light leading-relaxed max-w-2xl">
+          <p className="mt-2 text-lg text-gray-600 font-light leading-relaxed max-w-2xl break-keep">
             🌟 우리 강아지의 자세를 AI가 똑똑하게 분석해드려요! 🌟
           </p>
         </div>
@@ -319,6 +271,7 @@ export default function PostureAnalysisPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6 space-y-6">
+            {/* ... (강아지 선택, 파일 입력, 책임 한계 조항, GIF 미리보기 UI는 동일) ... */}
             <div>
               <label className="font-semibold text-sm mb-3 block flex items-center">
                 <Heart className="inline-block mr-2 h-4 w-4 text-pink-500" />
@@ -349,13 +302,13 @@ export default function PostureAnalysisPage() {
             <div>
               <label className="font-semibold text-sm mb-3 block flex items-center">
                 <Video className="inline-block mr-2 h-4 w-4 text-purple-500" />
-                걸어다니는 영상을 올려주세요
+                네 발로 서있는 옆 모습 영상을 올려주세요
               </label>
               <Input 
                 type="file" 
                 accept="video/*" 
                 onChange={handleFileChange} 
-                disabled={status === 'processing' || status === 'uploading'}
+                disabled={status !== 'idle' && status !== 'completed' && status !== 'failed'}
                 className="border-2 border-purple-200 focus:border-purple-400 file:bg-gradient-to-r file:from-orange-400 file:to-pink-400 file:text-white file:border-0 file:rounded-md file:px-4 file:py-2 file:mr-4"
               />
               <p className="text-xs text-gray-500 mt-2">
@@ -363,7 +316,6 @@ export default function PostureAnalysisPage() {
               </p>
             </div>
 
-            {/* ★★★ 책임 한계 조항 추가 ★★★ */}
             <Alert variant="destructive" className="bg-yellow-50 border-yellow-400 text-yellow-800 mb-6">
               <Terminal className="h-4 w-4 !text-yellow-800" />
               <AlertTitle className="font-bold"></AlertTitle>
@@ -372,7 +324,6 @@ export default function PostureAnalysisPage() {
               </AlertDescription>
             </Alert>
 
-            {/* --- GIF 미리보기 --- */}
             <div className="mt-6 p-4 border-2 border-dashed border-orange-200 rounded-xl bg-orange-50/50">
               <p className="text-sm font-semibold text-center text-orange-700 mb-3 flex items-center justify-center">
                 <Sparkles className="inline-block mr-2 h-4 w-4 text-orange-500" />
@@ -390,14 +341,14 @@ export default function PostureAnalysisPage() {
             
             <Button 
               onClick={handleAnalyzeClick} 
-              disabled={!file || !selectedDogId || status === 'processing' || status === 'uploading'} 
+              disabled={!file || !selectedDogId || (status !== 'idle' && status !== 'completed' && status !== 'failed')} 
               className="w-full bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 hover:from-orange-500 hover:via-pink-600 hover:to-purple-600 text-white font-bold py-3 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all duration-200"
               size="lg"
             >
-              {(status === 'processing' || status === 'uploading') ? (
+              {status !== 'idle' && status !== 'completed' && status !== 'failed' ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  {status === 'uploading' ? '🚀 업로드 중...' : '🔍 AI가 열심히 분석 중...'}
+                  {getStatusMessage()}
                 </>
               ) : (
                 <>
@@ -408,14 +359,14 @@ export default function PostureAnalysisPage() {
             </Button>
           </CardContent>
 
-          {(status === 'processing' || status === 'uploading') && (
+          {(status !== 'idle' && status !== 'completed' && status !== 'failed') && (
             <CardContent className="px-6 pb-6">
               <div className="bg-gradient-to-r from-orange-100 to-purple-100 p-4 rounded-xl">
                 <Progress value={progress} className="w-full h-3 mb-3" />
-                <p className="text-center text-sm text-gray-700 font-medium">
-                  🎯 {progress}% 완료! AI가 우리 강아지를 꼼꼼히 살펴보고 있어요
+                <p className="text-center text-sm text-gray-700 font-medium break-keep">
+                  🎯 {status === 'processing' ? `${progress}% 완료! AI가 우리 강아지를 꼼꼼히 살펴보고 있어요` : getStatusMessage()}
                 </p>
-                <p className="text-center text-xs text-gray-500 mt-1">
+                <p className="text-center text-xs text-gray-500 mt-1 break-keep">
                   💫 이 페이지를 벗어나도 분석은 계속돼요!
                 </p>
               </div>
@@ -435,6 +386,7 @@ export default function PostureAnalysisPage() {
 
         {status === 'completed' && analysisResult && videoUrl && (
           <Card className="mt-8 overflow-hidden shadow-xl border-2 border-green-200 bg-white/90 backdrop-blur-md">
+            {/* ... (분석 완료 후 UI는 동일) ... */}
             <CardHeader className="bg-gradient-to-r from-green-100 to-blue-100 text-center">
               <CardTitle className="text-2xl font-bold text-gray-800 flex items-center justify-center">
                 <Sparkles className="mr-2 h-6 w-6 text-green-500" />
@@ -442,7 +394,6 @@ export default function PostureAnalysisPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              {/* 안정성 점수 표시 */}
               <div className="mb-6 p-6 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl text-center">
                 <div className="flex items-center justify-center mb-3">
                   <Award className="h-8 w-8 text-amber-500 mr-3" />
@@ -461,9 +412,8 @@ export default function PostureAnalysisPage() {
                   <Heart className="mr-1 h-4 w-4 text-pink-500" />
                   점수가 높을수록 우리 강아지의 자세가 안정적이에요!
                 </p>
-                {/* 점수별 코멘트 */}
                 <div className="mt-4 p-3 bg-white/70 rounded-lg">
-                  <p className="text-sm font-medium text-gray-700">
+                  <p className="text-sm font-medium text-gray-700 break-keep">
                     {analysisResult.stability_score >= 80 ? "✅ 분석된 영상에서는 일관된 안정성을 보여줍니다. 하지만 이 결과는 보조적인 참고 자료이며, 건강에 대한 우려가 있으시면 반드시 수의사와 상담하세요." :
                      analysisResult.stability_score >= 60 ? "🟡 걸음걸이에서 약간의 변동성이 관찰됩니다. 주기적인 관찰을 통해 변화를 추적해보세요. 정확한 진단은 전문가의 도움이 필요합니다." :
                      analysisResult.stability_score >= 40 ? "⚠️ 자세에 눈에 띄는 불안정성이 감지되었습니다. 이는 일시적인 현상일 수도 있지만, 빠른 시일 내에 수의사에게 전문적인 검진을 받아보시는 것을 강력히 권장합니다." :
@@ -472,7 +422,6 @@ export default function PostureAnalysisPage() {
                 </div>
               </div>
 
-              {/* 영상 플레이어 */}
               <div className="relative w-full max-w-2xl mx-auto border-2 border-gray-200 rounded-xl overflow-hidden shadow-lg">
                 <video ref={videoRef} src={videoUrl} controls playsInline crossOrigin="anonymous" className="w-full h-auto aspect-video" />
                 <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />

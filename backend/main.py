@@ -275,6 +275,13 @@ def analyze_video_in_background(job_id: str, video_path: str, user_id: str, dog_
 def read_root():
     return {"message": "AI 관절 추적 API 서버 V6 (DB 저장 및 점수화 기능 추가)"}
 
+# --- 헬스 체크 엔드포인트 ---
+@app.get("/api/health")
+def health_check():
+    """서버가 활성 상태인지 확인하기 위한 간단한 엔드포인트."""
+    return {"status": "ok", "message": "AI server is ready."}
+
+
 # --- 1. 작업 생성 엔드포인트 ---
 @app.post("/api/jobs")
 async def create_analysis_job(
