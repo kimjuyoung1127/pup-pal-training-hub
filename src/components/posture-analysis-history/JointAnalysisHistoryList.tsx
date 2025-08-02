@@ -46,6 +46,7 @@ const JointAnalysisHistoryList: React.FC<JointAnalysisHistoryListProps> = ({ rec
     >
       {records.map((record) => {
         const stabilityScore = record.analysis_results?.scores?.stability;
+        const curvatureScore = record.analysis_results?.scores?.curvature;
         const scoreInfo = stabilityScore ? getScoreInfo(stabilityScore) : null;
         
         return (
@@ -75,15 +76,26 @@ const JointAnalysisHistoryList: React.FC<JointAnalysisHistoryListProps> = ({ rec
                         </Badge>
                       )}
                     </div>
-                    {stabilityScore !== undefined && (
-                      <div className="flex items-center mt-2 bg-gradient-to-r from-amber-50 to-orange-50 p-2 rounded-lg">
-                        <Award className="w-5 h-5 mr-2 text-amber-600" />
-                        <span className="font-semibold text-gray-700">안정성:</span>
-                        <span className="ml-2 text-xl font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
-                          {stabilityScore.toFixed(1)}점
-                        </span>
-                      </div>
-                    )}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                      {stabilityScore !== undefined && (
+                        <div className="flex items-center bg-blue-50 p-2 rounded-lg">
+                          <Award className="w-5 h-5 mr-2 text-blue-600" />
+                          <span className="font-semibold text-sm text-gray-700">안정성:</span>
+                          <span className="ml-2 text-lg font-bold text-blue-600">
+                            {stabilityScore.toFixed(1)}점
+                          </span>
+                        </div>
+                      )}
+                      {curvatureScore !== undefined && (
+                        <div className="flex items-center bg-green-50 p-2 rounded-lg">
+                          <Sparkles className="w-5 h-5 mr-2 text-green-600" />
+                          <span className="font-semibold text-sm text-gray-700">허리 곧음:</span>
+                          <span className="ml-2 text-lg font-bold text-green-600">
+                            {curvatureScore.toFixed(1)}°
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </CardContent>

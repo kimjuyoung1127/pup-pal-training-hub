@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { JointAnalysisRecord } from '@/types/analysis';
-import { Calendar, Award, Heart, Sparkles, Terminal, Star, TrendingUp, TrendingDown, Minus, Info, Expand, Loader2 } from 'lucide-react';
+import { Calendar, Award, Heart, Sparkles, Terminal, Star, Expand, Loader2, Dog } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,25 +10,33 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from '@/hooks/use-toast';
 import { updateDogBaseline } from '@/lib/dogApi';
 import { AnalysisDataWithKeypoints } from '@/hooks/useVideoExporter';
-import { AnalysisShareController } from './AnalysisShareController'; // ★★★ 컨트롤러 임포트
+import { AnalysisShareController } from './AnalysisShareController';
 
 const POINT_COLOR = "#f59e0b";
 
-// 점수 정보 헬퍼 함수
-const getScoreInfo = (score: number) => {
-    if (score >= 80) return { emoji: '✅', message: '일관된 안정성', advice: '분석된 영상에서는 일관된 안정성을 보여줍니다. 하지만 이 결과는 보조적인 참고 자료이며, 건강에 대한 우려가 있으시면 반드시 수의사와 상담하세요.', color: 'text-green-600', bgColor: 'bg-green-50', borderColor: 'border-green-200' };
-    if (score >= 60) return { emoji: '🟡', message: '약간의 변동성 관찰', advice: '걸음걸이에서 약간의 변동성이 관찰됩니다. 주기적인 관찰을 통해 변화를 추적해보세요. 정확한 진단은 전문가의 도움이 필요합니다.', color: 'text-yellow-600', bgColor: 'bg-yellow-50', borderColor: 'border-yellow-200' };
-    if (score >= 40) return { emoji: '⚠️', message: '불안정성 감지', advice: '자세에 눈에 띄는 불안정성이 감지되었습니다. 이는 일시적인 현상일 수도 있지만, 빠른 시일 내에 수의사에게 전문적인 검진을 받아보시는 것을 강력히 권장합니다.', color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-200' };
-    return { emoji: '🆘', message: '지속적인 관찰 필요', advice: '지속적인 관찰이 필요한 수준의 불안정성이 확인되었습니다. 단순한 자세 문제가 아닐 수 있으니, 반드시 전문가와 상담하여 정확한 원인을 파악해주세요.', color: 'text-red-600', bgColor: 'bg-red-50', borderColor: 'border-red-200' };
+// 종합 코멘트 생성 함수
+const getOverallComment = (stability?: number, curvature?: number): string => {
+  if (stability === undefined || curvature === undefined) {
+    return "분석 데이터를 읽어오는 중입니다...";
+  }
+  const stabilityComment = stability >= 80 ? "매우 안정적인 걸음걸이" : stability >= 60 ? "준수한 걸음걸이" : "다소 불안정한 걸음걸이";
+  const curvatureComment = curvature >= 170 ? "곧게 펴진 허리" : curvature >= 155 ? "조금 웅크린 자세" : "주의가 필요한 웅크린 자세";
+
+  if (stability >= 80 && curvature >= 170) {
+    return `✅ ${stabilityComment}와 ${curvatureComment}를 모두 보여주네요! 아주 이상적인 자세입니다.`;
+  }
+  if (stability < 60 && curvature < 155) {
+    return `⚠️ ${stabilityComment}와 ${curvatureComment}가 함께 관찰됩니다. 자세에 대한 전문가의 관심이 필요해 보입니다.`;
+  }
+  return `ℹ️ 종합적으로, 우리 강아지는 ${stabilityComment}와 ${curvatureComment}를 보이고 있습니다. 꾸준한 관찰을 통해 변화를 지켜봐 주세요.`;
 };
 
 // --- 메인 뷰 컴포넌트 ---
 const AnalysisDetailView: React.FC<{
   record: JointAnalysisRecord;
   baselineAnalysisId: number | null;
-  baselineRecord: JointAnalysisRecord | null;
   onBaselineUpdate: () => void;
-}> = ({ record, baselineAnalysisId, baselineRecord, onBaselineUpdate }) => {
+}> = ({ record, baselineAnalysisId, onBaselineUpdate }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameId = useRef<number>();
@@ -44,7 +52,9 @@ const AnalysisDetailView: React.FC<{
   };
 
   const analysisResult = useMemo(() => parseAnalysisResults(record.analysis_results), [record]);
-  const baselineAnalysisResult = useMemo(() => parseAnalysisResults(baselineRecord?.analysis_results), [baselineRecord]);
+  
+  const stabilityScore = analysisResult?.scores?.stability;
+  const curvatureScore = analysisResult?.scores?.curvature;
 
   const handleFullscreen = () => {
     if (videoContainerRef.current) {
@@ -151,54 +161,8 @@ const AnalysisDetailView: React.FC<{
   const formattedDate = new Date(record.created_at).toLocaleString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   const isCurrentBaseline = record.id === baselineAnalysisId;
 
-  const renderScoreComparison = () => {
-    const stabilityScore = analysisResult?.scores?.stability;
-    if (stabilityScore === undefined) return null;
-    
-    const scoreInfo = getScoreInfo(stabilityScore);
-    const baselineScore = baselineAnalysisResult?.scores?.stability;
-
-    if (baselineScore === undefined) {
-      return (
-        <>
-          <div className={`${scoreInfo.bgColor} ${scoreInfo.borderColor} border-2 p-6 rounded-2xl mb-6`}>
-            <div className="text-center mb-4">
-              <div className="flex items-center justify-center mb-2"><Award className="w-8 h-8 mr-3 text-amber-500" /><h3 className="text-xl font-bold text-gray-800">자세 안정성 점수</h3></div>
-              <div className="flex items-center justify-center space-x-2 mb-3"><span className="text-5xl font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">{stabilityScore.toFixed(1)}</span><div className="text-left"><div className="text-xl font-bold text-amber-600">점</div><div className="text-sm text-gray-500">/ 100점</div></div></div>
-              <Badge className={`${scoreInfo.bgColor} ${scoreInfo.color} border-0 text-lg px-4 py-1`}>{scoreInfo.emoji} {scoreInfo.message}</Badge>
-            </div>
-            <div className="bg-white/70 p-4 rounded-lg"><h4 className="font-semibold text-gray-800 mb-2 flex items-center"><Sparkles className="mr-2 h-4 w-4" />AI 추천 사항</h4><p className="text-sm text-gray-700">{scoreInfo.advice}</p></div>
-          </div>
-          <Alert className="bg-blue-50 border-blue-200 text-blue-800">
-            <Info className="h-4 w-4 !text-blue-800" />
-            <AlertTitle>변화를 추적해보세요!</AlertTitle>
-            <AlertDescription>아직 기준 분석이 없어요. 가장 좋은 자세의 분석을 기준으로 설정하여 변화를 추적해보세요!</AlertDescription>
-          </Alert>
-        </>
-      );
-    }
-
-    const diff = stabilityScore - baselineScore;
-    const diffColor = diff > 0 ? 'text-green-600' : diff < 0 ? 'text-red-600' : 'text-gray-600';
-    const DiffIcon = diff > 0 ? TrendingUp : diff < 0 ? TrendingDown : Minus;
-
-    return (
-      <div className="bg-blue-50 border-2 border-blue-200 p-6 rounded-2xl mb-6">
-        <div className="text-center mb-4">
-          <div className="flex items-center justify-center mb-2"><Award className="w-8 h-8 mr-3 text-blue-500" /><h3 className="text-xl font-bold text-gray-800">기준 대비 안정성 변화</h3></div>
-        </div>
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div><p className="text-sm text-gray-500">기준 점수</p><p className="text-2xl font-bold text-gray-700">{baselineScore.toFixed(1)}</p></div>
-          <div className="flex flex-col items-center justify-center"><p className="text-sm text-gray-500">변화</p><div className={`flex items-center text-2xl font-bold ${diffColor}`}><DiffIcon className="w-6 h-6 mr-1" /><span>{diff.toFixed(1)}</span></div></div>
-          <div><p className="text-sm text-gray-500">현재 점수</p><p className="text-2xl font-bold text-blue-600">{stabilityScore.toFixed(1)}</p></div>
-        </div>
-        <div className="bg-white/70 p-4 rounded-lg mt-6"><h4 className="font-semibold text-gray-800 mb-2 flex items-center"><Sparkles className="mr-2 h-4 w-4" />AI 추천 사항</h4><p className="text-sm text-gray-700">{getScoreInfo(stabilityScore).advice}</p></div>
-      </div>
-    );
-  };
-
   return (
-    <Card className="sticky top-24 shadow-xl border-2 border-purple-200 bg-white/90 backdrop-blur-md">
+    <Card className="shadow-xl border-2 border-purple-200 bg-white/90 backdrop-blur-md">
       <CardHeader className="bg-gradient-to-r from-purple-100 to-pink-100">
         <div className="flex justify-between items-center">
           <div>
@@ -212,12 +176,53 @@ const AnalysisDetailView: React.FC<{
         <Alert variant="destructive" className="bg-yellow-50 border-yellow-400 text-yellow-800 mb-6">
           <Terminal className="h-4 w-4 !text-yellow-800" />
           <AlertTitle className="font-bold">중요 안내: 책임 한계 조항</AlertTitle>
-          <AlertDescription className="text-xs">본 AI 자세 분석 기능은 의료적 진단이나 전문적인 수의학적 소견을 대체��� 수 없습니다. 분석 결과는 참고용 보조 지표이며, 반려동물의 건강에 이상이 의심될 경우 반드시 전문 수의사와 상담하시기 바랍니다.</AlertDescription>
+          <AlertDescription className="text-xs">본 AI 자세 분석 기능은 의료적 진단이나 전문적인 수의학적 소견을 대체할 수 없습니다. 분석 결과는 참고용 보조 지표이며, 반려동물의 건강에 이상이 의심될 경우 반드시 전문 수의사와 상담하시기 바랍니다.</AlertDescription>
         </Alert>
         
-        {renderScoreComparison()}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* 자세 안정성 */}
+          <div className="bg-white/80 backdrop-blur-sm p-5 rounded-2xl shadow-lg border border-gray-200/80 text-center">
+            <div className="flex items-center justify-center mb-3">
+              <Award className="h-7 w-7 text-blue-500 mr-2" />
+              <h3 className="text-xl font-bold text-gray-800">자세 안정성</h3>
+            </div>
+            <div className="flex items-baseline justify-center">
+              <span className="text-6xl font-extrabold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                {stabilityScore?.toFixed(1) ?? '-'}
+              </span>
+              <span className="text-xl font-semibold text-gray-500 ml-1">점</span>
+            </div>
+            <p className="text-xs text-gray-500 mt-2 break-keep">
+              걸음걸이의 흔들림이 적을수록 높은 점수를 받아요.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* 허리 곧음 정도 */}
+          <div className="bg-white/80 backdrop-blur-sm p-5 rounded-2xl shadow-lg border border-gray-200/80 text-center">
+            <div className="flex items-center justify-center mb-3">
+              <Dog className="h-7 w-7 text-green-500 mr-2" />
+              <h3 className="text-xl font-bold text-gray-800">허리 곧음 정도</h3>
+            </div>
+            <div className="flex items-baseline justify-center">
+              <span className="text-6xl font-extrabold bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
+                {curvatureScore?.toFixed(1) ?? '-'}
+              </span>
+              <span className="text-xl font-semibold text-gray-500 ml-1">°</span>
+            </div>
+            <p className="text-xs text-gray-500 mt-2 break-keep">
+              180°에 가까울수록 허리가 곧게 펴진 자세예요.
+            </p>
+          </div>
+        </div>
+
+        {/* 종합 코멘트 */}
+        <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
+          <p className="text-sm font-medium text-gray-700 break-keep text-center">
+            {getOverallComment(stabilityScore, curvatureScore)}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           <div className="space-y-4">
             <div className="bg-purple-50 p-4 rounded-xl border border-purple-200">
               <div className="flex items-start"><Calendar className="w-5 h-5 mr-3 text-purple-500 mt-1" /><div><p className="font-semibold text-gray-800">분석 일시</p><p className="text-gray-700">{formattedDate}</p></div></div>
@@ -230,7 +235,6 @@ const AnalysisDetailView: React.FC<{
               </Button>
             )}
             
-            {/* ★★��� 통합된 공유 컨트롤러 삽입 ★★★ */}
             <AnalysisShareController 
               record={record}
               analysisResult={analysisResult}

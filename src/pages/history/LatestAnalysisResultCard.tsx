@@ -30,6 +30,7 @@ const LatestAnalysisResultCard: React.FC<LatestAnalysisResultCardProps> = ({ rec
   });
 
   const stabilityScore = record.analysis_results?.scores?.stability;
+  const curvatureScore = record.analysis_results?.scores?.curvature;
 
   // 점수별 이모지와 메시지
   const getScoreInfo = (score: number) => {
@@ -70,29 +71,30 @@ const LatestAnalysisResultCard: React.FC<LatestAnalysisResultCardProps> = ({ rec
             <Calendar className="w-5 h-5 mr-2 text-purple-500" />
             <span className="font-medium">{formattedDate}</span>
           </div>
-          {stabilityScore !== undefined && (
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-200 mb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Award className="w-8 h-8 mr-3 text-amber-500" />
-                  <div>
-                    <p className="text-lg font-semibold text-gray-800">자세 안정성</p>
-                    <p className="text-xs text-gray-600">AI가 분석한 결과예요</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-3xl font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
-                    {stabilityScore.toFixed(1)}
-                  </p>
-                  <p className="text-sm text-gray-500">/ 100점</p>
-                </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            {stabilityScore !== undefined && (
+              <div className="bg-blue-50 p-4 rounded-xl border border-blue-200 text-center">
+                <p className="text-sm font-semibold text-blue-800">자세 안정성</p>
+                <p className="text-3xl font-bold text-blue-600">
+                  {stabilityScore.toFixed(1)} <span className="text-lg">점</span>
+                </p>
               </div>
-            </div>
-          )}
+            )}
+            {curvatureScore !== undefined && (
+              <div className="bg-green-50 p-4 rounded-xl border border-green-200 text-center">
+                <p className="text-sm font-semibold text-green-800">허리 곧음 정도</p>
+                <p className="text-3xl font-bold text-green-600">
+                  {curvatureScore.toFixed(1)} <span className="text-lg">°</span>
+                </p>
+              </div>
+            )}
+          </div>
+
           <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
-            <p className="text-sm text-purple-700 flex items-center">
+            <p className="text-sm text-purple-700 flex items-center justify-center">
               <Sparkles className="mr-2 h-4 w-4" />
-              상세한 분석 결과와 개선 팁을 확인해보세요!
+              상세 분석 결과와 개선 팁을 확인해보세요!
             </p>
           </div>
         </CardContent>

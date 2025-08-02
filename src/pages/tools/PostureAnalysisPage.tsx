@@ -88,11 +88,13 @@ export default function PostureAnalysisPage() {
         original_video_filename: file?.name || 'unknown_video',
         processed_video_url: videoUrl,
         analysis_results: {
-          metadata: { fps: analysisResult.fps },
-          scores: { stability: analysisResult.stability_score }
+          metadata: { fps: analysisResult.metadata.fps },
+          scores: { 
+            stability: analysisResult.scores.stability,
+            curvature: analysisResult.scores.curvature 
+          }
         },
         dog_name: dogs?.find(d => d.id === selectedDogId)?.name || 'Unknown Dog',
-        stability_score: analysisResult.stability_score,
       };
       localStorage.setItem('latestAnalysisResult', JSON.stringify(resultToStore));
       navigate('/app/posture-analysis-history');
@@ -485,7 +487,4 @@ const getOverallComment = (stability: number, curvature: number): string => {
   }
   return `ℹ️ 종합적으로, 우리 강아지는 ${stabilityComment}와 ${curvatureComment}를 보이고 있습니다. 꾸준한 관찰을 통해 변화를 지켜봐 주세요.`;
 };
-function setIsProcessing(arg0: boolean) {
-  throw new Error('Function not implemented.');
-}
 

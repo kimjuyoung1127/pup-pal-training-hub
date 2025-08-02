@@ -35,6 +35,7 @@ export interface AnalysisData {
  * 다양한 분석 점수를 포함합니다.
  */
 export interface AnalysisScores {
+  curvature: any;
   stability: number;
   symmetry?: number; // 향후 확장
   gait?: number; // 향후 확장
