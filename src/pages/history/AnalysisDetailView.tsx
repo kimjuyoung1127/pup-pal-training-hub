@@ -173,9 +173,19 @@ const AnalysisDetailView: React.FC<{
         </div>
       </CardHeader>
       <CardContent className="p-6">
+        {/* 모바일에서 영상을 최상단에 배치 */}
+        <div className="block md:hidden mb-6">
+          <div ref={videoContainerRef} className="relative w-full border-2 border-purple-200 rounded-xl overflow-hidden shadow-lg aspect-video">
+            <video ref={videoRef} src={record.processed_video_url} controls playsInline crossOrigin="anonymous" className="absolute top-0 left-0 w-full h-full" />
+            <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
+          </div>
+          <Button onClick={handleFullscreen} variant="outline" className="w-full mt-2"><Expand className="mr-2 h-4 w-4" /> 전체 화면으로 보기 (추적 유지)</Button>
+          <p className="text-xs text-gray-500 mt-1 text-center">자세 추적을 유지하려면 이 버튼으로 전체 화면을 실행하세요.</p>
+        </div>
+
         <Alert variant="destructive" className="bg-yellow-50 border-yellow-400 text-yellow-800 mb-6">
           <Terminal className="h-4 w-4 !text-yellow-800" />
-          <AlertTitle className="font-bold">중요 안내: 책임 한계 조항</AlertTitle>
+          <AlertTitle className="font-bold"> 책임 한계 조항</AlertTitle>
           <AlertDescription className="text-xs">본 AI 자세 분석 기능은 의료적 진단이나 전문적인 수의학적 소견을 대체할 수 없습니다. 분석 결과는 참고용 보조 지표이며, 반려동물의 건강에 이상이 의심될 경우 반드시 전문 수의사와 상담하시기 바랍니다.</AlertDescription>
         </Alert>
         
@@ -193,7 +203,7 @@ const AnalysisDetailView: React.FC<{
               <span className="text-xl font-semibold text-gray-500 ml-1">점</span>
             </div>
             <p className="text-xs text-gray-500 mt-2 break-keep">
-              걸음걸이의 흔들림이 적을수록 높은 점수를 받아요.
+              자세의 안정성에 영향을 미치는 요소들을 분석하여 안정적인 자세를 유지하고 있는지 평가해요.
             </p>
           </div>
 
@@ -222,6 +232,7 @@ const AnalysisDetailView: React.FC<{
           </p>
         </div>
 
+        {/* 데스크톱에서는 기존 레이아웃 유지, 모바일에서는 세로 배치 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           <div className="space-y-4">
             <div className="bg-purple-50 p-4 rounded-xl border border-purple-200">
@@ -242,7 +253,8 @@ const AnalysisDetailView: React.FC<{
             />
           </div>
 
-          <div>
+          {/* 데스크톱에서만 영상 표시 */}
+          <div className="hidden md:block">
             <div ref={videoContainerRef} className="relative w-full border-2 border-purple-200 rounded-xl overflow-hidden shadow-lg aspect-video">
               <video ref={videoRef} src={record.processed_video_url} controls playsInline crossOrigin="anonymous" className="absolute top-0 left-0 w-full h-full" />
               <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />

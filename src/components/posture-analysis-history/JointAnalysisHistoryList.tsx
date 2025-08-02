@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { JointAnalysisRecord } from '@/types/analysis';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, Award, Share2, Eye, Heart, Sparkles } from 'lucide-react';
+import { Calendar, Award, Share2, Eye, Heart, Sparkles, Dog } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface JointAnalysisHistoryListProps {
