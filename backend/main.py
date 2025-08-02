@@ -194,6 +194,13 @@ def analyze_video_in_background(job_id: str, video_path: str, user_id: str, dog_
             processed_frames += 1
             jobs[job_id]['progress'] = int((processed_frames / total_frames) * 100)
 
+        # --- 💡 1단계: 가정 검증을 위한 로그 추가 ---
+        if keypoints_data and keypoints_data[0] and keypoints_data[0][0]:
+            first_frame_first_dog_keypoints = keypoints_data[0][0]
+            logger.info(f"✅ [검���] 첫 프레임의 키포인트 개수: {len(first_frame_first_dog_keypoints)}")
+            logger.info(f"✅ [검증] 키포인트 데이터 구조 (첫번째 객체): {np.array(first_frame_first_dog_keypoints).shape}")
+        # --- 💡 로그 추가 완료 ---
+
         # 2. 안정성 점수 계산
         stability_score = calculate_stability_score(keypoints_data)
 
