@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Dict, List
 from supabase import create_client, Client
 from dotenv import load_dotenv
+import re
 
 # --- 환경 변수 로드 ---
 load_dotenv()
@@ -213,10 +214,22 @@ def read_root(): return {"message": "AI 관절 추적 API"}
 @app.get("/api/health")
 def health_check(): return {"status": "ok"}
 
+import re
+
+# --- (다른 코드는 그대로) ---
+
 @app.post("/api/jobs")
 async def create_analysis_job(req: Request, bg: BackgroundTasks, file: UploadFile = File(...), user_id: str = Form(...), dog_id: str = Form(...)):
     job_id = str(uuid.uuid4())
-    upload_path = str(UPLOAD_DIR / f"{job_id}_{file.filename}")
+    
+    # ★★★ 파일 이름 정규화 로직 추가 ★★★
+    # 1. 안전한 문자만 남기고 나머지는 제거
+    safe_filename = re.sub(r'[^a-zA-Z0-9._-]', '', file.filename)
+    # 2. 연속된 점(.)을 하나로 합침
+    safe_filename = re.sub(r'\.+', '.', safe_filename).strip('.')
+    
+    upload_path = str(UPLOAD_DIR / f"{job_id}_{safe_filename}")
+    
     with open(upload_path, "wb") as buffer: shutil.copyfileobj(file.file, buffer)
     
     scheme = req.headers.get("x-forwarded-proto", "http")
@@ -224,7 +237,8 @@ async def create_analysis_job(req: Request, bg: BackgroundTasks, file: UploadFil
     base_url = f"{scheme}://{host}"
 
     jobs[job_id] = {'status': 'pending', 'progress': 0, 'base_url': base_url}
-    bg.add_task(analyze_video_in_background, job_id, upload_path, user_id, dog_id, file.filename)
+    # ★★★ 정규화된 파일 이름을 백그라운드 작업에 전달 ★★★
+    bg.add_task(analyze_video_in_background, job_id, upload_path, user_id, dog_id, safe_filename)
     return JSONResponse(status_code=202, content={"job_id": job_id})
 
 @app.get("/api/jobs/{job_id}")
