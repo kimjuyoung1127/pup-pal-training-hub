@@ -302,15 +302,15 @@ def analyze_video_in_background(job_id: str, video_path: str, user_id: str, dog_
                 count_res = supabase.table('joint_analysis_records').select('id', count='exact').eq('dog_id', dog_id).execute()
                 is_baseline = count_res.count == 0
 
-                # 4-4. 저장할 데이터 준비 (영구 URL 사용)
+                # 4-4. 저장할 데이터 준비 (새로운 점수 구조 반영)
                 record_to_insert = {
                     "user_id": user_id,
                     "dog_id": dog_id,
                     "is_baseline": is_baseline,
                     "original_video_filename": original_filename,
-                    "processed_video_url": public_url, # 임시 URL 대신 영구 URL 사용
-                    "analysis_results": analysis_results_json,
-                    "notes": f"Stability Score: {stability_score}"
+                    "processed_video_url": public_url,
+                    "analysis_results": analysis_results_json, # JSONB 컬럼에 결과 전체 저장
+                    "notes": f"안정성: {analysis_results_json['scores']['stability']}점, 허리 곧음: {analysis_results_json['scores']['curvature']:.1f}°"
                 }
                 
                 supabase.table('joint_analysis_records').insert(record_to_insert).execute()
