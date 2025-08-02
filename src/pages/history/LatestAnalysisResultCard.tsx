@@ -72,23 +72,19 @@ const LatestAnalysisResultCard: React.FC<LatestAnalysisResultCardProps> = ({ rec
             <span className="font-medium">{formattedDate}</span>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            {stabilityScore !== undefined && (
-              <div className="bg-blue-50 p-4 rounded-xl border border-blue-200 text-center">
-                <p className="text-sm font-semibold text-blue-800">자세 안정성</p>
-                <p className="text-3xl font-bold text-blue-600">
-                  {stabilityScore.toFixed(1)} <span className="text-lg">점</span>
-                </p>
-              </div>
-            )}
-            {curvatureScore !== undefined && (
-              <div className="bg-green-50 p-4 rounded-xl border border-green-200 text-center">
-                <p className="text-sm font-semibold text-green-800">허리 곧음 정도</p>
-                <p className="text-3xl font-bold text-green-600">
-                  {curvatureScore.toFixed(1)} <span className="text-lg">°</span>
-                </p>
-              </div>
-            )}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-blue-50 p-4 rounded-lg text-center">
+              <p className="text-sm font-semibold text-blue-800">자세 안정성</p>
+              <p className="text-2xl font-bold text-blue-600">
+                {record.analysis_results.scores.stability.toFixed(1)}<span className="text-lg ml-1">점</span>
+              </p>
+            </div>
+            <div className="bg-green-50 p-4 rounded-lg text-center">
+              <p className="text-sm font-semibold text-green-800">자세 점수</p>
+              <p className="text-2xl font-bold text-green-600">
+                {record.analysis_results.scores.curvature.toFixed(1)}<span className="text-lg ml-1">점</span>
+              </p>
+            </div>
           </div>
 
           <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">

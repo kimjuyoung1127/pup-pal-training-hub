@@ -87,13 +87,10 @@ const JointAnalysisHistoryList: React.FC<JointAnalysisHistoryListProps> = ({ rec
                         </div>
                       )}
                       {curvatureScore !== undefined && (
-                        <div className="flex items-center bg-green-50 p-2 rounded-lg">
-                          <Sparkles className="w-5 h-5 mr-2 text-green-600" />
-                          <span className="font-semibold text-sm text-gray-700">허리 곧음:</span>
-                          <span className="ml-2 text-lg font-bold text-green-600">
-                            {curvatureScore.toFixed(1)}°
-                          </span>
-                        </div>
+                        <div className="flex items-center justify-center bg-green-100 text-green-800 px-3 py-1 rounded-full">
+                  <Dog className="w-4 h-4 mr-2" />
+                  <span className="font-semibold">자세 {record.analysis_results.scores.curvature.toFixed(1)}점</span>
+                </div>
                       )}
                     </div>
                   </div>

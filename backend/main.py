@@ -85,7 +85,9 @@ def calculate_stability_score(keypoints_data: List[List[List[List[float]]]]) -> 
     score = max(0, 100 - (angle_std_dev * 10))
     return int(score)
 
-# --- 척추 만곡 각도 계산 함수 (V5: 벡터 내적 기반 + 이상치 제거) ---
+import math
+
+# --- 척추 만곡 각도 계산 함수 (V6: 사인 곡선 기반 점수 변환) ---
 def calculate_spine_curvature(keypoints_data: List[List[List[List[float]]]]) -> float:
     if not keypoints_data: return 0.0
     
@@ -104,48 +106,49 @@ def calculate_spine_curvature(keypoints_data: List[List[List[List[float]]]]) -> 
         shoulder_center = (np.array(dog_keypoints[l_shoulder_idx]) + np.array(dog_keypoints[r_shoulder_idx])) / 2
         hip_center = (np.array(dog_keypoints[l_hip_idx]) + np.array(dog_keypoints[r_hip_idx])) / 2
         
-        # 1. 척추선 벡터와 수평선 벡터 정의
         spine_vector = hip_center - shoulder_center
-        horizontal_vector = np.array([1, 0]) # 오른쪽을 향하는 수평선 벡터
+        horizontal_vector = np.array([1, 0])
 
-        # 2. 두 벡터의 내적을 이용해 코사인 각도 계산
         dot_product = np.dot(spine_vector, horizontal_vector)
         norm_spine = np.linalg.norm(spine_vector)
-        norm_horizontal = np.linalg.norm(horizontal_vector)
-
+        
         if norm_spine == 0: continue
 
-        cosine_angle = dot_product / (norm_spine * norm_horizontal)
+        cosine_angle = np.clip(dot_product / norm_spine, -1.0, 1.0)
+        angle_deg = np.degrees(np.arccos(cosine_angle))
         
-        # 3. 코사인 값을 각도로 변환 (0 ~ 180도)
-        angle_rad = np.arccos(np.clip(cosine_angle, -1.0, 1.0))
-        angle_deg = np.degrees(angle_rad)
-        
-        # 4. 점수화: 수평에 가까울수록 180점에 가깝게 변환
-        # 척추가 수평이면(0도 또는 180도) 180점이 되고, 수직이면(90도) 90점이 됨
-        score = 180 - abs(angle_deg - 90) * 2 if angle_deg > 90 else angle_deg * 2
-        # 위 로직보다 더 간단하고 직관적인 방법:
-        # 척추선과 수평선이 이루는 각도의 절대값은 0~180 사이. 
-        # 수평일수록 0 또는 180에 가까워짐. 
-        # 우리는 180에 가까운 값을 원하므로, 0에 가까운 값(왼쪽으로 향할때)을 180에 가깝게 바꿔준다.
-        final_score = 180 - angle_deg if angle_deg < 90 else angle_deg
-        
-        curvature_angles.append(final_score)
+        curvature_angles.append(angle_deg)
 
     if not curvature_angles: return 0.0
 
     # 이상치 제거 로직 (상/하위 10% 제거)
     if len(curvature_angles) < 10:
-        return float(np.mean(curvature_angles))
+        stable_angles = curvature_angles
+    else:
+        sorted_angles = np.sort(curvature_angles)
+        trim_count = int(len(sorted_angles) * 0.1)
+        stable_angles = sorted_angles[trim_count:-trim_count]
+        if len(stable_angles) == 0:
+            stable_angles = sorted_angles
 
-    sorted_angles = np.sort(curvature_angles)
-    trim_count = int(len(sorted_angles) * 0.1)
-    trimmed_angles = sorted_angles[trim_count:-trim_count]
+    # 안정적인 각도들의 평균 계산
+    mean_angle = float(np.mean(stable_angles))
+
+    # ★★★ 사인 곡선을 이용한 점수 변환 ★★★
+    if mean_angle < 90:
+        return 0.0
+    if mean_angle > 180:
+        mean_angle = 180
     
-    if len(trimmed_angles) == 0:
-        return float(np.mean(sorted_angles))
+    # 90~180 범위를 0~1 범위로 정규화
+    x = (mean_angle - 90) / 90
+    
+    # sin(0) = 0, sin(pi/2) = 1
+    # 사인 곡선을 이용하여 0~100점 사이의 점수로 변환
+    score = math.sin(x * math.pi / 2) * 100
+    
+    return score
 
-    return float(np.mean(trimmed_angles))
 
 # --- 실제 분석 및 저장 로직 ---
 def analyze_video_in_background(job_id: str, video_path: str, user_id: str, dog_id: str, original_filename: str):

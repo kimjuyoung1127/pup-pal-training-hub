@@ -209,8 +209,8 @@ export default function PostureAnalysisPage() {
                   <p className="text-3xl font-bold">{analysisResult.scores.stability.toFixed(1)}점</p>
                 </div>
                 <div className="text-center p-4 rounded-lg bg-green-50">
-                  <h3 className="font-bold">허리 곧음 정도</h3>
-                  <p className="text-3xl font-bold">{analysisResult.scores.curvature.toFixed(1)}°</p>
+                  <h3 className="font-bold">자세 점수</h3>
+                  <p className="text-3xl font-bold">{analysisResult.scores.curvature.toFixed(1)}점</p>
                 </div>
               </div>
               <div className="p-4 bg-gray-50 rounded-lg">

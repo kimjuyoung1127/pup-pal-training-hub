@@ -197,20 +197,20 @@ const AnalysisDetailView: React.FC<{
             </p>
           </div>
 
-          {/* 허리 곧음 정도 */}
+          {/* 자세 점수 */}
           <div className="bg-white/80 backdrop-blur-sm p-5 rounded-2xl shadow-lg border border-gray-200/80 text-center">
             <div className="flex items-center justify-center mb-3">
               <Dog className="h-7 w-7 text-green-500 mr-2" />
-              <h3 className="text-xl font-bold text-gray-800">허리 곧음 정도</h3>
+              <h3 className="text-xl font-bold text-gray-800">자세 점수</h3>
             </div>
             <div className="flex items-baseline justify-center">
               <span className="text-6xl font-extrabold bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
                 {curvatureScore?.toFixed(1) ?? '-'}
               </span>
-              <span className="text-xl font-semibold text-gray-500 ml-1">°</span>
+              <span className="text-xl font-semibold text-gray-500 ml-1">점</span>
             </div>
             <p className="text-xs text-gray-500 mt-2 break-keep">
-              180°에 가까울수록 허리가 곧게 펴진 자세예요.
+              AI가 판단한 이상적인 자세에 가까울수록 높은 점수를 받아요.
             </p>
           </div>
         </div>
