@@ -85,53 +85,50 @@ def calculate_stability_score(keypoints_data: List[List[List[List[float]]]]) -> 
     score = max(0, 100 - (angle_std_dev * 10))
     return int(score)
 
-# --- 척추 만곡 각도 계산 함수 (이상치 제거 기능 추가) ---
+# --- 척추 만곡 각도 계산 함수 (V4: 척추 수평 각도 기반 + 이상치 제거) ---
 def calculate_spine_curvature(keypoints_data: List[List[List[List[float]]]]) -> float:
     if not keypoints_data: return 0.0
-    l_shoulder_idx, r_shoulder_idx = 6, 7
-    withers_idx = 12
-    l_hip_idx, r_hip_idx = 13, 14
     
-    curvature_angles = []
+    # ★★★ 올바른 관절 번호로 수정 ★★★
+    l_shoulder_idx, r_shoulder_idx = 5, 6
+    l_hip_idx, r_hip_idx = 11, 12
+    
+    horizontal_angles = []
     for frame_keypoints in keypoints_data:
         if not frame_keypoints: continue
         dog_keypoints = frame_keypoints[0]
-        required_indices = [l_shoulder_idx, r_shoulder_idx, withers_idx, l_hip_idx, r_hip_idx]
         
+        required_indices = [l_shoulder_idx, r_shoulder_idx, l_hip_idx, r_hip_idx]
         if not (len(dog_keypoints) > max(required_indices) and all(dog_keypoints[i] for i in required_indices)):
             continue
             
+        # 어깨 중심과 엉덩이 중심 계산
         shoulder_center = (np.array(dog_keypoints[l_shoulder_idx]) + np.array(dog_keypoints[r_shoulder_idx])) / 2
-        withers = np.array(dog_keypoints[withers_idx])
         hip_center = (np.array(dog_keypoints[l_hip_idx]) + np.array(dog_keypoints[r_hip_idx])) / 2
         
-        vec_ba, vec_bc = shoulder_center - withers, hip_center - withers
+        # 척추 선 벡터 계산
+        spine_vector = shoulder_center - hip_center
         
-        if np.linalg.norm(vec_ba) == 0 or np.linalg.norm(vec_bc) == 0: continue
-            
-        cos_theta = np.clip(np.dot(vec_ba, vec_bc) / (np.linalg.norm(vec_ba) * np.linalg.norm(vec_bc)), -1.0, 1.0)
-        curvature_angles.append(np.degrees(np.arccos(cos_theta)))
+        # 수평선 대비 각도 계산 (결과가 180에 가까울수록 수평)
+        angle = np.degrees(np.arctan2(spine_vector[1], spine_vector[0]))
+        
+        # 각도를 0~180 범위로 변환 (180에 가까울수록 좋음)
+        horizontal_angle = 180 - abs(angle)
+        horizontal_angles.append(horizontal_angle)
 
-    if not curvature_angles: return 0.0
+    if not horizontal_angles: return 0.0
 
-    # ★★★ 이상치 제거 로직 ★★★
-    # 데이터가 10개 미만이면 이상치 제거를 적용하지 않음
-    if len(curvature_angles) < 10:
-        return float(np.mean(curvature_angles))
+    # 이상치 제거 로직 (상/하위 10% 제거)
+    if len(horizontal_angles) < 10:
+        return float(np.mean(horizontal_angles))
 
-    # 상위/하위 10%를 제거하기 위해 배열을 정렬
-    sorted_angles = np.sort(curvature_angles)
-    
-    # 제거할 개수 계산 (양쪽에서 10%씩)
+    sorted_angles = np.sort(horizontal_angles)
     trim_count = int(len(sorted_angles) * 0.1)
-    
-    # 양쪽 끝 값을 제거
     trimmed_angles = sorted_angles[trim_count:-trim_count]
     
     if len(trimmed_angles) == 0:
-        return float(np.mean(sorted_angles)) # 만약 모두 제거되면 원본 평균 반환
+        return float(np.mean(sorted_angles))
 
-    # 신뢰할 수 있는 값들로만 평균 계산
     return float(np.mean(trimmed_angles))
 
 # --- 실제 분석 및 저장 로직 ---
