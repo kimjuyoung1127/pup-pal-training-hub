@@ -17,11 +17,18 @@ const POLLING_INTERVAL = 2000; // 작업 상태 폴링 간격 (2초)
 
 // --- 타입 정의 ---
 type JobStatus = 'idle' | 'connecting' | 'waking_server' | 'uploading' | 'processing' | 'completed' | 'failed';
-type AnalysisResult = {
+interface AnalysisResult {
   keypoints_data: number[][][][];
   fps: number;
-  stability_score: number;
-};
+  scores: {
+    stability: number;
+    curvature: number;
+  };
+  metadata: {
+    fps: number;
+    frame_count: number;
+  };
+}
 
 export default function PostureAnalysisPage() {
   // --- 사용자 및 강아지 정보 ---
@@ -182,16 +189,22 @@ export default function PostureAnalysisPage() {
       setVideoUrl(data.original_video_url);
 
       if (data.status === 'completed') {
-        setStatus('completed');
-        setAnalysisResult(data.result);
-        clearTimeout(pollingTimer.current);
-      } else if (data.status === 'failed') {
-        setStatus('failed');
-        setError(data.error || '알 수 없는 오류로 분석에 실패했습니다.');
-        clearTimeout(pollingTimer.current);
-      } else {
-        pollingTimer.current = setTimeout(pollJobStatus, POLLING_INTERVAL);
-      }
+        const resultData: AnalysisResult = {
+                ...data.result,
+                scores: {
+                  stability: data.result.scores.stability,
+                  curvature: data.result.scores.curvature,
+                },
+              };
+              setAnalysisResult(resultData);
+              setStatus('completed');
+              setJobId(null);
+              // 분석 완료 시 isProcessing을 false로 설정
+              setIsProcessing(false);
+            } else {
+              // 아직 처리 중이면 5초 후에 다시 확인
+              setTimeout(() => pollJobStatus(jobId), 5000);
+            }
     } catch (err: any) {
       setError(err.message);
       setStatus('failed');
@@ -386,7 +399,6 @@ export default function PostureAnalysisPage() {
 
         {status === 'completed' && analysisResult && videoUrl && (
           <Card className="mt-8 overflow-hidden shadow-xl border-2 border-green-200 bg-white/90 backdrop-blur-md">
-            {/* ... (분석 완료 후 UI는 동일) ... */}
             <CardHeader className="bg-gradient-to-r from-green-100 to-blue-100 text-center">
               <CardTitle className="text-2xl font-bold text-gray-800 flex items-center justify-center">
                 <Sparkles className="mr-2 h-6 w-6 text-green-500" />
@@ -394,35 +406,50 @@ export default function PostureAnalysisPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="mb-6 p-6 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl text-center">
-                <div className="flex items-center justify-center mb-3">
-                  <Award className="h-8 w-8 text-amber-500 mr-3" />
-                  <h3 className="text-xl font-bold text-amber-800">자세 안정성 점수</h3>
-                </div>
-                <div className="flex items-center justify-center space-x-2">
-                  <span className="text-6xl font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
-                    {analysisResult.stability_score}
-                  </span>
-                  <div className="text-left">
-                    <div className="text-2xl font-bold text-amber-600">점</div>
-                    <div className="text-sm text-gray-500">/ 100점</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                {/* 자세 안정성 */}
+                <div className="bg-white/80 backdrop-blur-sm p-5 rounded-2xl shadow-lg border border-gray-200/80 text-center">
+                  <div className="flex items-center justify-center mb-3">
+                    <Award className="h-7 w-7 text-blue-500 mr-2" />
+                    <h3 className="text-xl font-bold text-gray-800">자세 안정성</h3>
                   </div>
+                  <div className="flex items-baseline justify-center">
+                    <span className="text-6xl font-extrabold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                      {analysisResult.scores.stability}
+                    </span>
+                    <span className="text-xl font-semibold text-gray-500 ml-1">점</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2 break-keep">
+                    걸음걸이의 흔들림이 적을수록 높은 점수를 받아요.
+                  </p>
                 </div>
-                <p className="text-sm text-gray-600 mt-3 flex items-center justify-center">
-                  <Heart className="mr-1 h-4 w-4 text-pink-500" />
-                  점수가 높을수록 우리 강아지의 자세가 안정적이에요!
-                </p>
-                <div className="mt-4 p-3 bg-white/70 rounded-lg">
-                  <p className="text-sm font-medium text-gray-700 break-keep">
-                    {analysisResult.stability_score >= 80 ? "✅ 분석된 영상에서는 일관된 안정성을 보여줍니다. 하지만 이 결과는 보조적인 참고 자료이며, 건강에 대한 우려가 있으시면 반드시 수의사와 상담하세요." :
-                     analysisResult.stability_score >= 60 ? "🟡 걸음걸이에서 약간의 변동성이 관찰됩니다. 주기적인 관찰을 통해 변화를 추적해보세요. 정확한 진단은 전문가의 도움이 필요합니다." :
-                     analysisResult.stability_score >= 40 ? "⚠️ 자세에 눈에 띄는 불안정성이 감지되었습니다. 이는 일시적인 현상일 수도 있지만, 빠른 시일 내에 수의사에게 전문적인 검진을 받아보시는 것을 강력히 권장합니다." :
-                     "🆘 지속적인 관찰이 필요한 수준의 불안정성이 확인되었습니다. 단순한 자세 문제가 아닐 수 있으니, 반드시 전문가와 상담하여 정확한 원인을 파악해주세요."}
+
+                {/* 허리 곧음 정도 */}
+                <div className="bg-white/80 backdrop-blur-sm p-5 rounded-2xl shadow-lg border border-gray-200/80 text-center">
+                  <div className="flex items-center justify-center mb-3">
+                    <Dog className="h-7 w-7 text-green-500 mr-2" />
+                    <h3 className="text-xl font-bold text-gray-800">허리 곧음 정도</h3>
+                  </div>
+                  <div className="flex items-baseline justify-center">
+                    <span className="text-6xl font-extrabold bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
+                      {analysisResult.scores.curvature.toFixed(1)}
+                    </span>
+                    <span className="text-xl font-semibold text-gray-500 ml-1">°</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2 break-keep">
+                    강아지가 허리를 얼마나 곧게 펴고 있는지 나타내요. 일자(180°)에 가까울수록 이상적인 자세랍니다!
                   </p>
                 </div>
               </div>
 
-              <div className="relative w-full max-w-2xl mx-auto border-2 border-gray-200 rounded-xl overflow-hidden shadow-lg">
+              {/* 종합 코멘트 */}
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
+                <p className="text-sm font-medium text-gray-700 break-keep text-center">
+                  {getOverallComment(analysisResult.scores.stability, analysisResult.scores.curvature)}
+                </p>
+              </div>
+
+              <div className="relative w-full max-w-2xl mx-auto border-2 border-gray-200 rounded-xl overflow-hidden shadow-lg mt-6">
                 <video ref={videoRef} src={videoUrl} controls playsInline crossOrigin="anonymous" className="w-full h-auto aspect-video" />
                 <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
               </div>
@@ -444,3 +471,21 @@ export default function PostureAnalysisPage() {
     </div>
   );
 }
+
+// 종합 코멘트 생성 함수
+const getOverallComment = (stability: number, curvature: number): string => {
+  const stabilityComment = stability >= 80 ? "매우 안정적인 걸음걸이" : stability >= 60 ? "준수한 걸음걸이" : "다소 불안정한 걸음걸이";
+  const curvatureComment = curvature >= 170 ? "곧게 펴진 허리" : curvature >= 155 ? "조금 웅크린 자세" : "주의가 필요한 웅크린 자세";
+
+  if (stability >= 80 && curvature >= 170) {
+    return `✅ ${stabilityComment}와 ${curvatureComment}를 모두 보여주네요! 아주 이상적인 자세입니다.`;
+  }
+  if (stability < 60 && curvature < 155) {
+    return `⚠️ ${stabilityComment}와 ${curvatureComment}가 함께 관찰됩니다. 자세에 대한 전문가의 관심이 필요해 보입니다.`;
+  }
+  return `ℹ️ 종합적으로, 우리 강아지는 ${stabilityComment}와 ${curvatureComment}를 보이고 있습니다. 꾸준한 관찰을 통해 변화를 지켜봐 주세요.`;
+};
+function setIsProcessing(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}
+

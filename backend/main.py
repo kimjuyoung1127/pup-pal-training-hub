@@ -121,6 +121,67 @@ def calculate_stability_score(keypoints_data: List[List[List[List[float]]]]) -> 
     
     return int(score)
 
+# --- 척추 만곡 각도 계산 함수 (V3: 척추 만곡 분석) ---
+def calculate_spine_curvature(keypoints_data: List[List[List[List[float]]]]) -> float:
+    """
+    척추의 굽은 정도(만곡)를 계산합니다.
+    어깨-기갑-엉덩이를 잇는 각도를 측정하며, 180도에 가까울수록 곧게 펴진 상태를 의미합니다.
+    """
+    if not keypoints_data:
+        return 0.0
+
+    # Dog-Pose 24-point model 기준 관절 인덱스
+    l_shoulder_idx, r_shoulder_idx = 6, 7
+    withers_idx = 12  # 기갑 (등 중앙점)
+    l_hip_idx, r_hip_idx = 13, 14
+
+    curvature_angles = []
+
+    for frame_keypoints in keypoints_data:
+        if not frame_keypoints:
+            continue
+        
+        dog_keypoints = frame_keypoints[0]
+        
+        # 필요한 모든 관절이 감지되었는지 확인
+        required_indices = [l_shoulder_idx, r_shoulder_idx, withers_idx, l_hip_idx, r_hip_idx]
+        if not (len(dog_keypoints) > max(required_indices) and all(dog_keypoints[i] for i in required_indices)):
+            continue
+
+        # 1. 어깨 중심점, 기갑, 엉덩이 중심점 좌표 추출
+        shoulder_center = (np.array(dog_keypoints[l_shoulder_idx]) + np.array(dog_keypoints[r_shoulder_idx])) / 2
+        withers = np.array(dog_keypoints[withers_idx])
+        hip_center = (np.array(dog_keypoints[l_hip_idx]) + np.array(dog_keypoints[r_hip_idx])) / 2
+        
+        # 2. 세 점 사이의 각도 계산 (벡터 BA와 BC의 내적 이용)
+        # B: withers, A: shoulder_center, C: hip_center
+        vec_ba = shoulder_center - withers
+        vec_bc = hip_center - withers
+
+        # 벡터 내적 공식: a · b = |a| |b| cos(theta)
+        dot_product = np.dot(vec_ba, vec_bc)
+        norm_ba = np.linalg.norm(vec_ba)
+        norm_bc = np.linalg.norm(vec_bc)
+        
+        # 0으로 나누는 것을 방지
+        if norm_ba == 0 or norm_bc == 0:
+            continue
+
+        # cos(theta) 값 계산 및 클리핑 (-1과 1 사이로 보장)
+        cos_theta = np.clip(dot_product / (norm_ba * norm_bc), -1.0, 1.0)
+        
+        # 아크코사인을 사용하여 각도(라디안) 계산 후 도로 변환
+        angle_rad = np.arccos(cos_theta)
+        angle_deg = np.degrees(angle_rad)
+        
+        curvature_angles.append(angle_deg)
+
+    if not curvature_angles:
+        return 0.0
+
+    # 3. 영상 전체 프레임의 평��� 각도를 반환
+    return float(np.mean(curvature_angles))
+
 # --- 기존 안정성 점수 계산 함수 (V1) ---
 # def calculate_stability_score(keypoints_data: List[List[List[List[float]]]]) -> int:
 #     """
@@ -201,24 +262,17 @@ def analyze_video_in_background(job_id: str, video_path: str, user_id: str, dog_
             logger.info(f"✅ [검증] 키포인트 데이터 구조 (첫번째 객체): {np.array(first_frame_first_dog_keypoints).shape}")
         # --- 💡 로그 추가 완료 ---
 
-        # 2. 안정성 점수 계산
+        # 2. 안정성 및 만곡 점수 계산
         stability_score = calculate_stability_score(keypoints_data)
+        spine_curvature_angle = calculate_spine_curvature(keypoints_data)
 
         # 3. 최종 결과 구성
-        # 기존 코드 (135-143번째 줄)
         analysis_results_json = {
             "keypoints_data": keypoints_data,
             "fps": fps,
-            "stability_score": stability_score
-        }
-        
-        # 수정된 코드 (하위 호환성 유지)
-        analysis_results_json = {
-            "keypoints_data": keypoints_data,
-            "fps": fps,
-            "stability_score": stability_score,  # 기존 구조 유지
             "scores": {
-                "stability": stability_score
+                "stability": stability_score,
+                "curvature": spine_curvature_angle
             },
             "metadata": {
                 "fps": fps,
