@@ -29,7 +29,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
       workbox: {
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB로 증설
+        // 서비스 워커가 캐시할 수 있는 파일의 최대 크기를 5MB로 설정합니다.
+        // Netlify 빌드 시 기본값(2MB)을 초과하는 청크 파일로 인해 빌드가 실패하는 문제를 해결합니다.
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
       manifest: {
         name: 'Pet-Life',
@@ -63,13 +65,18 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
+        // 코드 분할(Code Splitting) 설정을 통해 번들 크기를 최적화합니다.
+        // 라이브러리 코드를 별도의 청크 파일로 분리하여 초기 로딩 성능을 개선하고,
+        // 브라우저 캐싱 효율을 높입니다.
         manualChunks(id: string) {
           if (id.includes('node_modules')) {
-            return id
-              .toString()
-              .split('node_modules/')[1]
-              .split('/')[0]
-              .toString();
+            // React 관련 라이브러리는 'vendor-react' 청크로 그룹화합니다.
+            // 런타임 오류를 방지하기 위해 다른 라이브러리보다 먼저 로드되도록 보장합니다.
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'vendor-react';
+            }
+            // 나머지 서드파티 라이브러리는 'vendor' 청크로 그룹화합니다.
+            return 'vendor';
           }
         },
       },
