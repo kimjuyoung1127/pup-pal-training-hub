@@ -243,7 +243,7 @@ export default function PostureAnalysisPage() {
                   <div>
                     <h4 className="font-semibold text-gray-800 mb-1">🎬 분석 과정 영상 제공</h4>
                     <p className="text-sm leading-relaxed">
-                      AI가 어떻게 분석했는지 시각적으로 확인할 수 있어요. 🔍
+                      AI가 어떻게 분석했는지 시각적으로 확인할 수 있어요. . 🔍
                     </p>
                   </div>
                 </div>
@@ -253,15 +253,7 @@ export default function PostureAnalysisPage() {
               <div className="flex justify-center">
                 <img 
                   src="/posture/posture-analysis-demo.gif" 
-                  alt="자세 분석 시연 1" 
-                  className="rounded-lg shadow-lg max-w-full h-auto border border-gray-200"
-                  style={{ maxHeight: '250px' }}
-                />
-              </div>
-              <div className="flex justify-center">
-                <img 
-                  src="/posture/posture-analysis-demo2.gif" 
-                  alt="자세 분석 시연 2" 
+                  alt="자세 분석 시연" 
                   className="rounded-lg shadow-lg max-w-full h-auto border border-gray-200"
                   style={{ maxHeight: '250px' }}
                 />
