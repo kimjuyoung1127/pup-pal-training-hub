@@ -15,14 +15,14 @@ interface TrainingProgressPageProps {
   trainingProgram: TrainingProgram & { isAiTraining?: boolean };
   onNavigate: (page: string, params?: any) => void;
   onExit: () => void;
-  dogId: string; // dogId prop 추가
+  dogId: string; 
 }
 
 const TrainingProgressPage = ({ onNavigate, onExit, trainingProgram, dogId }: TrainingProgressPageProps) => {
   const [flowStep, setFlowStep] = useState(1); // 1: intro, 2: steps, 3: log, 4: summary
-  const [startTime, setStartTime] = useState<number | null>(null);
+  const [actualDuration, setActualDuration] = useState<number | null>(null);
   const [completedLog, setCompletedLog] = useState<TrainingLogType | null>(null);
-  const { addMutation } = useTrainingHistory(dogId); // dogId를 useTrainingHistory에 전달
+  const { addMutation } = useTrainingHistory(dogId);
   
   const program = trainingProgram;
 
@@ -36,18 +36,18 @@ const TrainingProgressPage = ({ onNavigate, onExit, trainingProgram, dogId }: Tr
   }
 
   const handleStart = () => {
-    setStartTime(Date.now());
     setFlowStep(2);
   };
 
-  const handleFinishSteps = () => {
+  const handleFinishTraining = (durationInSeconds: number) => {
+    setActualDuration(durationInSeconds);
     setFlowStep(3);
   }
 
   const handleSave = (result: { success: boolean; notes: string }) => {
-    if (result.success === null || !startTime) return;
+    if (result.success === null || actualDuration === null) return;
 
-    const durationMinutes = Math.round((Date.now() - startTime) / (1000 * 60));
+    const durationMinutes = Math.round(actualDuration / 60);
 
     const newLog: TrainingLogCreate = {
       training_program_id: program.isAiTraining ? null : program.id,
@@ -70,7 +70,7 @@ const TrainingProgressPage = ({ onNavigate, onExit, trainingProgram, dogId }: Tr
   const renderContent = () => {
     switch (flowStep) {
       case 1: return <TrainingIntro program={program} onStart={handleStart} />;
-      case 2: return <TrainingSteps steps={program.steps} onFinishSteps={handleFinishSteps} />;
+      case 2: return <TrainingSteps program={program} onFinish={handleFinishTraining} />;
       case 3: return <TrainingLog onSave={handleSave} isSaving={addMutation.isPending} />;
       case 4: return <TrainingSummary onNavigate={onNavigate} onExit={onExit} trainingLog={completedLog} />;
       default: return <TrainingIntro program={program} onStart={handleStart} />;

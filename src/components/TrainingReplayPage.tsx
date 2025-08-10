@@ -96,7 +96,7 @@ const TrainingReplayPage = ({ trainingLog, onExit }: TrainingReplayPageProps) =>
   const renderContent = () => {
     switch (flowStep) {
       case 1: return <TrainingIntro program={program} onStart={handleStart} />;
-      case 2: return <TrainingSteps steps={program.steps} onFinishSteps={handleFinishSteps} />;
+      case 2: return <TrainingSteps program={program} onFinish={handleFinishSteps} isReplay={true} />;
       case 3: return <TrainingSummary onNavigate={() => {}} onExit={onExit} isReplay={true} />;
       default: return <TrainingIntro program={program} onStart={handleStart} />;
     }

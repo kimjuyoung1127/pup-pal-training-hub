@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'; // useNavigate 추가
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import OnboardingPage from '@/components/OnboardingPage';
 import LoginPage from '@/components/LoginPage';
 import DashboardPage from '@/components/DashboardPage';
@@ -7,6 +7,7 @@ import DogInfoPage from '@/components/DogInfoPage';
 import DogProfilePage from '@/components/DogProfilePage';
 import SettingsPage from '@/components/SettingsPage';
 import TrainingHistoryPage from '@/components/TrainingHistoryPage';
+import TrainingReplayPage from '@/components/TrainingReplayPage'; // 추가
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
 import { useDogProfile } from '@/hooks/useDogProfile';
@@ -95,6 +96,14 @@ const AppCore: React.FC = () => {
           <Route path="history" element={<TrainingHistoryPage onNavigate={(page, params) => navigate(page, { state: params })} />} />
           <Route path="settings" element={<SettingsPage />} />
           
+          {/* 훈련 재생 페이지 라우트 추가 */}
+          <Route path="training-replay" element={
+            <TrainingReplayPage 
+              trainingLog={location.state?.trainingLog} 
+              onExit={() => navigate('/app/history')} 
+            />
+          } />
+          
           {/* Extra pages, not in header but accessible */}
           <Route path="training-recommender" element={<AiTrainingRecommender onSelectTraining={(training) => navigate(`/app/training-start/${training.id}`)} selectedTrainingTitle={''} />} />
           <Route path="posture-analysis" element={<PostureAnalysisPage />} />
@@ -106,7 +115,7 @@ const AppCore: React.FC = () => {
           {/* Auth routes */}
           <Route path="onboarding" element={<OnboardingPage onComplete={() => {
             console.log('onComplete received in AppCore Route. Navigating to /app/login...');
-            localStorage.setItem('onboardingComplete', 'true'); // 온보딩 완료 상태 저장
+            localStorage.setItem('onboardingComplete', 'true');
             navigate('/app/login');
           }} />} />
           <Route path="login" element={<LoginPage onLogin={() => navigate('/app')} />} />
