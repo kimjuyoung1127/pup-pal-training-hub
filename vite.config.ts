@@ -57,19 +57,7 @@ export default defineConfig({
       },
     }),
   ],
-  build: {
-    rollupOptions: {
-      output: {
-        // 안정성을 위해 모든 서드파티 라이브러리를 단일 'vendor' 청크로 그룹화합니다.
-        // 이는 'createContext'와 같은 라이브러리 로딩 순서 문제를 방지합니다.
-        manualChunks(id: string) {
-          if (id.includes('node_modules')) {
-            return 'vendor';
-          }
-        },
-      },
-    },
-  },
+  // build.rollupOptions.output.manualChunks 설정을 제거하여 Vite의 기본 최적화 사용
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
