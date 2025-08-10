@@ -42,7 +42,8 @@ const AnalysisDetailView: React.FC<{
   const mobileCanvasRef = useRef<HTMLCanvasElement>(null);
   const desktopVideoRef = useRef<HTMLVideoElement>(null);
   const desktopCanvasRef = useRef<HTMLCanvasElement>(null);
-  const videoContainerRef = useRef<HTMLDivElement>(null);
+  const mobileVideoContainerRef = useRef<HTMLDivElement>(null);
+  const desktopVideoContainerRef = useRef<HTMLDivElement>(null);
 
   const [isUpdating, setIsUpdating] = useState(false);
   const { toast } = useToast();
@@ -58,9 +59,9 @@ const AnalysisDetailView: React.FC<{
   const stabilityScore = analysisResult?.scores?.stability;
   const curvatureScore = analysisResult?.scores?.curvature;
 
-  const handleFullscreen = () => {
-    if (videoContainerRef.current) {
-      videoContainerRef.current.requestFullscreen().catch(err => {
+  const handleFullscreen = (ref: React.RefObject<HTMLDivElement>) => {
+    if (ref.current) {
+      ref.current.requestFullscreen().catch(err => {
         alert(`전체 화면 모드를 시작할 수 없습니다: ${err.message}`);
       });
     }
@@ -205,11 +206,11 @@ const AnalysisDetailView: React.FC<{
       <CardContent className="p-6">
         {/* 모바일에서 영상을 최상단에 배치 */}
         <div className="block md:hidden mb-6">
-          <div ref={videoContainerRef} className="relative w-full border-2 border-purple-200 rounded-xl overflow-hidden shadow-lg aspect-video">
+          <div ref={mobileVideoContainerRef} className="relative w-full border-2 border-purple-200 rounded-xl overflow-hidden shadow-lg aspect-video">
             <video ref={mobileVideoRef} src={record.processed_video_url} controls playsInline crossOrigin="anonymous" className="absolute top-0 left-0 w-full h-full" />
             <canvas ref={mobileCanvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
           </div>
-          <Button onClick={handleFullscreen} variant="outline" className="w-full mt-2"><Expand className="mr-2 h-4 w-4" /> 전체 화면으로 보기 (추적 유지)</Button>
+          <Button onClick={() => handleFullscreen(mobileVideoContainerRef)} variant="outline" className="w-full mt-2"><Expand className="mr-2 h-4 w-4" /> 전체 화면으로 보기 (추적 유지)</Button>
           <p className="text-xs text-gray-500 mt-1 text-center">자세 추적을 유지하려면 이 버튼으로 전체 화면을 실행하세요.</p>
         </div>
 
@@ -285,11 +286,11 @@ const AnalysisDetailView: React.FC<{
 
           {/* 데스크톱에서만 영상 표시 */}
           <div className="hidden md:block">
-            <div className="relative w-full border-2 border-purple-200 rounded-xl overflow-hidden shadow-lg aspect-video">
+            <div ref={desktopVideoContainerRef} className="relative w-full border-2 border-purple-200 rounded-xl overflow-hidden shadow-lg aspect-video">
               <video ref={desktopVideoRef} src={record.processed_video_url} controls playsInline crossOrigin="anonymous" className="absolute top-0 left-0 w-full h-full" />
               <canvas ref={desktopCanvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
             </div>
-            <Button onClick={handleFullscreen} variant="outline" className="w-full mt-2"><Expand className="mr-2 h-4 w-4" /> 전체 화면으로 보기 (추적 유지)</Button>
+            <Button onClick={() => handleFullscreen(desktopVideoContainerRef)} variant="outline" className="w-full mt-2"><Expand className="mr-2 h-4 w-4" /> 전체 화면으로 보기 (추적 유지)</Button>
             <p className="text-xs text-gray-500 mt-1 text-center">자세 추적을 유지하려면 이 버튼으로 전체 화면을 실행하세요.</p>
           </div>
         </div>

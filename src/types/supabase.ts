@@ -413,6 +413,7 @@ export type Database = {
       }
       dogs: {
         Row: {
+          baseline_analysis_id: null
           age: string | null
           breed: string | null
           created_at: string
