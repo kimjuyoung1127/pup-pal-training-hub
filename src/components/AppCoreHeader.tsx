@@ -28,7 +28,7 @@ const navItems = [
       key: "training-history",
       components: [
         { path: "/app/history", title: "훈련 기록 보기", description: "지난 훈련 성과와 활동 내역을 확인합니다." },
-        { path: "/app/posture-analysis-history", title: "자세 분석 기록", description: "자세 변화 추이를 그래프와 데이터로 확인하세요." },
+        { path: "/app/posture-analysis-history", title: "자세 분석 기록", description: "자세 변화 추이를 데이터로 확인하세요." },
       ]
     },
 ];

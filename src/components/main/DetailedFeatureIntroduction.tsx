@@ -68,7 +68,7 @@ export const DetailedFeatureIntroduction = () => {
   return (
     <section id="features" className="w-full py-24 md:py-32 bg-cream-50">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center mb-20">
+        <div className="text-center mb-24">
           <h2 className="text-4xl md:text-5xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 break-keep">
             Mung-Ai, AI로 완성하는 반려 생활
           </h2>
