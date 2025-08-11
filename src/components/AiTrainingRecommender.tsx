@@ -39,18 +39,21 @@ const AiTrainingRecommender = ({ onSelectTraining, trainingGoals }: AiTrainingRe
   const saveRecommendationsMutation = useSaveAiRecommendations();
 
   useEffect(() => {
+    console.log('[DEBUG] Saved recommendations loaded:', savedRecommendations);
     if (savedRecommendations && savedRecommendations.length > 0) {
-      // 가장 최근의 추천 기록만 사용합니다.
       const latestRecommendation = savedRecommendations[0];
       const parsedRecommendations = latestRecommendation.recommendations as unknown as AiTrainingProgram[];
+      console.log('[DEBUG] Parsed recommendations from saved data:', parsedRecommendations);
       setAiRecommendations(parsedRecommendations || []);
     } else {
+      console.log('[DEBUG] No saved recommendations found.');
       setAiRecommendations([]);
     }
   }, [savedRecommendations]);
 
   const recommendTrainingMutation = useMutation({
     mutationFn: async () => {
+      console.log('[DEBUG] Starting AI training recommendation mutation.');
       if (!dogInfo) throw new Error('강아지 프로필이 없습니다.');
       
       const fullProfile = { ...dogInfo, ...extendedProfile };
@@ -59,50 +62,12 @@ const AiTrainingRecommender = ({ onSelectTraining, trainingGoals }: AiTrainingRe
       delete fullProfile.created_at;
       delete fullProfile.updated_at;
       
-      // 확장된 프롬프트
-      const prompt = `당신은 반려견 행동 수정 전문가입니다.
+      console.log('[DEBUG] Training goals received:', trainingGoals);
+      console.log('[DEBUG] Full dog profile for prompt:', fullProfile);
 
-      다음 **핵심 훈련 목표**를 최우선으로 달성하기 위한 전문적이고 창의적인 맞춤형 훈련 2가지를 추천해주세요.
-      추천하는 훈련은 반드시 아래 **핵심 훈련 목표** 달성에 직접적으로 기여해야 합니다.
-      아래 **강아지 프로필**은 훈련 강도, 난이도, 주의사항 등을 설정할 때 참고용으로만 활용하세요.
-      훈련목표와 상관없는 추천은 금지
-      긍정강화, 부정강화, 긍정처벌, 부정처벌 등 복합적인 트레이닝 방법을 활용하여 훈련 계획을 세워주세요.
-
-      🎯 **핵심 훈련 목표 (가장 중요한 추천 기준):**
-      ${JSON.stringify(trainingGoals && trainingGoals.length > 0 ? trainingGoals : fullProfile.trainingGoals, null, 2)}
-
-      🐶 **강아지 프로필 (참고용):**
-      ${JSON.stringify(fullProfile, null, 2)}
+      const prompt = `당신은 반려견 행동 수정 전문가입니다.\n\n      다음 **핵심 훈련 목표**를 최우선으로 달성하기 위한 전문적이고 창의적인 맞춤형 훈련 2가지를 추천해주세요.\n      추천하는 훈련은 반드시 아래 **핵심 훈련 목표** 달성에 직접적으로 기여해야 합니다.\n      아래 **강아지 프로필**은 훈련 강도, 난이도, 주의사항 등을 설정할 때 참고용으로만 활용하세요.\n      훈련목표와 상관없는 추천은 금지\n      긍정강화, 부정강화, 긍정처벌, 부정처벌 등 복합적인 트레이닝 방법을 활용하여 훈련 계획을 세워주세요.\n\n      🎯 **핵심 훈련 목표 (가장 중요한 추천 기준):**\n      ${JSON.stringify(trainingGoals && trainingGoals.length > 0 ? trainingGoals : fullProfile.trainingGoals, null, 2)}\n\n      🐶 **강아지 프로필 (참고용):**\n      ${JSON.stringify(fullProfile, null, 2)}\n      \n      📋 훈련 하나당 반드시 다음 구조를 따르세요:\n      {\n        "title": "훈련 이름 (예: '짖음 감소를 위한 5분 집중 훈련')",\n        "description": "이 훈련은 [목표] 달성을 위한 짧은 세션입니다. 타이머와 함께 각 단계를 진행하며 반려견과의 유대감을 강화해보세요. 훈련의 목적과 강아지에게 주는 효과를 간결하고 쉽게 설명해주세요.",\n        "difficulty": "초급 | 중급 | 고급",\n        "duration": "5분에서 10분 사이에 완료할 수 있는 집중 훈련",\n        "benefits": ["훈련을 통해 얻을 수 있는 핵심 효과 3가지", "예: '짖음감소'", "예: '사회성 증가'"],\n        "equipment": ["필요한 도구 목록. 없으면 빈 배열 []", "예: '방석', '간식'"],\n        "caution": "훈련 중 주의할 점 또는 위험 요소",\n        "steps": [\n          {\n            "title": "단계 이름",\n            "instruction": "실행 방법 (예: '1분 동안 간식을 이용해 앉도록 유도하세요.')",\n            "tip": "부드러운 진행을 위한 팁 (없으면 null)",\n            "duration_seconds": 60\n          },\n          ...3~5개의 명확하고 간단한 단계...\n        ]\n      }\n      \n      🎯 응답 전체는 반드시 아래와 같은 **JSON 배열 2개**로 구성된 **JSON만 반환**하세요.\n      (설명 없이 JSON만 제공해야 합니다):\n      \n      [\n        { ...훈련1 },\n        { ...훈련2 }\n      ]\n      `;
       
-      📋 훈련 하나당 반드시 다음 구조를 따르세요:
-      {
-        "title": "훈련 이름 (예: '짖음 감소를 위한 5분 집중 훈련')",
-        "description": "이 훈련은 [목표] 달성을 위한 짧은 세션입니다. 타이머와 함께 각 단계를 진행하며 반려견과의 유대감을 강화해보세요. 훈련의 목적과 강아지에게 주는 효과를 간결하고 쉽게 설명해주세요.",
-        "difficulty": "초급 | 중급 | 고급",
-        "duration": "5분에서 10분 사이에 완료할 수 있는 집중 훈련",
-        "benefits": ["훈련을 통해 얻을 수 있는 핵심 효과 3가지", "예: '짖음감소'", "예: '사회성 증가'"],
-        "equipment": ["필요한 도구 목록. 없으면 빈 배열 []", "예: '방석', '간식'"],
-        "caution": "훈련 중 주의할 점 또는 위험 요소",
-        "steps": [
-          {
-            "title": "단계 이름",
-            "instruction": "실행 방법 (예: '1분 동안 간식을 이용해 앉도록 유도하세요.')",
-            "tip": "부드러운 진행을 위한 팁 (없으면 null)",
-            "duration_seconds": 60
-          },
-          ...3~5개의 명확하고 간단한 단계...
-        ]
-      }
-      
-      🎯 응답 전체는 반드시 아래와 같은 **JSON 배열 2개**로 구성된 **JSON만 반환**하세요.
-      (설명 없이 JSON만 제공해야 합니다):
-      
-      [
-        { ...훈련1 },
-        { ...훈련2 }
-      ]
-      `;
-      
+      console.log('[DEBUG] Generated prompt for AI:', prompt);
 
       const { data, error } = await supabase.functions.invoke('gemini-chat', {
         body: { history: [{ role: 'user', parts: [{ text: prompt }] }] },
@@ -110,65 +75,58 @@ const AiTrainingRecommender = ({ onSelectTraining, trainingGoals }: AiTrainingRe
 
       if (error) throw error;
 
-      // 응답 데이터 구조 검증 및 파싱
       if (!data || !data.content) throw new Error('AI 응답이 비어있거나 content 필드가 없습니다.');
       
-      // 응답 데이터 로깅 (디버깅용)
-      console.log('Raw AI response:', data);
+      console.log('[DEBUG] Raw AI response:', data);
       
-      // content 필드에서 JSON 문자열 추출
       const responseString = data.content;
 
-      // JSON 배열 추출 및 정제
       const cleanedResponse = responseString
         .replace(/```json\n?/g, '')
         .replace(/```/g, '')
         .trim();
 
-      // JSON 배열 범위 찾기
       const startIndex = cleanedResponse.indexOf('[');
       const endIndex = cleanedResponse.lastIndexOf(']');
       
       if (startIndex === -1 || endIndex === -1 || endIndex <= startIndex) {
-        console.error('Invalid JSON structure:', cleanedResponse);
+        console.error('[DEBUG] Invalid JSON structure:', cleanedResponse);
         throw new Error('AI 응답에서 유효한 JSON 배열을 찾을 수 없습니다.');
       }
 
-      // JSON 배열 추출 및 파싱
       let jsonString = cleanedResponse.substring(startIndex, endIndex + 1);
       
       try {
         const parsedData = JSON.parse(jsonString) as AiTrainingProgram[];
         
-        // 데이터 유효성 검증
         if (!Array.isArray(parsedData) || parsedData.length === 0) {
           throw new Error('AI 응답이 유효한 훈련 프로그램 배열이 아닙니다.');
         }
 
-        // 각 훈련 프로그램의 필수 필드 검증
         parsedData.forEach((program, index) => {
           if (!program.title || !program.description || !program.difficulty) {
             throw new Error(`훈련 프로그램 #${index + 1}에 필수 필드가 누락되었습니다.`);
           }
         });
-
+        console.log('[DEBUG] Successfully parsed AI response:', parsedData);
         return parsedData;
 
       } catch (parseError: any) {
-        console.error('JSON parsing error:', parseError, '\nJSON string:', jsonString);
+        console.error('[DEBUG] JSON parsing error:', parseError, '\nJSON string:', jsonString);
         throw new Error(`AI 응답 파싱 실패: ${parseError.message}`);
       }
     },
     onSuccess: (data) => {
+      console.log('[DEBUG] Mutation onSuccess, received data:', data);
       toast.success('AI 훈련 추천을 생성했습니다!');
-      // 새로 생성된 추천으로 상태를 완전히 교체합니다.
       setAiRecommendations(data);
       if (dogInfo?.id) {
+        console.log('[DEBUG] Saving recommendations to DB for dogId:', dogInfo.id);
         saveRecommendationsMutation.mutate({ dogId: dogInfo.id, recommendations: data });
       }
     },
     onError: (error: any) => {
-      console.error('AI recommendation error:', error);
+      console.error('[DEBUG] Mutation onError:', error);
       toast.error('AI 추천 생성에 실패했습니다.', { 
         description: error.message || '알 수 없는 오류가 발생했습니다.'
       });

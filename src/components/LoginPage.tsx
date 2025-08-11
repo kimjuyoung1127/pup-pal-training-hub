@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { isWebView } from '@/lib/utils';
 import ExternalBrowserPrompt from './ui/ExternalBrowserPrompt';
 
-const LoginPage = ({ onLogin }: { onLogin: () => void }) => {
+const LoginPage = () => {
   const [showWebViewPrompt, setShowWebViewPrompt] = useState(false);
 
   useEffect(() => {

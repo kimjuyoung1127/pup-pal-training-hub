@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrainingLog } from '@/hooks/useTrainingHistory';
 import TrainingHistoryCard from './TrainingHistoryCard';
@@ -9,8 +9,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { Zap } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import AiTrainingPlanModal from './AiTrainingPlanModal';
 
 interface TrainingHistoryListProps {
     trainingHistory: (TrainingLog & { isAiTraining?: boolean })[];
@@ -20,6 +23,10 @@ interface TrainingHistoryListProps {
 }
 
 const TrainingHistoryList = ({ trainingHistory, onEdit, onDelete, onRetry }: TrainingHistoryListProps) => {
+    const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
+
+    const dogId = trainingHistory.length > 0 ? trainingHistory[0].dog_id : null;
+
     const groupedByDate = React.useMemo(() => 
         trainingHistory.reduce((acc, log) => {
             const dateKey = format(parseISO(log.session_date), 'yyyy-MM-dd');
@@ -35,10 +42,18 @@ const TrainingHistoryList = ({ trainingHistory, onEdit, onDelete, onRetry }: Tra
         Object.keys(groupedByDate).sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
     , [groupedByDate]);
 
-    // Open the first (most recent) day by default
     const defaultOpenValue = sortedDates.length > 0 ? [`item-${sortedDates[0]}`] : [];
 
     return (
+      <div className="w-full">
+        <div className="mb-6 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+            <h2 className="text-xl font-bold text-gray-800 flex items-center"><Zap className="w-6 h-6 mr-3 text-yellow-500"/>AI 맞춤 훈련 챌린지</h2>
+            <p className="text-gray-600 mt-2 mb-4">지난 훈련 기록을 바탕으로 AI가 강아지의 다음 성장 목표를 설정하고, 맞춤형 훈련 챌린지를 생성합니다.</p>
+            <Button onClick={() => setIsPlanModalOpen(true)} className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600">
+                AI 훈련 챌린지 시작하기
+            </Button>
+        </div>
+
         <Accordion type="multiple" className="w-full space-y-4" defaultValue={defaultOpenValue}>
             <AnimatePresence initial={false}>
                 {sortedDates.map((date) => {
@@ -84,6 +99,13 @@ const TrainingHistoryList = ({ trainingHistory, onEdit, onDelete, onRetry }: Tra
                 })}
             </AnimatePresence>
         </Accordion>
+        
+        <AiTrainingPlanModal 
+            isOpen={isPlanModalOpen} 
+            onClose={() => setIsPlanModalOpen(false)} 
+            dogId={dogId} 
+        />
+      </div>
     );
 };
 

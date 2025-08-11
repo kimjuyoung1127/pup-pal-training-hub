@@ -51,3 +51,55 @@
 ### **최종 결과**
 
 모든 개발 작업이 성공적으로 완료됨. 이제 사용자는 기본 훈련 또는 AI 추천 훈련을 시작하면, 각 훈련 단계마다 내용에 맞게 설정된 개별 타이머와 함께 훈련을 진행하게 됨. 이를 통해 더욱 높은 몰입감과 성취감을 느낄 수 있는 기반이 마련됨.
+
+---
+
+## Feature Update: "AI Training Challenge" Implementation
+
+**Goal:** To provide users with a personalized, long-term training plan based on their dog's actual training history, moving beyond single recommendations.
+
+**Core Concept:** Instead of generic weekly plans, the AI analyzes the user's training history to identify a "Key Growth Target" and generates a focused, multi-phase "challenge" to help the user and their dog achieve that specific goal.
+
+---
+
+### **Phase 1: Ideation & Planning**
+
+- **Initial Request:** User requested a feature for weekly/monthly training plans based on history.
+- **Solution Design:**
+    - **Plan A (Simple Weekly):** Rejected as too generic.
+    - **Plan B (Thematic Weekly):** Considered a good improvement.
+    - **Plan C (AI Goal Challenge):** Selected as the final direction. This approach best showcases the AI's analytical capabilities by having it diagnose a key issue from data and create a tailored plan, making it a true "AI Trainer" feature.
+- **Technical Strategy:** Decided to use a single, comprehensive API call containing the recent training history to provide the AI with enough context to create a meaningful plan.
+
+---
+
+### **Phase 2: Frontend Implementation**
+
+- **UI Scaffolding:**
+    - Created a new button, "AI 훈련 챌린지 시작하기" (Start AI Training Challenge), on the training history page (`TrainingHistoryList.tsx`).
+    - Created a new modal component, `AiTrainingPlanModal.tsx`, by adapting the existing `AnalysisDetailModal` for a familiar UX. The new modal was placed in `src/components/training-history/` for code co-location.
+- **API Integration:**
+    - Implemented a `useMutation` hook within the new modal to handle the API call lifecycle (loading, success, error).
+    - Designed a new, detailed prompt for the `gemini-chat` Supabase function. The prompt instructs the AI to act as an expert trainer, analyze the provided history (JSON), identify a key goal, and return a structured 3-phase challenge plan (JSON).
+
+---
+
+### **Phase 3: Debugging & Refinement**
+
+- **Initial Problem:** The "Start Challenge" button opened the modal, but the API call to generate the plan was never triggered.
+- **Debugging Process:**
+    1.  Added detailed `console.log` statements to `AiTrainingPlanModal.tsx` to trace the component's state and data flow.
+    2.  **Log Analysis:** The logs revealed that `useTrainingHistory` hook was returning `trainingHistory: undefined` and `isLoading: false`.
+    3.  **Root Cause Identification:** The component was misinterpreting this state. It assumed loading was complete and there was no data, while the real issue was that the `useTrainingHistory` hook hadn't started its fetch yet or was disabled due to a missing `dogId` initially. A type mismatch for `dogId` (`number | null` vs `string | null`) was also identified.
+- **Resolution:**
+    1.  **Refactored `AiTrainingPlanModal.tsx`:**
+        - Corrected the `dogId` prop type to `string | null`.
+        - Modified the component to use the `status` field (`'pending'`, `'success'`, `'error'`) from the `useQuery` result within `useTrainingHistory`.
+        - This ensures the component can reliably distinguish between "loading", "load succeeded", and "load failed".
+    2.  **Improved UX:** Added a specific message for the user when the `status` is `'success'` but the `trainingHistory` array is empty, informing them that at least one training record is needed.
+
+---
+
+### **Final Outcome**
+
+The "AI Training Challenge" feature is now fully implemented and robust. It correctly fetches history, calls the AI with a detailed context, and displays a personalized, multi-step training plan. The debugging process led to more resilient code that gracefully handles edge cases like empty training histories.

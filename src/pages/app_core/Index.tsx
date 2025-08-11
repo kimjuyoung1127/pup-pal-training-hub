@@ -76,7 +76,7 @@ const AppCore: React.FC = () => {
     if (!location.pathname.startsWith('/app/login') && !location.pathname.startsWith('/app/onboarding') && !location.pathname.startsWith('/app/test-nav')) {
       const onboardingComplete = localStorage.getItem('onboardingComplete');
       return onboardingComplete 
-        ? <LoginPage onLogin={() => navigate('/app')} /> 
+        ? <LoginPage /> 
         : <OnboardingPage onComplete={() => {
             console.log('onComplete received in AppCore. Navigating to /app/login...');
             localStorage.setItem('onboardingComplete', 'true'); // 온보딩 완료 상태 저장
@@ -118,7 +118,7 @@ const AppCore: React.FC = () => {
             localStorage.setItem('onboardingComplete', 'true');
             navigate('/app/login');
           }} />} />
-          <Route path="login" element={<LoginPage onLogin={() => navigate('/app')} />} />
+          <Route path="login" element={<LoginPage />} />
 
           {/* Fallback Route */}
           <Route path="*" element={<DashboardPage runTour={runTour} setRunTour={setRunTour} startTour={startTour} />} />
