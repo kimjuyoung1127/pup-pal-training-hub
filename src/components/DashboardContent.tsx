@@ -130,14 +130,14 @@ const DashboardContent = ({ onNavigate, runTour, setRunTour }: DashboardContentP
       {/* Action Buttons - 모바일 최적화 */}
       <motion.div className="space-y-3 action-buttons" variants={itemVariants}>
         <Button 
-          onClick={() => onNavigate('dog-info')} 
+          onClick={() => navigate('/app/dog-profile')} 
           className="w-full justify-between py-4 sm:py-6 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] dog-info-button"
         >
           <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
             <div className="bg-white/20 p-1.5 sm:p-2 rounded-lg flex-shrink-0">
               <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <span className="text-sm sm:text-lg font-semibold truncate">강아지 정보 입력하기</span>
+            <span className="text-sm sm:text-lg font-semibold truncate">내 강아지 정보 보기</span>
           </div>
           <div className="text-xl sm:text-2xl flex-shrink-0">🐕</div>
         </Button>

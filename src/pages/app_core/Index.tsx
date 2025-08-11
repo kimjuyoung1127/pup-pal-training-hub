@@ -92,7 +92,7 @@ const AppCore: React.FC = () => {
         <Routes>
           <Route index element={<DashboardPage runTour={runTour} setRunTour={setRunTour} startTour={startTour} />} />
           <Route path="dog-info" element={<DogInfoPage onComplete={handleProfileComplete} dogInfoToEdit={null} />} />
-          <Route path="my-page" element={<DogProfilePage onNavigate={(page, params) => navigate(page, { state: params })} />} />
+          <Route path="dog-profile" element={<DogProfilePage onNavigate={(page, params) => navigate(page, { state: params })} />} />
           <Route path="history" element={<TrainingHistoryPage onNavigate={(page, params) => navigate(page, { state: params })} />} />
           <Route path="settings" element={<SettingsPage />} />
           
