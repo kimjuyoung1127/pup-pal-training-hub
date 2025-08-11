@@ -52,7 +52,7 @@ const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
   });
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-sky-50 to-sky-100">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-sky-50 to-sky-100 overflow-hidden">
       {/* Header with logo */}
       <div className="flex items-center justify-center pt-12 pb-8">
         <div className="flex items-center space-x-2">

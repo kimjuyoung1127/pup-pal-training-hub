@@ -14,7 +14,7 @@ import {
 
 const navItems = [
     { path: "/app", title: "홈", end: true },
-    { path: "/app/my-page", title: "내 프로필" },
+    { path: "/app/dog-profile", title: "내 프로필" },
     { 
       title: "훈련 과정", 
       key: "training-process",
