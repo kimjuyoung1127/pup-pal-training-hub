@@ -6,7 +6,7 @@ const aiSolutions = [
   { name: '견종 백과', icon: BookOpen, path: '/woofpedia', description: '수백 가지 견종의 정보를 탐색해 보세요.' },
   { name: '견종 MBTI', icon: Compass, path: '/mbti', description: '우리 강아지의 성격 유형을 알아보세요.' },
   { name: '댕댕이 궁합 테스트', icon: HeartHandshake, path: '/compatibility-test', description: '나와 꼭 맞는 운명의 댕댕이를 찾아보세요.' },
-  { name: 'AI 관절 추적', icon: Bone, path: '/joint-tracking', description: '걸음걸이를 분석하여 건강 상태를 확인해요.', isDeveloping: true },
+  { name: 'AI 자세 추적', icon: Bone, path: '/joint-tracking', description: '강아지의 자세를 분석하여 건강 상태를 확인해요.', isDeveloping: true },
 ];
 
 const AiSolutionsPage: React.FC = () => {
@@ -14,7 +14,7 @@ const AiSolutionsPage: React.FC = () => {
     <div className="min-h-screen bg-slate-50">
       <div className="container mx-auto max-w-2xl py-8 px-4">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold text-gray-800">✨ AI 솔루션 모아보기</h1>
+          <h1 className="text-4xl font-extrabold text-gray-800">✨ AI 기능 모아보기</h1>
           <p className="mt-4 text-lg text-gray-600">
             당신의 반려 생활을 더욱 스마트하고 풍요롭게 만들어 줄 특별한 기능들을 만나보세요.
           </p>

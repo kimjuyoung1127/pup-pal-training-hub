@@ -20,8 +20,8 @@ import { Home, Users, Sparkles, UserCircle, BookOpen, Compass, HeartHandshake, B
 const aiSolutions = [
   { name: '견종 백과', icon: BookOpen, path: '/breeds' },
   { name: '견종 MBTI', icon: Compass, path: '/mbti-test' },
-  { name: '댕댕이 궁합 테스트', icon: HeartHandshake, path: '/filter-wizard' },
-  { name: '전문가 영상', icon: Film, path: '/training/videos' },
+  { name: '맞춤 견종 추천', icon: HeartHandshake, path: '/filter-wizard' },
+  { name: '전문가 영상 골라보기', icon: Film, path: '/training/videos' },
 ];
 
 const trainingTools = [
@@ -38,12 +38,19 @@ const navItems = [
 ];
 
 // --- 서랍 내부 섹션 컴포넌트 ---
-const DrawerSection: React.FC<{ title: string; items: any[]; icon: React.ElementType; onClick: (item: any) => void; }> = ({ title, items, icon: SectionIcon, onClick }) => (
+const DrawerSection: React.FC<{
+  title: string;
+  description?: string;
+  items: any[];
+  icon: React.ElementType;
+  onClick: (item: any) => void;
+}> = ({ title, description, items, icon: SectionIcon, onClick }) => (
   <div>
     <div className="flex items-center px-4 pt-4 pb-2">
       <SectionIcon className="w-5 h-5 mr-2 text-gray-500" />
       <h3 className="font-semibold text-gray-600">{title}</h3>
     </div>
+    {description && <p className="px-4 pb-2 text-xs text-gray-500">{description}</p>}
     <div className="p-4 grid grid-cols-2 gap-3">
       {items.map((item) => (
         <DrawerClose asChild key={item.name}>
@@ -146,13 +153,13 @@ const WoofpediaBottomNav: React.FC = () => {
       <DrawerContent className="bg-white">
         <div className="mx-auto w-full max-w-md">
           <DrawerHeader className="text-center">
-            <DrawerTitle>✨ AI 기능 모아보기</DrawerTitle>
+            <DrawerTitle>✨ Mung-AI 기능 모아보기</DrawerTitle>
             <DrawerDescription>댕댕이 라이프를 스마트하게!</DrawerDescription>
           </DrawerHeader>
           
-          <DrawerSection title="AI 솔루션" items={aiSolutions} icon={Sparkles} onClick={handleLinkClick} />
+          <DrawerSection title="스마트 기능" items={aiSolutions} icon={Sparkles} onClick={handleLinkClick} />
           <Separator className="my-2" />
-          <DrawerSection title="AI 훈련 도구" items={trainingTools} icon={Bot} onClick={handleLinkClick} />
+          <DrawerSection title="AI 솔루션" items={trainingTools} icon={Bot} onClick={handleLinkClick} description="AI 추천, 분석 등 개인화 기능은 로그인이 필요해요!" />
 
           <DrawerFooter className="mt-4">
             <DrawerClose asChild>

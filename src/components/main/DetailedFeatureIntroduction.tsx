@@ -30,9 +30,9 @@ const features = [
   },
   {
     id: 4,
-    title: '신뢰도 높은 전문가 매거진',
+    title: '신뢰도 높은 컨텐츠',
     description:
-      '모든 콘텐츠는 수의사와 훈련 전문가의 검수를 거칩니다. AI의 기술력과 전문가의 신뢰도를 결합하여, 당신의 반려 생활을 가장 정확하고 안전한 길로 안내합니다.',
+      '모든 콘텐츠는 신뢰도 높은 정보를 AI기술 를 통해 엄선하여 제공됩니다',
     Icon: BookOpenCheck,
     image_path: '/features/4.png',
   },

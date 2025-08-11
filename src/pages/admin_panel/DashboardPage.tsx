@@ -27,7 +27,7 @@ const DashboardPage = () => {
   return (
     <div className="bg-white p-8 rounded-lg shadow-md">
       <h2 className="text-3xl font-bold mb-4">관리자 대시보드</h2>
-      <p className="text-gray-600">Pet-Life Magazine 콘텐츠 관리 시스템에 오신 것을 환영합니다.</p>
+      <p className="text-gray-600">Mung-AI Magazine 콘텐츠 관리 시스템에 오신 것을 환영합니다.</p>
       
       {isError && <div className="mt-4 text-red-500">데이터 로딩 실패: {error.message}</div>}
 

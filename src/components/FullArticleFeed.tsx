@@ -41,7 +41,7 @@ const FullArticleFeed: React.FC = () => {
   return (
     <section className="py-10 bg-white">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-8 break-keep">최신 아티클</h2>
+        <h2 className="text-3xl font-bold text-center mb-8 break-keep">최신 해외기사</h2>
         {isLoading ? (
           <p className="text-center">아티클을 불러오는 중...</p>
         ) : (
