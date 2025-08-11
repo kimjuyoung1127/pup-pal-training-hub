@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
-import { ChevronRight, Heart, BookOpen, TrendingUp } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Heart, BookOpen, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useSwipeable } from 'react-swipeable';
 
 const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -43,6 +44,13 @@ const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
     }
   };
 
+  const handlers = useSwipeable({
+    onSwipedLeft: () => nextSlide(),
+    onSwipedRight: () => prevSlide(),
+    preventScrollOnSwipe: true,
+    trackMouse: true
+  });
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-sky-50 to-sky-100">
       {/* Header with logo */}
@@ -54,7 +62,7 @@ const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
       </div>
 
       {/* Slides container */}
-      <div className="flex-1 relative overflow-hidden">
+      <div {...handlers} className="flex-1 relative overflow-hidden">
         <div 
           className="flex transition-transform duration-500 ease-out h-full"
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
@@ -78,15 +86,16 @@ const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between p-8">
+      <div className="flex items-center justify-between p-4 md:p-8">
         {/* Previous button */}
         <Button
+          size="icon"
           variant="ghost"
           onClick={prevSlide}
           disabled={currentSlide === 0}
           className="text-sky-600 hover:text-sky-800 disabled:opacity-30"
         >
-          이전
+          <ChevronLeft className="w-6 h-6" />
         </Button>
 
         {/* Page indicators */}
@@ -105,13 +114,25 @@ const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
 
         {/* Next/Start button */}
         <Button
+          size="icon"
           onClick={nextSlide}
-          className="bg-sky-600 hover:bg-sky-700 text-white flex items-center space-x-2"
+          className="bg-sky-600 hover:bg-sky-700 text-white"
         >
-          <span>{currentSlide === slides.length - 1 ? '시작하기' : '다음'}</span>
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="w-6 h-6" />
         </Button>
       </div>
+      
+      {/* Bottom action button for the last slide */}
+      {currentSlide === slides.length - 1 && (
+        <div className="p-4 md:p-8">
+          <Button
+            onClick={onComplete}
+            className="w-full bg-sky-600 hover:bg-sky-700 text-white py-4 text-lg"
+          >
+            시작하기
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
