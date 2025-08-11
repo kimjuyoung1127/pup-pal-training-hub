@@ -153,7 +153,7 @@ const DogInfoPage = ({ onComplete, dogInfoToEdit }: DogInfoPageProps) => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-2">
           <div className="text-xl">🐾</div>
-          <h1 className="text-lg font-bold text-sky-800 font-pretendard">멍멍트레이너</h1>
+          <h1 className="text-lg font-bold text-sky-800 font-pretendard">Mung-AI</h1>
         </div>
         <div className="text-sm text-sky-600 font-pretendard">
           {currentStep + 1} / 3

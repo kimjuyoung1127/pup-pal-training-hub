@@ -57,7 +57,7 @@ const OnboardingPage = ({ onComplete }: { onComplete: () => void }) => {
       <div className="flex items-center justify-center pt-12 pb-8">
         <div className="flex items-center space-x-2">
           <div className="text-2xl">🐾</div>
-          <h1 className="text-xl font-bold text-sky-800">멍멍트레이너</h1>
+          <h1 className="text-xl font-bold text-sky-800">Mung-AI</h1>
         </div>
       </div>
 
