@@ -42,6 +42,10 @@ const TrainingSummary = ({ onNavigate, onExit, newlyAwardedBadges = [], isReplay
     if (!newlyAwardedBadges || newlyAwardedBadges.length === 0) {
       const randomIndex = Math.floor(Math.random() * completionMessages.length);
       setCompletionMessage(completionMessages[randomIndex]);
+    } else {
+      // 뱃지 획득 시 메시지 설정
+      const badgeNames = newlyAwardedBadges.map(b => b.name).join(', ');
+      setCompletionMessage(`대단해요! ${badgeNames} 뱃지를 획득했어요!`);
     }
   }, [newlyAwardedBadges]);
 
@@ -78,7 +82,7 @@ const TrainingSummary = ({ onNavigate, onExit, newlyAwardedBadges = [], isReplay
       <Award className="w-20 h-20 text-sky-500 mb-4 animate-bounce-gentle" />
       <h1 className="text-3xl font-bold text-sky-800">훈련 완료!</h1>
       <p className="text-gray-600 mt-2 mb-6">
-        {newlyAwardedBadges.length === 0 && completionMessage}
+        {completionMessage}
       </p>
       
       <Card className="bg-sky-50 border-sky-200 p-4 mb-8 w-full">
