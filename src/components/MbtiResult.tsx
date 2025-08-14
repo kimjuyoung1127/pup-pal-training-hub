@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -106,7 +105,7 @@ const resizeImage = (file: File, p0: number): Promise<Blob> => {
 };
 
 // --- 공유용 결과 카드 ---
-const MbtiResultCard = React.forwardRef<HTMLDivElement, { result: any, petName: string, petImage: string | null }>(({ result, petName, petImage }, ref) => {
+const MbtiResultCard = React.forwardRef<HTMLDivElement, { result: any, petName: string, petImage: string | null, brandText: string }>(({ result, petName, petImage, brandText }, ref) => {
   return (
     <div ref={ref} className="w-[320px] bg-gradient-to-br from-orange-100 via-pink-100 to-purple-100 p-4 font-sans">
       <div className="bg-white rounded-lg shadow-lg p-4">
@@ -130,9 +129,11 @@ const MbtiResultCard = React.forwardRef<HTMLDivElement, { result: any, petName: 
         <p className="text-center text-xs text-gray-500 px-2">
           {result?.description}
         </p>
-        <div className="text-center mt-4 text-xs font-bold text-purple-600">
-          puppyvill.com
-        </div>
+        {brandText && (
+          <div className="text-center mt-4 text-xs font-bold text-purple-600">
+            {brandText}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -172,6 +173,7 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
   
   const [petName, setPetName] = useState('');
   const [petImage, setPetImage] = useState<string | null>(null);
+  const [brandText, setBrandText] = useState('puppyvill.com');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isSharing, setIsSharing] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -187,6 +189,13 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
+      
+      // HEIC/HEIF 포맷 체크 추가
+      if (file.type === 'image/heic' || file.type === 'image/heif') {
+        alert('HEIC/HEIF 형식의 이미지는 현재 지원되지 않습니다. 스크린샷을 찍거나 다른 형식(JPG, PNG)으로 변환 후 업로드해주세요.');
+        return;
+      }
+
       try {
         const resizedBlob = await resizeImage(file, 800);
         const reader = new FileReader();
@@ -196,7 +205,9 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
         reader.readAsDataURL(resizedBlob);
       } catch (error) {
         console.error("Image processing failed:", error);
-        alert('이미지 처리 중 오류가 발생했습니다. 다른 파일을 선택해주세요.');
+        // 오류 메시지를 더 자세하게 표시
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        alert(`이미지 처리 중 오류가 발생했습니다. 다른 파일을 선택해주세요.\n\n오류: ${errorMessage}`);
       }
     }
   };
@@ -264,8 +275,8 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
         buttons: [{ title: '나도 테스트하기', link: { mobileWebUrl: 'https://mungai.co.kr/mbti-test', webUrl: 'https://mungai.co.kr/mbti-test' } }],
       });
     } catch (error) {
-      console.error('카카오톡 공유 실패:', error);
-      alert('공유 이미지를 생성하는 데 실패했습니다. 다시 시도해주세요.');
+      console.error('KakaoTalk sharing failed:', error);
+      alert('Failed to generate shared image. Please try again.');
     } finally {
       setIsSharing(false);
     }
@@ -283,6 +294,10 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
               <div className="mb-4">
                 <label htmlFor="petName" className="block text-sm font-medium text-gray-700 mb-1">강아지 이름</label>
                 <Input id="petName" type="text" placeholder="예: 몽이" value={petName} onChange={(e) => setPetName(e.target.value)} className="border-purple-300 focus:ring-purple-500 focus:border-purple-500" />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="brandText" className="block text-sm font-medium text-gray-700 mb-1">브랜드 문구 (선택)</label>
+                <Input id="brandText" type="text" placeholder="예: my-brand.com" value={brandText} onChange={(e) => setBrandText(e.target.value)} className="border-purple-300 focus:ring-purple-500 focus:border-purple-500" />
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">사진 업로드 (선택)</label>
@@ -310,7 +325,7 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
             <div className="flex flex-col items-center justify-center w-full md:w-auto md:flex-shrink-0">
               <p className="text-center text-sm font-medium text-gray-700 mb-2">미리보기</p>
               <div className="flex justify-center">
-                <MbtiResultCard ref={cardRef} result={description} petName={petName} petImage={petImage} />
+                <MbtiResultCard ref={cardRef} result={description} petName={petName} petImage={petImage} brandText={brandText} />
               </div>
             </div>
           </CardContent>
@@ -344,6 +359,10 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
               <Input id="petName" type="text" placeholder="예: 몽이" value={petName} onChange={(e) => setPetName(e.target.value)} className="border-purple-300 focus:ring-purple-500 focus:border-purple-500" />
             </div>
             <div className="mb-4">
+              <label htmlFor="brandText" className="block text-sm font-medium text-gray-700 mb-1">브랜드 문구 (선택)</label>
+              <Input id="brandText" type="text" placeholder="예: my-brand.com" value={brandText} onChange={(e) => setBrandText(e.target.value)} className="border-purple-300 focus:ring-purple-500 focus:border-purple-500" />
+            </div>
+            <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">사진 업로드 (선택)</label>
               <Input id="petImage" type="file" accept="image/*" ref={imageInputRef} onChange={handleImageUpload} className="hidden" />
               <Button onClick={() => imageInputRef.current?.click()} variant="outline" className="w-full border-purple-300 text-purple-700 hover:bg-purple-100 hover:text-purple-800">
@@ -364,7 +383,7 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
           <div className="flex flex-col items-center justify-center w-full md:w-auto md:flex-shrink-0">
             <p className="text-center text-sm font-medium text-gray-700 mb-2">미리보기</p>
             <div className="flex justify-center">
-              <MbtiResultCard ref={cardRef} result={description} petName={petName} petImage={petImage} />
+              <MbtiResultCard ref={cardRef} result={description} petName={petName} petImage={petImage} brandText={brandText} />
             </div>
           </div>
         </CardContent>
