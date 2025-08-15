@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { Loader2, Upload, Download, Share2, Dog, Sparkles } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { initKakao } from '@/lib/kakao';
+import { useToast } from '@/hooks/use-toast';
 
 // --- Hooks ---
 const useMbtiDescription = (mbti: string) => {
@@ -170,6 +171,7 @@ const breedImageStyle = {
 export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onReset: () => void; }>(({ result, onReset }, ref) => {
   const { data: description, isLoading: isLoadingDesc } = useMbtiDescription(result);
   const { data: breeds, isLoading: isLoadingBreeds } = useBreedsByMbti(result);
+  const { toast } = useToast();
   
   const [petName, setPetName] = useState('');
   const [petImage, setPetImage] = useState<string | null>(null);
@@ -192,7 +194,19 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
       
       // HEIC/HEIF 포맷 체크 추가
       if (file.type === 'image/heic' || file.type === 'image/heif') {
-        alert('HEIC/HEIF 형식의 이미지는 현재 지원되지 않습니다. 스크린샷을 찍거나 다른 형식(JPG, PNG)으로 변환 후 업로드해주세요.');
+        event.preventDefault();
+        event.stopPropagation();
+        
+        toast({
+          title: "지원하지 않는 파일 형식",
+          description: "HEIC/HEIF 형식의 이미지는 현재 지원되지 않습니다. 스크린샷을 찍거나 다른 형식(JPG, PNG)으로 변환 후 업로드해주세요.",
+          variant: "destructive",
+        });
+        
+        // 파일 인풋 값을 초기화
+        if (imageInputRef.current) {
+          imageInputRef.current.value = '';
+        }
         return;
       }
 
@@ -205,9 +219,20 @@ export const MbtiResult = React.forwardRef<HTMLDivElement, { result: string; onR
         reader.readAsDataURL(resizedBlob);
       } catch (error) {
         console.error("Image processing failed:", error);
-        // 오류 메시지를 더 자세하게 표시
+        event.preventDefault();
+        event.stopPropagation();
+        
         const errorMessage = error instanceof Error ? error.message : String(error);
-        alert(`이미지 처리 중 오류가 발생했습니다. 다른 파일을 선택해주세요.\n\n오류: ${errorMessage}`);
+        toast({
+          title: "이미지 처리 오류",
+          description: `이미지 처리 중 오류가 발생했습니다. 다른 파일을 선택해주세요.\n\n오류: ${errorMessage}`,
+          variant: "destructive",
+        });
+        
+        // 파일 인풋 값을 초기화
+        if (imageInputRef.current) {
+          imageInputRef.current.value = '';
+        }
       }
     }
   };
