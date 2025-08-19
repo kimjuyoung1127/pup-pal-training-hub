@@ -56,7 +56,10 @@ const AuthRedirectHandler = () => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && !location.pathname.startsWith('/app')) {
+      // 로그인 페이지나 홈페이지에서만 자동 리디렉트
+      const autoRedirectPaths = ['/', '/login', '/signup'];
+      
+      if (event === 'SIGNED_IN' && autoRedirectPaths.includes(location.pathname)) {
         navigate('/app');
       }
       if (event === 'SIGNED_OUT') {
