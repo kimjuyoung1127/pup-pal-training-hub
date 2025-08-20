@@ -102,7 +102,7 @@ serve(async (req) => {
           - At the end, create a "📚 함께 읽으면 좋은 글" section. Select the 2-3 most relevant articles from the "Existing Article List" and list them.
 
       6.  **Add Author Byline:**
-          - At the very end, add the byline: "✍️ By [전문가 김주영](https://puppyvill.com/jason) of [Pet-Life Magazine](https://mungai.co.kr/about)"
+          - At the very end, add the byline: "✍️ By [전문가 김주영](https://puppyvill.com/jason) of Mung-AI 매거진"
 
       7.  **Final Output:** The output must be strictly in Markdown format, starting with the "Fact-Check List". Do not add any other comments or explanations.
 

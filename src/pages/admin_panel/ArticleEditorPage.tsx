@@ -106,6 +106,13 @@ const ArticleEditorPage = () => {
   };
 
   const onImageUpload = async (file: File) => {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert('이미지를 업로드하려면 로그인이 필요합니다.');
+      return Promise.reject('User not authenticated');
+    }
+
     const fileName = `${uuidv4()}-${file.name}`;
     const { error: uploadError } = await supabase.storage
       .from('articles-images')
