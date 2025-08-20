@@ -8,6 +8,7 @@ import GeminiChatPage from './components/GeminiChatPage';
 import { StagewiseToolbar } from '@stagewise/toolbar-react';
 import ReactPlugin from '@stagewise-plugins/react';
 import { useEffect } from 'react';
+import InstallPwaButton from "@/components/InstallPwaButton"; // PWA 설치 버튼 임포트
 
 // main_features
 import HomePage from './pages/main_features/HomePage';
@@ -81,6 +82,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <InstallPwaButton /> {/* PWA 설치 버튼 컴포넌트 추가 */}
       <BrowserRouter>
         <AuthRedirectHandler />
         <Routes>
