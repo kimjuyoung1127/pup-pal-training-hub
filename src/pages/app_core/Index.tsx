@@ -14,6 +14,7 @@ import { useDogProfile } from '@/hooks/useDogProfile';
 import AiTrainingRecommender from '@/components/AiTrainingRecommender';
 import AppCoreHeader from '@/components/AppCoreHeader';
 import PostureAnalysisPage from '@/pages/tools/PostureAnalysisPage';
+import RealtimePostureGuide from '@/pages/tools/RealtimePostureGuide';
 import PostureAnalysisHistoryPage from '@/pages/history/PostureAnalysisHistoryPage';
 import { TrainingProgram } from '@/lib/trainingData';
 import TrainingStartPage from '@/components/TrainingStartPage';
@@ -107,6 +108,7 @@ const AppCore: React.FC = () => {
           {/* Extra pages, not in header but accessible */}
           <Route path="training-recommender" element={<AiTrainingRecommender onSelectTraining={(training) => navigate(`/app/training-start/${training.id}`)} selectedTrainingTitle={''} />} />
           <Route path="posture-analysis" element={<PostureAnalysisPage />} />
+          
           <Route path="posture-analysis-history" element={<PostureAnalysisHistoryPage />} />
           
           {/* 훈련 시작 페이지 라우트 추가 */}
