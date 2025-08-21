@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { PoseLandmarker, FilesetResolver, DrawingUtils } from '@mediapipe/tasks-vision';
+import * as vision from '@mediapipe/tasks-vision';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Camera as CameraIcon, Info, Loader2 } from 'lucide-react';
@@ -9,16 +9,16 @@ const RealtimePostureGuide: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [feedback, setFeedback] = useState('AI 모델을 로딩하는 중입니다...');
   const [isLoading, setIsLoading] = useState(true);
-  const poseLandmarkerRef = useRef<PoseLandmarker | null>(null);
+  const poseLandmarkerRef = useRef<vision.PoseLandmarker | null>(null);
   const animationFrameId = useRef<number | null>(null);
 
   useEffect(() => {
     const createPoseLandmarker = async () => {
       try {
-        const vision = await FilesetResolver.forVisionTasks(
+        const visionResolver = await vision.FilesetResolver.forVisionTasks(
           "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
         );
-        const landmarker = await PoseLandmarker.createFromOptions(vision, {
+        const landmarker = await vision.PoseLandmarker.createFromOptions(visionResolver, {
           baseOptions: {
             modelAssetPath: `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task`,
             delegate: "GPU",
@@ -74,7 +74,7 @@ const RealtimePostureGuide: React.FC = () => {
     const canvasCtx = canvasElement.getContext('2d');
     if (!canvasCtx) return;
 
-    const drawingUtils = new DrawingUtils(canvasCtx);
+    const drawingUtils = new vision.DrawingUtils(canvasCtx);
     const nowInMs = Date.now();
     poseLandmarkerRef.current.detectForVideo(video, nowInMs, (result) => {
       canvasCtx.save();
@@ -84,7 +84,7 @@ const RealtimePostureGuide: React.FC = () => {
       if (result.landmarks && result.landmarks.length > 0) {
         const landmarks = result.landmarks[0];
         drawingUtils.drawLandmarks(landmarks, { color: '#FF0000', lineWidth: 2 });
-        drawingUtils.drawConnectors(landmarks, PoseLandmarker.POSE_CONNECTIONS, { color: '#00FF00', lineWidth: 4 });
+        drawingUtils.drawConnectors(landmarks, vision.PoseLandmarker.POSE_CONNECTIONS, { color: '#00FF00', lineWidth: 4 });
         updateFeedback(landmarks);
       } else {
         setFeedback('강아지를 화면에 맞춰주세요.');
