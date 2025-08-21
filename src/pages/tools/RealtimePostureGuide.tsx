@@ -137,7 +137,7 @@ const RealtimePostureGuide: React.FC = () => {
             <AlertTitle className="!text-blue-800 font-bold">안내</AlertTitle>
             <AlertDescription className="!text-blue-700">
               AI가 실시간으로 강아지의 자세를 인식합니다. 아래 가이드에 따라 강아지를 위치시켜주세요.
-            </AlerDescription>
+            </AlertDescription>
           </Alert>
 
           <div className="relative w-full mx-auto aspect-video bg-gray-200 rounded-lg flex items-center justify-center" style={{maxWidth: '640px'}}>
