@@ -22,6 +22,7 @@ const aiSolutions = [
   { name: '견종 MBTI', icon: Compass, path: '/mbti-test' },
   { name: '맞춤 견종 추천', icon: HeartHandshake, path: '/filter-wizard' },
   { name: '전문가 영상 골라보기', icon: Film, path: '/training/videos' },
+  { name: '자세 분석 (Test)', icon: BarChart3, path: '/posture-guide-test' },
 ];
 
 const trainingTools = [
