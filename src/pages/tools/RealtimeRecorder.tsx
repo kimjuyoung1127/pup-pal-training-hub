@@ -113,6 +113,9 @@ const RealtimeRecorder: React.FC<RealtimeRecorderProps> = ({ onRecordingComplete
     setSetupStatus('setting_up');
     setFeedback('카메라를 여는 중입니다...');
     
+    // 백엔드 서버 깨우기
+    wakeUpServer();
+
     // 1. 카메라 켜기
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
@@ -386,6 +389,29 @@ const RealtimeRecorder: React.FC<RealtimeRecorderProps> = ({ onRecordingComplete
 
 export default RealtimeRecorder;
 
-function wakeUpServer() {
-  throw new Error('Function not implemented.');
-}
+const wakeUpServer = async () => {
+  try {
+    // 환경 변수에서 API URL을 가져옵니다.
+    const apiUrl = import.meta.env.VITE_API_URL;
+    if (!apiUrl) {
+      console.warn("VITE_API_URL is not defined. Skipping server wake-up call.");
+      return;
+    }
+
+    const response = await fetch(`${apiUrl}/wakeup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Server wakeup call successful:', data);
+    } else {
+      console.error('Server wakeup call failed:', response.status, response.statusText);
+    }
+  } catch (error) {
+    console.error('Error during server wakeup call:', error);
+  }
+};

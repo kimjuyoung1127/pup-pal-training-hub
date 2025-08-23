@@ -214,9 +214,16 @@ def read_root(): return {"message": "AI 관절 추적 API"}
 @app.get("/api/health")
 def health_check(): return {"status": "ok"}
 
-import re
+@app.post("/api/wakeup")
+def wakeup_server():
+    """
+    프론트엔드에서 서버를 깨우기 위해 호출하는 엔드포인트입니다.
+    실제로는 아무 작업도 하지 않지만, 서버 인스턴스를 활성화하는 효과가 있습니다.
+    """
+    logger.info("Server wakeup call received.")
+    return {"status": "awake"}
 
-# --- (다른 코드는 그대로) ---
+import re
 
 @app.post("/api/jobs")
 async def create_analysis_job(req: Request, bg: BackgroundTasks, file: UploadFile = File(...), user_id: str = Form(...), dog_id: str = Form(...)):

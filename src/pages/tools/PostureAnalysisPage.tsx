@@ -169,7 +169,7 @@ export default function PostureAnalysisPage() {
 
   const getStatusMessage = () => ({
     'connecting': '🔗 서버에 연결하는 중...',
-    'waking_server': '💤 AI 서버를 깨우는 중... (최대 1분 소요)',
+    'waking_server': '💤 AI 서버를 깨우는 중... (최대 2분 소요)',
     'uploading': '🚀 영상을 안전하게 전송하는 중...',
     'processing': '🔍 AI가 열심히 분석 중...',
   }[status] || '✨ 자세 분석 시작하기');
