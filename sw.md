@@ -1,15 +1,2 @@
-vision_wasm_internal.js:9 
- E0821 08:43:41.905000 1819728 gl_graph_runner_internal_image.cc:68] Adding Image to stream image_in was not ok: INVALID_ARGUMENT: Graph has errors: 
-Packet timestamp mismatch on a calculator receiving from stream "free_memory". Current minimum expected timestamp is 1755765803074001 but received 1755765803074000. Are you using a custom InputStreamHandler? Note that some InputStreamHandlers allow timestamps that are not strictly monotonically increasing. See for example the ImmediateInputStreamHandler class comment. [type.googleapis.com/mediapipe.StatusList='\n\xf7\x02\x08\x03\x12\xf2\x02Packet timestamp mismatch on a calculator receiving from stream \"free_memory\". Current minimum expected timestamp is 1755765803074001 but received 1755765803074000. Are you using a custom InputStreamHandler? Note that some InputStreamHandlers allow timestamps that are not strictly monotonically increasing. See for example the ImmediateInputStreamHandler class comment.']
-=== Source Location Trace: === 
-third_party/mediapipe/framework/input_stream_manager.cc:139
-vision_wasm_internal.js:9 
- E0821 08:43:41.906000 1819728 calculator_graph.cc:858] INVALID_ARGUMENT: CalculatorGraph::Run() failed in Run: 
-Packet timestamp mismatch on a calculator receiving from stream "free_memory". Current minimum expected timestamp is 1755765803074001 but received 1755765803074000. Are you using a custom InputStreamHandler? Note that some InputStreamHandlers allow timestamps that are not strictly monotonically increasing. See for example the ImmediateInputStreamHandler class comment. [type.googleapis.com/mediapipe.StatusList='\n\xf7\x02\x08\x03\x12\xf2\x02Packet timestamp mismatch on a calculator receiving from stream \"free_memory\". Current minimum expected timestamp is 1755765803074001 but received 1755765803074000. Are you using a custom InputStreamHandler? Note that some InputStreamHandlers allow timestamps that are not strictly monotonically increasing. See for example the ImmediateInputStreamHandler class comment.']
-=== Source Location Trace: === 
-third_party/mediapipe/framework/input_stream_manager.cc:139
-vision_bundle.mjs:1 
- Uncaught Error: Encountered multiple errors: Graph has errors: 
-Packet timestamp mismatch on a calculator receiving from stream "free_memory". Current minimum expected timestamp is 1755765803074001 but received 1755765803074000. Are you using a custom InputStreamHandler? Note that some InputStreamHandlers allow timestamps that are not strictly monotonically increasing. See for example the ImmediateInputStreamHandler class comment.; Adding proto packet of type mediapipe.NormalizedRect to stream norm_rect was not ok, CalculatorGraph::Run() failed in Run: 
-Packet timestamp mismatch on a calculator receiving from stream "free_memory". Current minimum expected timestamp is 1755765803074001 but received 1755765803074000. Are you using a custom InputStreamHandler? Note that some InputStreamHandlers allow timestamps that are not strictly monotonically increasing. See for example the ImmediateInputStreamHandler class comment.; WaitUntilIdle failed
-    at predictWebcam (RealtimePostureGuide.tsx:116:31)
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5327530419834984"
+     crossorigin="anonymous"></script>
