@@ -11,6 +11,7 @@ import { useUser } from '@supabase/auth-helpers-react';
 import { useUserDogs } from '@/pages/history/useUserDogs';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import RealtimeRecorder from './RealtimeRecorder'; // RealtimeRecorder 컴포넌트 임포트
 
 // --- 상수 정의 ---
 const HEALTH_CHECK_INTERVAL = 5000;
@@ -55,6 +56,8 @@ export default function PostureAnalysisPage() {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const pollingTimer = useRef<NodeJS.Timeout>();
   const navigate = useNavigate();
+  
+  const [recordingOption, setRecordingOption] = useState<'upload' | 'record'>('upload');
 
   useEffect(() => {
     if (dogs && dogs.length > 0 && !selectedDogId) setSelectedDogId(dogs[0].id);
@@ -71,6 +74,12 @@ export default function PostureAnalysisPage() {
       resetState();
       setFile(event.target.files[0]);
     }
+  };
+
+  const handleRecordingComplete = (recordedFile: File) => {
+    resetState();
+    setFile(recordedFile);
+    setRecordingOption('upload'); // 녹화 완료 후 파일 업로드 화면으로 전환하여 선택된 파일 표시
   };
 
   const uploadFileAndStartJob = async () => {
@@ -291,56 +300,111 @@ export default function PostureAnalysisPage() {
             </Select>
           </div>
 
-          {/* 파일 업로드 */}
+          {/* 분석 방식 선택 */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">분석할 영상 업로드</label>
-            <div className="relative">
-              <Input 
-                type="file" 
-                accept="video/*" 
-                onChange={handleFileChange} 
-                disabled={status !== 'idle' && status !== 'completed' && status !== 'failed'}
-                className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-              />
-              <Upload className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            </div>
-            {file && (
-              <Badge className="bg-green-50 text-green-700 border-green-200">
-                ✅ {file.name}
-              </Badge>
-            )}
+            <label className="text-sm font-medium text-gray-700">분석 방식 선택</label>
+            <Select onValueChange={(value: 'upload' | 'record') => {
+              resetState();
+              setRecordingOption(value);
+            }} value={recordingOption}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="분석 방식을 선택하세요" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="upload">영상 파일 업로드</SelectItem>
+                <SelectItem value="record">실시간 영상 녹화</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-
-          {/* 책임 한계 조항 */}
-          <Alert variant="destructive" className="bg-yellow-50 border-yellow-400">
-            <Terminal className="h-4 w-4 !text-yellow-800" />
-            <AlertTitle className="!text-yellow-800 font-bold">책임 한계 조항</AlertTitle>
-            <AlertDescription className="!text-yellow-700">
-              본 기능은 의료적 진단을 대체할 수 없으며, 참고용 보조 지표입니다.
-            </AlertDescription>
-          </Alert>
-
-          {/* 분석 시작 버튼 */}
-          <Button 
-            onClick={handleAnalyzeClick} 
-            disabled={!file || !selectedDogId || (status !== 'idle' && status !== 'completed' && status !== 'failed')} 
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3"
-            size="lg"
-          >
-            {status !== 'idle' && status !== 'completed' && status !== 'failed' ? (
-              <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                {getStatusMessage()}
-              </>
-            ) : (
-              <>
-                <Sparkles className="mr-2 h-5 w-5" />
-                ✨ 자세 분석 시작하기
-              </>
-            )}
-          </Button>
         </CardContent>
       </Card>
+
+      {/* 선택에 따른 UI 렌더링 */}
+      {recordingOption === 'upload' ? (
+        <Card className="mt-6 shadow-xl border-2 border-purple-200 bg-white/90 backdrop-blur-md">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold flex items-center">
+              <Upload className="mr-3 h-5 w-5 text-purple-500" />
+              영상 파일 업로드
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 space-y-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">분석할 영상 파일</label>
+              <div className="relative">
+                <Input 
+                  type="file" 
+                  accept="video/*" 
+                  onChange={handleFileChange} 
+                  disabled={status !== 'idle' && status !== 'completed' && status !== 'failed'}
+                  className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                />
+                <Upload className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              </div>
+              {file && (
+                <Badge className="bg-green-50 text-green-700 border-green-200">
+                  ✅ {file.name}
+                </Badge>
+              )}
+            </div>
+
+            <Alert variant="destructive" className="bg-yellow-50 border-yellow-400">
+              <Terminal className="h-4 w-4 !text-yellow-800" />
+              <AlertTitle className="!text-yellow-800 font-bold">책임 한계 조항</AlertTitle>
+              <AlertDescription className="!text-yellow-700">
+                본 기능은 의료적 진단을 대체할 수 없으며, 참고용 보조 지표입니다.
+              </AlertDescription>
+            </Alert>
+
+            <Button 
+              onClick={handleAnalyzeClick} 
+              disabled={!file || !selectedDogId || (status !== 'idle' && status !== 'completed' && status !== 'failed')} 
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3"
+              size="lg"
+            >
+              {status !== 'idle' && status !== 'completed' && status !== 'failed' ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  {getStatusMessage()}
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-5 w-5" />
+                  ✨ 자세 분석 시작하기
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="mt-6 shadow-xl border-2 border-purple-200 bg-white/90 backdrop-blur-md">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold flex items-center">
+              <Camera className="mr-3 h-5 w-5 text-purple-500" />
+              실시간 영상 녹화
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <RealtimeRecorder onRecordingComplete={handleRecordingComplete} />
+            {file && (
+              <div className="mt-4 space-y-4">
+                <Badge className="bg-green-50 text-green-700 border-green-200">
+                  ✅ 녹화 완료: {file.name}
+                </Badge>
+                <Button 
+                  onClick={handleAnalyzeClick} 
+                  disabled={!file || !selectedDogId || (status !== 'idle' && status !== 'completed' && status !== 'failed')} 
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3"
+                  size="lg"
+                >
+                  <Sparkles className="mr-2 h-5 w-5" />
+                  녹화 영상으로 분석 시작하기
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* 진행 상황 */}
       {(status !== 'idle' && status !== 'completed' && status !== 'failed') && (

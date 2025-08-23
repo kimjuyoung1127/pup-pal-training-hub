@@ -20,7 +20,6 @@ import FindMyMatchPage from './pages/main_features/FindMyMatchPage';
 import MbtiTestPage from './pages/main_features/MbtiTestPage';
 import FilterWizardPage from './pages/main_features/FilterWizardPage';
 import TrainingVideosPage from '@/pages/main_features/TrainingVideosPage';
-import RealtimePostureGuide from '@/pages/tools/RealtimePostureGuide';
 
 // app_core
 import Index from "./pages/app_core/Index";
@@ -117,7 +116,6 @@ const App = () => (
                 <Route path="/breeds" element={<BlogPage />} /> {/* 견종 백과 경로를 BlogPage로 연결 */}
                 <Route path="/chat" element={<GeminiChatPage />} /> {/* 추가: GeminiChatPage 경로 */}
                 <Route path="/training/videos" element={<TrainingVideosPage />} />
-                <Route path="/posture-guide-test" element={<RealtimePostureGuide />} />
                 
                 {/* Mungai 핵심 기능은 /app 경로 하위에 위치하며, 이 부분만 인증 컨텍스트로 감쌉니다. */}
                 <Route path="/app/*" element={
