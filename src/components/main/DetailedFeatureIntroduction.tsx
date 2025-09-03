@@ -14,25 +14,27 @@ const features = [
   },
   {
     id: 2,
-    title: 'AI 행동 및 심리 분석',
+    title: 'AI 자세 추적',
     description:
-      '최신 AI 기술로 반려견의 관절 움직임까지 감지하는 AI가 행동의 숨은 의미를 정확히 해석합니다. 강아지의 내면의 성향을 파악하고 더 깊은 유대감을 형성하세요.',
+      '최신 AI 기술로 반려견의 관절 움직임까지 감지하는 AI가 자세를 정확히 분석합니다. 반려견의 자세를 실시간으로 모니터링해보세요.',
     Icon: BrainCircuit,
     image_path: '/features/2.png',
   },
   {
     id: 3,
-    title: 'AI 기반 맞춤형 콘텐츠',
+    title: 'AI 훈련 챗봇',
     description:
-      '당신의 관심사와 반려견의 품종, 나이, 건강 상태에 맞춰 AI가 매일 맞춤형 아티클과 팁을 제공합니다. 넘쳐나는 정보 속에서 헤매지 말고, 나에게 꼭 필요한 지식만 얻으세요.',
+      'AI 코치와 대화를 나누며 고민을 상담하고,반려견의 훈련을 도와드립니다.',
+
     Icon: Sparkles,
     image_path: '/features/3.png',
   },
   {
     id: 4,
-    title: '신뢰도 높은 컨텐츠',
+    title: '초개인화된 사료 구독 시스템',
     description:
-      '모든 콘텐츠는 신뢰도 높은 정보를 AI기술 를 통해 엄선하여 제공됩니다',
+      '반려견의 성향과 필요에 맞춘 사료를 구독하세요. AI가 분석한 데이터를 바탕으로 최적의 사료를 추천합니다.',
+
     Icon: BookOpenCheck,
     image_path: '/features/4.png',
   },
