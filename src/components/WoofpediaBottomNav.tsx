@@ -22,12 +22,13 @@ const aiSolutions = [
   { name: '견종 MBTI', icon: Compass, path: '/mbti-test' },
   { name: '맞춤 견종 추천', icon: HeartHandshake, path: '/filter-wizard' },
   { name: '전문가 영상 골라보기', icon: Film, path: '/training/videos' },
-  { name: '자세 분석 (Test)', icon: BarChart3, path: '/posture-guide-test' },
+  
 ];
 
 const trainingTools = [
   { name: '훈련 챗봇에게 물어보기', icon: MessageSquare, path: '/chat', isProtected: true, requiresDogProfile: true },
   { name: '맞춤 훈련 계획 추천', icon: Bot, path: '/app/training-recommender', isProtected: true, requiresDogProfile: true },
+  { name: 'AI 사료 추천 & 구독', icon: Bone, path: '/app/dog-food', isProtected: true, requiresDogProfile: true },
   { name: 'AI 관절 추적', icon: Bone, path: '/app/posture-analysis', isProtected: true, requiresDogProfile: true },
 ];
 

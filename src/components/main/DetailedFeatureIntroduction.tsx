@@ -6,9 +6,10 @@ import { BrainCircuit, Dog, Sparkles, BookOpenCheck } from 'lucide-react';
 const features = [
   {
     id: 1,
-    title: 'AI 견종 분석 & 추천',
+    title: 'AI 훈련 & 추천',
     description:
-      '나의 라이프스타일, 성향과 환경에 완벽하게 맞는 솔루션을 AI가 과학적으로 분석하고 추천합니다.',
+      '반려견의 정보를 입력하면, AI가 반려견에게 최적의 훈련 프로그램을 추천합니다.',
+
     Icon: Dog,
     image_path: '/features/1.png',
   },
@@ -31,7 +32,8 @@ const features = [
   },
   {
     id: 4,
-    title: '초개인화된 사료 구독 시스템',
+    title: 'AI 사료 추천 & 구독 시스템',
+
     description:
       '반려견의 성향과 필요에 맞춘 사료를 구독하세요. AI가 분석한 데이터를 바탕으로 최적의 사료를 추천합니다.',
 

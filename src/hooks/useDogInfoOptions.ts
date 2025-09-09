@@ -47,15 +47,15 @@ export const useDogInfoOptions = () => {
     const { data: healthOptionsData, isLoading: healthLoading } = useQuery({ 
         queryKey: ['health_options'], 
         queryFn: () => fetchOptions('health_status_options'),
-        staleTime: 0,
-        gcTime: 0, // Do not use cache
+        staleTime: 1000 * 60 * 60, // 1시간 동안은 캐시된 데이터 사용
+        gcTime: 1000 * 60 * 60 * 2, // 2시간 동안은 메모리에 유지
     });
 
     const { data: trainingOptionsData, isLoading: trainingLoading } = useQuery({ 
         queryKey: ['behavior_options'], 
         queryFn: () => fetchOptions('behavior_options'),
-        staleTime: 0,
-        gcTime: 0, // Do not use cache
+        staleTime: 1000 * 60 * 60, // 1시간 동안은 캐시된 데이터 사용
+        gcTime: 1000 * 60 * 60 * 2, // 2시간 동안은 메모리에 유지
     });
 
     const healthOptions = healthOptionsData?.map(o => ({ id: o.id, label: o.name, icon: healthIcons[o.name] || '❓' })) || [];

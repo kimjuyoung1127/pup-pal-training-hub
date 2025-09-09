@@ -184,7 +184,8 @@ export const useDogProfile = (): UseDogProfileReturn => {
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['dogProfile'],
     queryFn: fetchDogProfileData,
-    staleTime: 0, // 데이터를 항상 최신으로 유지
+    staleTime: 1000 * 60 * 5, // 5분 동안은 캐시된 데이터 사용
+    gcTime: 1000 * 60 * 10, // 10분 동안은 메모리에 유지
   });
 
   const { dogInfo, healthStatusNames, trainingGoalNames, trainingStats, extendedProfile, plan, plan_expiry_date } = data || {};

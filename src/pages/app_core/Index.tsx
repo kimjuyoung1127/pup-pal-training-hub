@@ -14,10 +14,11 @@ import { useDogProfile } from '@/hooks/useDogProfile';
 import AiTrainingRecommender from '@/components/AiTrainingRecommender';
 import AppCoreHeader from '@/components/AppCoreHeader';
 import PostureAnalysisPage from '@/pages/tools/PostureAnalysisPage';
-import RealtimePostureGuide from '@/pages/tools/RealtimePostureGuide';
 import PostureAnalysisHistoryPage from '@/pages/history/PostureAnalysisHistoryPage';
 import { TrainingProgram } from '@/lib/trainingData';
 import TrainingStartPage from '@/components/TrainingStartPage';
+import { DogProfileSummary, AiAnalysisReport, WeeklyMealPlan } from './dog_food';
+import DogFoodPage from './DogFoodPage';
 
 const AppCore: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -113,6 +114,10 @@ const AppCore: React.FC = () => {
           
           {/* 훈련 시작 페이지 라우트 추가 */}
           <Route path="training-start/:trainingId" element={<TrainingStartPage onNavigate={(path) => navigate(path)} />} />
+
+          {/* AI 사료 추천 페이지 추가 */}
+          <Route path="dog-food" element={<DogFoodPage />} />
+          
 
           {/* Auth routes */}
           <Route path="onboarding" element={<OnboardingPage onComplete={() => {
