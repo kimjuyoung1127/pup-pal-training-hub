@@ -61,4 +61,25 @@ export const missionCategories: MissionCategory[] = [
             { key: 'favorites', title: '최애템', question: '가장 좋아하는 간식이나 장난감은 무엇인가요?', type: 'array', placeholder: '쉼표(,)로 구분하여 입력' },
         ],
     },
+    {
+        key: 'routine',
+        title: '일상 루틴',
+        icon: '⏰',
+        missions: [
+            { key: 'active_time', title: '활발한 시간대', question: '하루중 활발한 시간대는 언제인가요?', type: 'radio', options: ['아침', '오전', '오후', '저녁', '밤', '종일 활발함', '종일 조용함'] },
+            { key: 'separation_anxiety', title: '분리 불안', question: '보호자가 외출할 때 반응이 어떤가요?', type: 'radio', options: ['매우 불안함', '약간 불안함', '보통', '평온함'] },
+            { key: 'sleep_pattern', title: '수면 패턴', question: '하루 수면 시간과 패턴은 어떤가요?', type: 'radio', options: ['새벽형 (늦게 자고 늦게 일어남)', '올빼미형 (밤에 활발하고 아침엔 조용함)', '정규형 (일정한 시간에 자고 일어남)', '낮잠을 많이 잔다', '잠이 적은 편이다'] },
+        ],
+    },
+    {
+        key: 'training',
+        title: '훈련 정보',
+        icon: '🎓',
+        missions: [
+            { key: 'known_commands', title: '알고 있는 명령어', question: '지금까지 배운 명령어들을 알려주세요.', type: 'array', placeholder: '쉼표(,)로 구분하여 입력' },
+            { key: 'training_challenges', title: '훈련 어려움', question: '어떤 훈련에서 어려움을 겪고 있나요?', type: 'array', placeholder: '쉼표(,)로 구분하여 입력' },
+            { key: 'reward_preference', title: '훈련 보상 선호도', question: '훈련할 때 어떤 보상을 제일 좋아하나요?', type: 'radio', options: ['간식', '칭찬', '장난감', '산책', '혼합'] },
+            { key: 'training_consistency', title: '훈련 일관성', question: '가족 구성원들이 훈련 방식에 얼마나 일관적인가요?', type: 'radio', options: ['매우 일관됨', '대체로 일관됨', '때때로 다름', '자주 다름'] },
+        ],
+    },
 ];

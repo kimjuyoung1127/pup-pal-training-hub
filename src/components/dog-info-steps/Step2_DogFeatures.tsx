@@ -1,13 +1,12 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input'; // Input 추가
+import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { DogInfo, dogBreeds } from '@/types/dog';
+import { DogInfo, dogBreeds, breedData } from '@/types/dog';
 
 interface Props {
   dogInfo: DogInfo;
@@ -17,6 +16,40 @@ interface Props {
 }
 
 const Step2_DogFeatures: React.FC<Props> = ({ dogInfo, setDogInfo, breedOpen, setBreedOpen }) => {
+  // Always include 0kg as minimum, and set a reasonable maximum based on breed
+  const [weightRange, setWeightRange] = useState<[number, number]>([0, 30]);
+  const [showWeightInput, setShowWeightInput] = useState(false);
+
+  // Update weight range based on breed, but always keep 0 as minimum
+  useEffect(() => {
+    if (dogInfo.breed && breedData[dogInfo.breed]) {
+      const breedInfo = breedData[dogInfo.breed];
+      // Get adult weight range as reference, but adjust for puppies
+      const adultRange = breedInfo.idealWeight.adult.male;
+      // Set max to adult weight + 20kg to accommodate growth and large breeds
+      setWeightRange([0, Math.max(30, adultRange[1] + 20)]);
+    } else {
+      // Default range - always start at 0 for puppies
+      setWeightRange([0, 30]);
+    }
+  }, [dogInfo.breed]);
+
+  // Handle weight slider change
+  const handleWeightChange = (value: number) => {
+    setDogInfo(prev => ({ ...prev, weight: value }));
+  };
+
+  // Handle manual input change
+  const handleManualInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setDogInfo(prev => ({ ...prev, weight: value === '' ? null : parseFloat(value) }));
+  };
+
+  // Toggle between slider and manual input
+  const toggleWeightInput = () => {
+    setShowWeightInput(!showWeightInput);
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
@@ -78,19 +111,68 @@ const Step2_DogFeatures: React.FC<Props> = ({ dogInfo, setDogInfo, breedOpen, se
         </div>
 
         <div>
-          <Label htmlFor="weight" className="text-gray-800 font-medium">체중 (kg)</Label>
-          <Input
-            id="weight"
-            type="number"
-            step="0.1"
-            value={dogInfo.weight ?? ''}
-            onChange={(e) => {
-              const value = e.target.value;
-              setDogInfo(prev => ({ ...prev, weight: value === '' ? null : parseFloat(value) }));
-            }}
-            placeholder="예: 5.2"
-            className="mt-2 bg-white border-2 border-sky-200 focus:border-sky-300 rounded-xl text-gray-900"
-          />
+          <div className="flex justify-between items-center mb-2">
+            <Label htmlFor="weight" className="text-gray-800 font-medium">체중 (kg)</Label>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={toggleWeightInput}
+              className="text-sky-600 hover:text-sky-800 text-xs"
+            >
+              {showWeightInput ? "슬라이더로 입력" : "직접 입력"}
+            </Button>
+          </div>
+          
+          {showWeightInput ? (
+            <Input
+              id="weight"
+              type="number"
+              step="0.1"
+              min="0"
+              value={dogInfo.weight ?? ''}
+              onChange={handleManualInputChange}
+              placeholder="예: 5.2"
+              className="mt-2 bg-white border-2 border-sky-200 focus:border-sky-300 rounded-xl text-gray-900"
+            />
+          ) : (
+            <div className="space-y-4">
+              <div className="relative pt-1">
+                <input
+                  type="range"
+                  min={weightRange[0]}
+                  max={weightRange[1]}
+                  step="0.1"
+                  value={dogInfo.weight ?? 0}
+                  onChange={(e) => handleWeightChange(parseFloat(e.target.value))}
+                  className="w-full h-2 bg-sky-200 rounded-lg appearance-none cursor-pointer accent-sky-600"
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>{weightRange[0]}kg</span>
+                  <span>{weightRange[1]}kg</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-center">
+                <div className="bg-sky-100 rounded-full w-24 h-24 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-sky-800">
+                    {dogInfo.weight !== null ? dogInfo.weight.toFixed(1) : '0.0'}kg
+                  </span>
+                </div>
+              </div>
+              
+              <div className="text-center text-xs text-gray-600 mt-2">
+                {dogInfo.breed && breedData[dogInfo.breed] ? (
+                  (() => {
+                    const breedInfo = breedData[dogInfo.breed];
+                    const adultRange = breedInfo.idealWeight.adult.male;
+                    return `참고: ${dogInfo.breed}의 성견 적정 체중은 ${adultRange[0]}~${adultRange[1]}kg 입니다 (어린 강아지는 이보다 작을 수 있습니다)`;
+                  })()
+                ) : (
+                  "어린 강아지의 경우 몇 주간 급격히 체중이 증가할 수 있습니다"
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

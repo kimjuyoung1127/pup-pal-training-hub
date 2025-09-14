@@ -8,10 +8,12 @@ import { DogInfo } from '@/types/dog';
 import Step1_BasicInfo from './dog-info-steps/Step1_BasicInfo';
 import Step2_DogFeatures from './dog-info-steps/Step2_DogFeatures';
 import Step3_TrainingGoals from './dog-info-steps/Step3_TrainingGoals';
+import ExtendedProfileCategoryStep from './dog-info-steps/ExtendedProfileCategoryStep';
 import { useDogInfoOptions } from '@/hooks/useDogInfoOptions';
 import { useSaveDogInfo } from '@/hooks/useSaveDogInfo';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
+import { missionCategories } from '@/lib/missionData';
 
 interface DogInfoPageProps {
   onComplete: (dogInfo: DogInfo) => void;
@@ -31,7 +33,8 @@ const DogInfoPage = ({ onComplete, dogInfoToEdit }: DogInfoPageProps) => {
     breed: '',
     weight: 0,
     healthStatus: [],
-    trainingGoals: []
+    trainingGoals: [],
+    extendedProfile: {}
   });
 
   useEffect(() => {
@@ -43,7 +46,11 @@ const DogInfoPage = ({ onComplete, dogInfoToEdit }: DogInfoPageProps) => {
         const months = parts[1] ? parseInt(parts[1].replace('개월', '')) || 0 : 0;
         ageObject = { years, months };
       }
-      setDogInfo({ ...dogInfoToEdit, age: ageObject });
+      setDogInfo({ 
+        ...dogInfoToEdit, 
+        age: ageObject,
+        extendedProfile: dogInfoToEdit.extendedProfile || {}
+      });
     }
   }, [dogInfoToEdit]);
 
@@ -72,7 +79,7 @@ const DogInfoPage = ({ onComplete, dogInfoToEdit }: DogInfoPageProps) => {
   };
 
   const nextStep = () => {
-    if (currentStep < 2) {
+    if (currentStep < 2 + missionCategories.length) {
       setCurrentStep(currentStep + 1);
     } else {
       saveDog(dogInfo);
@@ -94,40 +101,50 @@ const DogInfoPage = ({ onComplete, dogInfoToEdit }: DogInfoPageProps) => {
       case 2:
         return dogInfo.healthStatus.length > 0 && dogInfo.trainingGoals.length > 0;
       default:
-        return false;
+        // Extended profile steps are optional, so always allow proceeding
+        return true;
     }
   };
 
   const stepTitles = [
     '기본 정보를 알려주세요 🐕',
     '우리 아이 특징이 궁금해요 📏',
-    '어떤 훈련을 원하시나요? 🎯'
+    '어떤 훈련을 원하시나요? 🎯',
+    ...missionCategories.map(category => `${category.title}을 알려주세요 ${category.icon}`)
   ];
 
   const stepDescriptions = [
     '소중한 우리 아이의 이름과 기본 정보부터 시작해볼까요?',
     '견종과 체중 정보로 더 정확한 훈련을 추천해드릴게요!',
-    '건강 상태와 훈련 목표를 선택하면 맞춤 플랜을 만들어드려요!'
+    '건강 상태와 훈련 목표를 선택하면 맞춤 플랜을 만들어드려요!',
+    ...missionCategories.map(category => `${category.title}에 대한 정보를 입력해주세요. 더 정확한 훈련을 제공해드릴게요!`)
   ];
 
   const renderStep = () => {
-    switch(currentStep) {
-      case 0:
-        return <Step1_BasicInfo dogInfo={dogInfo} setDogInfo={setDogInfo} />;
-      case 1:
-        return <Step2_DogFeatures dogInfo={dogInfo} setDogInfo={setDogInfo} breedOpen={breedOpen} setBreedOpen={setBreedOpen} />;
-      case 2:
-        return <Step3_TrainingGoals 
-          dogInfo={dogInfo} 
-          healthOptions={healthOptions}
-          trainingGoalOptions={trainingGoalOptions}
-          handleHealthStatusChange={handleHealthStatusChange} 
-          handleTrainingGoalChange={handleTrainingGoalChange}
-          isLoading={optionsLoading}
-        />;
-      default:
-        return null;
+    if (currentStep === 0) {
+      return <Step1_BasicInfo dogInfo={dogInfo} setDogInfo={setDogInfo} />;
+    } else if (currentStep === 1) {
+      return <Step2_DogFeatures dogInfo={dogInfo} setDogInfo={setDogInfo} breedOpen={breedOpen} setBreedOpen={setBreedOpen} />;
+    } else if (currentStep === 2) {
+      return <Step3_TrainingGoals 
+        dogInfo={dogInfo} 
+        healthOptions={healthOptions}
+        trainingGoalOptions={trainingGoalOptions}
+        handleHealthStatusChange={handleHealthStatusChange} 
+        handleTrainingGoalChange={handleTrainingGoalChange}
+        isLoading={optionsLoading}
+      />;
+    } else if (currentStep >= 3 && currentStep < 3 + missionCategories.length) {
+      const categoryIndex = currentStep - 3;
+      return (
+        <ExtendedProfileCategoryStep 
+          category={missionCategories[categoryIndex]}
+          dogInfo={dogInfo}
+          setDogInfo={setDogInfo}
+        />
+      );
     }
+    return null;
   };
 
   if (showConfetti) {
@@ -156,7 +173,7 @@ const DogInfoPage = ({ onComplete, dogInfoToEdit }: DogInfoPageProps) => {
           <h1 className="text-lg font-bold text-sky-800 font-pretendard">Mung-AI</h1>
         </div>
         <div className="text-sm text-sky-600 font-pretendard">
-          {currentStep + 1} / 3
+          {currentStep + 1} / {3 + missionCategories.length}
         </div>
       </div>
 
@@ -165,7 +182,7 @@ const DogInfoPage = ({ onComplete, dogInfoToEdit }: DogInfoPageProps) => {
         <motion.div 
           className="bg-sky-500 h-2 rounded-full"
           initial={{ width: 0 }}
-          animate={{ width: `${((currentStep + 1) / 3) * 100}%` }}
+          animate={{ width: `${((currentStep + 1) / (3 + missionCategories.length)) * 100}%` }}
           transition={{ duration: 0.5, ease: "easeOut" }}
         />
       </div>
@@ -223,7 +240,10 @@ const DogInfoPage = ({ onComplete, dogInfoToEdit }: DogInfoPageProps) => {
             disabled={!canProceed() || isSaving}
             className="flex items-center space-x-2 bg-sky-600 hover:bg-sky-700 text-white font-pretendard focus:ring-0 focus:ring-offset-0"
           >
-            <span>{currentStep === 2 ? (isSaving ? '저장 중...' : '완료') : '다음'}</span>
+            <span>
+              {currentStep === 2 + missionCategories.length ? (isSaving ? '저장 중...' : '완료') : 
+               currentStep >= 3 ? '다음 카테고리' : '다음'}
+            </span>
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>

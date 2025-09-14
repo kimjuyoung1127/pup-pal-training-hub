@@ -29,6 +29,17 @@ export interface FullDogExtendedProfile {
   family_kids: boolean | null;
   family_elderly: boolean | null;
   preferred_play: string[] | null;
+  // Updated fields
+  active_time: string | null;  // New field for peak activity hours
+  separation_anxiety: string | null;
+  sleep_pattern: string | null;  // Updated to use predefined options
+  known_commands: string[] | null;
+  training_challenges: string[] | null;
+  reward_preference: string | null;
+  training_consistency: string | null;
+  energy_level: string | null;
+  physical_limitations: string | null;
+  vaccination_status: boolean | null;
   created_at: string;
   updated_at: string;
   [key: string]: any;

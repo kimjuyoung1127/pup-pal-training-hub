@@ -10,6 +10,20 @@ export interface DogInfo {
   weight: number | null;
   healthStatus: number[];
   trainingGoals: number[];
+  extendedProfile?: { 
+    [key: string]: any;
+    // Updated fields for better training recommendations
+    active_time?: string;  // New field for peak activity hours
+    separation_anxiety?: string;
+    sleep_pattern?: string;  // Updated to use predefined options
+    known_commands?: string[];
+    training_challenges?: string[];
+    reward_preference?: string;
+    training_consistency?: string;
+    energy_level?: string;
+    physical_limitations?: string;
+    vaccination_status?: boolean;
+  };
 }
 
 export type AgeGroup = 'puppy' | 'adult' | 'senior';
