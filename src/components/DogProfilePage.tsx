@@ -11,7 +11,6 @@ import TrainingGoalsCard from './dog-profile/TrainingGoalsCard';
 import TrainingStats from './dog-profile/TrainingStats';
 import QuickActions from './dog-profile/QuickActions';
 import DeleteProfileDialog from './dog-profile/DeleteProfileDialog';
-import GrowthMissionBoard from './dog-profile/GrowthMissionBoard';
 import { Card } from '@/components/ui/card'; // Card 컴포넌트 import 추가
 import { DogInfo, AgeGroup, GenderKey, breedData } from '@/types/dog'; // 타입 및 데이터 import 추가
 
@@ -185,15 +184,6 @@ const DogProfilePage = ({ onNavigate }: DogProfilePageProps) => {
           <TrainingStats stats={trainingStats} />
         </motion.div>
         
-        <motion.div
-          className="mission-board-section" // Joyride 타겟을 위한 클래스 추가
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <GrowthMissionBoard extendedProfile={extendedProfile} dogId={dogInfo.id} onUpdate={refetchDogProfile} />
-        </motion.div>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

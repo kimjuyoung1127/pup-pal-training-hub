@@ -1,0 +1,57 @@
+# .github/workflows/content_generation.yml
+
+name: AI Content Generation Pipeline
+
+on:
+  schedule:
+    # 매일 KST 기준 저녁 8시에 실행 (UTC 11시)
+    - cron: '0 11 * * *'
+  # 수동으로 실행할 수 있도록 workflow_dispatch 이벤트 추가
+  workflow_dispatch:
+
+jobs:
+  generate-content:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 저장소 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # PR 생성을 위해 토큰을 사용
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # 모든 브랜치와 히스토리를 가져옴
+          fetch-depth: 0 
+
+      # 2. Node.js 환경 설정
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+          cache-dependency-path: src/pages/community/agent/package-lock.json
+
+      # 3. Agent 디렉토리로 이동하여 의존성 설치
+      - name: Install dependencies
+        run: |
+          cd src/pages/community/agent
+          npm ci
+
+      # 4. TypeScript 컴파일
+      - name: Compile TypeScript
+        run: |
+          cd src/pages/community/agent
+          npx tsc
+
+      # 5. 환경변수 설정 (Ollama 서버 주소, GitHub Token)
+      #    이 값들은 GitHub Repository Secrets에 저장되어야 합니다.
+      #    Settings -> Secrets and variables -> Actions 에서 설정
+      - name: Set environment variables
+        run: |
+          echo "OLLAMA_HOST=${{ secrets.OLLAMA_HOST }}" >> $GITHUB_ENV
+          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+
+      # 6. 파이프라인 실행
+      - name: Run Content Generation Pipeline
+        run: |
+          cd src/pages/community/agent
+          node dist/main.js

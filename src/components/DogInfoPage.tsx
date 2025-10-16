@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Save } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { DogInfo } from '@/types/dog';
 import Step1_BasicInfo from './dog-info-steps/Step1_BasicInfo';
@@ -14,6 +14,7 @@ import { useSaveDogInfo } from '@/hooks/useSaveDogInfo';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
 import { missionCategories } from '@/lib/missionData';
+import { useNavigate } from 'react-router-dom';
 
 interface DogInfoPageProps {
   onComplete: (dogInfo: DogInfo) => void;
@@ -25,6 +26,7 @@ const DogInfoPage = ({ onComplete, dogInfoToEdit }: DogInfoPageProps) => {
   const [breedOpen, setBreedOpen] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const { width, height } = useWindowSize();
+  const navigate = useNavigate();
 
   const [dogInfo, setDogInfo] = useState<DogInfo>({
     name: '',
@@ -92,18 +94,29 @@ const DogInfoPage = ({ onComplete, dogInfoToEdit }: DogInfoPageProps) => {
     }
   };
 
+  // 현재까지 입력한 정보를 저장하고 프로필 페이지로 이동
+  const saveAndExit = () => {
+    saveDog(dogInfo);
+    // 저장이 완료되면 onComplete가 호출되어 자동으로 프로필 페이지로 이동
+  };
+
   const canProceed = () => {
     switch (currentStep) {
       case 0:
         return dogInfo.name && dogInfo.age && dogInfo.gender;
       case 1:
-        return dogInfo.breed && dogInfo.weight;
+        return dogInfo.breed && dogInfo.weight !== null;
       case 2:
         return dogInfo.healthStatus.length > 0 && dogInfo.trainingGoals.length > 0;
       default:
         // Extended profile steps are optional, so always allow proceeding
         return true;
     }
+  };
+
+  // 최소한의 필수 정보가 있는지 확인 (저장 버튼 활성화용)
+  const canSave = () => {
+    return dogInfo.name && dogInfo.breed;
   };
 
   const stepTitles = [
@@ -172,8 +185,21 @@ const DogInfoPage = ({ onComplete, dogInfoToEdit }: DogInfoPageProps) => {
           <div className="text-xl">🐾</div>
           <h1 className="text-lg font-bold text-sky-800 font-pretendard">Mung-AI</h1>
         </div>
-        <div className="text-sm text-sky-600 font-pretendard">
-          {currentStep + 1} / {3 + missionCategories.length}
+        <div className="flex items-center space-x-2">
+          {/* Save and Exit Button - Compact version */}
+          <Button
+            onClick={saveAndExit}
+            disabled={!canSave() || isSaving}
+            variant="outline"
+            size="sm"
+            className="flex items-center space-x-1 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-300 font-pretendard focus:ring-0 focus:ring-offset-0 h-8 px-2"
+          >
+            <Save className="w-4 h-4" />
+            <span className="text-xs">임시 저장</span>
+          </Button>
+          <div className="text-sm text-sky-600 font-pretendard">
+            {currentStep + 1} / {3 + missionCategories.length}
+          </div>
         </div>
       </div>
 

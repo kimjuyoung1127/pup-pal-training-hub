@@ -1,33 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 
 const HeroSection: React.FC = () => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const highResImageSrc = "/hero/images/1.png";
-  const lowResImageSrc = "/hero/images/1-placeholder.png"; // 가정: 작고 흐린 버전의 이미지
-
-  useEffect(() => {
-    const img = new Image();
-    img.src = highResImageSrc;
-    img.onload = () => {
-      setIsLoaded(true);
-    };
-  }, [highResImageSrc]);
+  // 준비된 이미지 경로에 맞게 변수 업데이트
+  const highResImageDesktop = "/hero/images/1-desktop.png";
+  const highResImageMobile = "/hero/images/1-mobile.webp";
+  const lowResImagePlaceholder = "/hero/images/1-placeholder.png";
 
   return (
     <section className="relative h-[75vh] min-h-[500px] w-full flex items-center justify-center text-center text-white overflow-hidden">
       {/* Background Image Container */}
-      <div 
-        className="absolute inset-0 z-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${lowResImageSrc})` }}
-      >
-        <img 
-          src={highResImageSrc}
-          alt="행복한 강아지와 주인" 
-          className={`w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+      <div className="absolute inset-0 z-0">
+        {/* 저해상도 플레이스홀더 이미지: 흐릿한 배경을 즉시 보여줌 */}
+        <img
+          src={lowResImagePlaceholder}
+          alt=""
+          aria-hidden="true"
+          className="w-full h-full object-cover"
         />
+        {/* picture 태그로 반응형 이미지 최적화 */}
+        <picture className="absolute inset-0">
+          {/* 모바일용 WebP 이미지 소스 (768px 이하) */}
+          <source media="(max-width: 768px)" srcSet={highResImageMobile} type="image/webp" />
+          {/* 데스크톱용 PNG 이미지 소스 (769px 이상) */}
+          <source media="(min-width: 769px)" srcSet={highResImageDesktop} type="image/png" />
+          {/* 기본 이미지 (picture 미지원 브라우저 또는 기본값) */}
+          <img
+            src={highResImageDesktop}
+            alt="행복한 강아지와 주인"
+            loading="eager"
+            fetchPriority="high"
+            className="w-full h-full object-cover absolute inset-0 transition-opacity duration-700 ease-in-out opacity-0"
+            onLoad={(e) => {
+              e.currentTarget.style.opacity = '1';
+            }}
+          />
+        </picture>
       </div>
       {/* Solid overlay for perfect text readability */}
       <div className="absolute inset-0 bg-black/50"></div>
