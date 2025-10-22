@@ -17,7 +17,7 @@ type MbtiDimension = 'E' | 'I' | 'S' | 'N' | 'T' | 'F' | 'J' | 'P';
 // A모드: 나와 잘 맞는 견종 찾기 질문
 const questions = [
   { question: "주말에 주로 무엇을 하시나요?", choiceA: { text: "친구들과 약속! 밖에서 에너지 충전! 🔥", type: 'E' }, choiceB: { text: "집에서 휴식... 조용한 게 최고! 🏠", type: 'I' } },
-  { question: "새로운 장소에 가는 것을 좋아하시나요?", choiceA: { text: "네, 새로운 경험은 언제나 환영이죠! ✨", type: 'N' }, choiceB: { text: "아니요, 익숙하고 편안한 곳이 좋아요. 😌", type: 'S' } },
+  { question: "새로운 장소에 가는 것을 좋아하시나요?", choiceA: { text: "새로운 경험은 언제나 환영이죠! ✨", type: 'N' }, choiceB: { text: "아니요, 익숙하고 편안한 곳이 좋아요. 😌", type: 'S' } },
   { question: "반려견의 문제를 해결할 때, 가장 먼저 하는 것은?", choiceA: { text: "객관적인 정보와 데이터를 찾아본다. 📊", type: 'T' }, choiceB: { text: "다른 사람들의 경험담과 조언을 구한다. ❤️", type: 'F' } },
   { question: "여행 계획을 세울 때 당신은?", choiceA: { text: "분 단위로 엑셀에 정리해야 마음이 편안~ ✈️", type: 'J' }, choiceB: { text: "비행기 표만 끊고 나머지는 즉흥적으로! 🗺️", type: 'P' } },
   { question: "친구와 갈등이 생겼을 때, 어떻게 해결하시나요?", choiceA: { text: "솔직하게 내 감정을 이야기하고 공감을 구한다. 😢", type: 'F' }, choiceB: { text: "무엇이 문제인지 논리적으로 분석하고 해결책을 찾는다. 🧠", type: 'T' } },
