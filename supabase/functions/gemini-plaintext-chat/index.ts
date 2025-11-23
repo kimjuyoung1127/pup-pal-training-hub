@@ -50,36 +50,77 @@ serve(async (req) => {
         status: 400,
       })
     }
+
+    // Validate history format
+    if (!Array.isArray(history)) {
+      return new Response(JSON.stringify({ error: 'History must be an array' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      })
+    }
+
+    // Validate each history item structure
+    for (const item of history) {
+      if (!item.role || !item.parts) {
+        return new Response(JSON.stringify({ error: 'Each message must have role and parts' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        })
+      }
+      
+      if (!Array.isArray(item.parts) || item.parts.length === 0) {
+        return new Response(JSON.stringify({ error: 'Parts must be a non-empty array' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        })
+      }
+      
+      // Check if text content exists and is not empty
+      if (!item.parts[0].text || typeof item.parts[0].text !== 'string' || item.parts[0].text.trim() === '') {
+        return new Response(JSON.stringify({ error: 'Text content is required and cannot be empty' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        })
+      }
+    }
     
     const contents = history;
+
+    // Log the request payload for debugging
+    console.log('Sending request to Gemini with contents:', JSON.stringify(contents, null, 2));
+
+    const requestBody = {
+      contents: contents,
+      systemInstruction: {
+        parts: [
+          { text: "You are a helpful and friendly dog training coach. Respond in plain text, not JSON." } // 시스템 프롬프트 수정
+        ]
+      },
+      generationConfig: {
+          responseMimeType: 'text/plain', // 응답 타입을 text/plain으로 변경
+          temperature: 0.8,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 2048, // 일반 챗봇이므로 토큰 수 조정
+      },
+      safetySettings: [
+          { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE" },
+          { "category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE" },
+          { "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE" },
+          { "category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE" }
+      ]
+    };
 
     const response = await fetchWithRetry(API_URL, { // 기존 fetch를 fetchWithRetry로 교체
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        contents: contents,
-        systemInstruction: {
-          parts: [
-            { text: "You are a helpful and friendly dog training coach. Respond in plain text, not JSON." } // 시스템 프롬프트 수정
-          ]
-        },
-        generationConfig: {
-            responseMimeType: 'text/plain', // 응답 타입을 text/plain으로 변경
-            temperature: 0.8,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 2048, // 일반 챗봇이므로 토큰 수 조정
-        },
-        safetySettings: [
-            { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE" },
-            { "category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE" },
-            { "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE" },
-            { "category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE" }
-        ]
-      }),
+      body: JSON.stringify(requestBody),
     })
+
+    console.log('Gemini API response status:', response.status);
+    console.log('Gemini API response headers:', Object.fromEntries(response.headers.entries()));
 
     if (!response) { // fetchWithRetry가 null을 반환하는 경우 (모든 재시도 실패)
         throw new Error("AI 서비스가 응답하지 않습니다. 잠시 후 다시 시도해주세요.");
