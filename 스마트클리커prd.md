@@ -18,7 +18,7 @@
 - **데이터 페칭/캐싱**: Tanstack Query (React Query)
 - **폼 관리**: React Hook Form & Zod
 - **백엔드 (BaaS)**: Supabase
-- **결제 연동**: Bootpay, Toss Payments
+- **결제 연동**: 구현예정
 - **애니메이션/UX**: Framer Motion, React Joyride
 - **배포**: Netlify
 - **패키지 매니저**: npm / bun
@@ -61,7 +61,6 @@ C:/Users/gmdqn/AI/
 - 사용자 인증 및 프로필
 - 콘텐츠 피드
 - 구독 및 결제
-- AI 스마트 훈련기 (웨어러블 클리커와 디스펜서를 활용한 듀얼 모드 훈련 시스템)
 
 ## 개발 지침
 
